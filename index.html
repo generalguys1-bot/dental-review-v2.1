@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>리뷰 작성</title>
+<link rel="stylesheet" as="style" crossorigin
+  href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<style>
+  :root{
+    --bg:#F3F6F4; --surface:#FFFFFF; --deep:#163832; --deep-light:#2C5D54;
+    --text:#1B2624; --muted:#5B6B67; --gold:#C89B3C; --gold-soft:#EADFC2;
+    --border:#E1E8E5; --radius:18px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg); color:var(--text);
+    font-family:'Pretendard',-apple-system,BlinkMacSystemFont,sans-serif;
+    -webkit-font-smoothing:antialiased; min-height:100vh;
+    display:flex; justify-content:center; padding-bottom:110px;
+  }
+  .app{ width:100%; max-width:480px; padding:28px 20px 24px; }
+  .clinic-name{ font-size:13px; font-weight:600; letter-spacing:.02em; color:var(--deep-light); margin:0 0 6px; }
+  h1{ font-size:24px; font-weight:800; line-height:1.35; margin:0 0 4px; color:var(--deep); }
+  .sub{ font-size:14px; color:var(--muted); margin:0 0 22px; }
+  .smile-wrap{ display:flex; flex-direction:column; align-items:center; margin-bottom:26px; }
+  .smile-track{ fill:none; stroke:var(--border); stroke-width:6; stroke-linecap:round; }
+  .smile-fill{ fill:none; stroke:var(--gold); stroke-width:6; stroke-linecap:round; transition:stroke-dashoffset .5s cubic-bezier(.4,0,.2,1); }
+  .smile-label{ font-size:12px; color:var(--muted); margin-top:6px; font-weight:600; }
+  .step{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:18px 18px 16px; margin-bottom:14px; display:none; animation:rise .35s ease; }
+  .step.active{ display:block; }
+  @keyframes rise{ from{ opacity:0; transform:translateY(8px);} to{ opacity:1; transform:translateY(0);} }
+  .step-eyebrow{ font-size:12px; font-weight:700; color:var(--gold); letter-spacing:.03em; margin:0 0 4px; }
+  .step-title{ font-size:17px; font-weight:700; margin:0 0 4px; color:var(--deep); }
+  .step-desc{ font-size:12.5px; color:var(--muted); margin:0 0 14px; }
+  .step-optional-tag{ display:inline-block; font-size:11px; font-weight:700; color:var(--muted); background:var(--bg); border:1px solid var(--border); padding:2px 8px; border-radius:999px; margin-left:6px; vertical-align:middle; }
+  .options{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .options.single-col{ grid-template-columns:1fr; }
+  .opt{ border:1.5px solid var(--border); background:#FBFCFB; border-radius:12px; padding:14px 10px; font-size:14px; font-weight:600; color:var(--text); text-align:center; cursor:pointer; transition:.15s ease; user-select:none; line-height:1.3; }
+  .opt:active{ transform:scale(.97); }
+  .opt.selected{ border-color:var(--deep); background:var(--deep); color:#fff; }
+  .opt.category{ padding:18px 10px; font-size:15px; }
+  .opt.improvement.selected{ border-color:var(--gold); background:var(--gold); color:#fff; }
+  .role-group{ margin-bottom:18px; }
+  .role-group:last-child{ margin-bottom:0; }
+  .role-header{ display:flex; align-items:center; gap:6px; font-size:13px; font-weight:700; color:var(--deep-light); margin-bottom:8px; padding-bottom:6px; border-bottom:1px dashed var(--border); }
+  textarea{ width:100%; min-height:100px; border:1.5px solid var(--border); border-radius:12px; padding:14px; font-family:inherit; font-size:14.5px; line-height:1.6; resize:vertical; color:var(--text); }
+  textarea:focus{ outline:none; border-color:var(--deep-light); }
+  #manualText{ min-height:140px; }
+  .note-label{ font-size:12.5px; font-weight:700; color:var(--deep-light); margin:16px 0 8px; }
+  .bar{ position:fixed; bottom:0; left:0; right:0; display:flex; justify-content:center; background:linear-gradient(to top, var(--bg) 60%, rgba(243,246,244,0)); padding:18px 20px 22px; }
+  .bar-inner{ width:100%; max-width:480px; }
+  .btn{ width:100%; padding:16px; border:none; border-radius:14px; font-size:16px; font-weight:700; cursor:pointer; transition:.15s ease; font-family:inherit; }
+  .btn:active{ transform:scale(.98); }
+  .btn-primary{ background:var(--deep); color:#fff; }
+  .btn-primary:disabled{ background:#B7C4C0; cursor:not-allowed; }
+  .btn-ghost{ background:transparent; color:var(--deep-light); font-weight:600; font-size:13.5px; padding:10px; margin-top:6px; width:100%; border:none; cursor:pointer; }
+  .result-card{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:20px; display:none; }
+  .result-card.active{ display:block; animation:rise .4s ease; }
+  .result-badge{ display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:700; color:var(--deep-light); background:var(--gold-soft); padding:5px 10px; border-radius:999px; margin-bottom:12px; }
+  .result-text{ font-size:15px; line-height:1.75; color:var(--text); white-space:pre-wrap; }
+  .loading{ display:none; align-items:center; gap:10px; padding:24px 4px; color:var(--muted); font-size:14px; font-weight:600; }
+  .loading.active{ display:flex; }
+  .spinner{ width:18px; height:18px; border:2.5px solid var(--border); border-top-color:var(--gold); border-radius:50%; animation:spin .8s linear infinite; flex-shrink:0; }
+  @keyframes spin{ to{ transform:rotate(360deg);} }
+  .toast{ position:fixed; top:24px; left:50%; transform:translateX(-50%) translateY(-20px); background:var(--deep); color:#fff; font-size:13.5px; font-weight:600; padding:10px 18px; border-radius:999px; opacity:0; pointer-events:none; transition:.25s ease; z-index:99; white-space:nowrap; }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+  .setup-needed{ text-align:center; padding:60px 24px; }
+  .setup-needed a{ display:inline-block; margin-top:18px; background:var(--deep); color:#fff; text-decoration:none; padding:14px 22px; border-radius:12px; font-weight:700; font-size:14px; }
+  .privacy-note{ font-size:11.5px; color:var(--muted); text-align:center; line-height:1.6; margin-top:22px; padding:0 8px; }
+</style>
+</head>
+<body>
+
+<div class="app" id="app">
+  <div class="setup-needed" id="setupNeeded" style="display:none;">
+    <p class="step-eyebrow">⚠️ 설정 필요</p>
+    <p class="step-title">이 링크에는 아직 치과 정보가<br>연결되어 있지 않아요</p>
+    <a href="./setup.html">치과 정보 등록하러 가기 →</a>
+  </div>
+
+  <div id="mainContent" style="display:none;">
+    <p class="clinic-name" id="clinicNameLabel"></p>
+    <h1>진료, 어떠셨나요?</h1>
+    <p class="sub">잠깐만 알려주시면 리뷰를 만들어드려요</p>
+
+    <div class="smile-wrap">
+      <svg width="140" height="76" viewBox="0 0 140 76">
+        <path class="smile-track" d="M10,20 Q70,76 130,20"/>
+        <path class="smile-fill" id="smileFill" d="M10,20 Q70,76 130,20" stroke-dasharray="128" stroke-dashoffset="128"/>
+      </svg>
+      <p class="smile-label" id="smileLabel">시작해볼까요?</p>
+    </div>
+
+    <div class="step active" data-step="0">
+      <p class="step-eyebrow">① 작성방식</p>
+      <p class="step-title">리뷰를 어떻게 작성할까요?</p>
+      <div class="options">
+        <div class="opt" data-group="method" data-value="ai">AI 문구 생성 ✨</div>
+        <div class="opt" data-group="method" data-value="manual">직접 입력 ✍️</div>
+      </div>
+    </div>
+
+    <div class="step" data-step="1">
+      <p class="step-eyebrow">② 방문유형</p>
+      <p class="step-title">이번 방문은?</p>
+      <div class="options" id="visitOptions"></div>
+    </div>
+
+    <div class="step" data-step="2">
+      <p class="step-eyebrow">③ 진료분야</p>
+      <p class="step-title">어느 분야로 진료받으셨나요?</p>
+      <div class="options single-col" id="categoryOptions"></div>
+    </div>
+
+    <div class="step" data-step="3">
+      <p class="step-eyebrow">④ 세부 치료</p>
+      <p class="step-title" id="treatmentTitle">어떤 치료를 받으셨나요?</p>
+      <div class="options" id="treatmentOptions"></div>
+    </div>
+
+    <div class="step" data-step="4">
+      <p class="step-eyebrow">⑤ 경험선택</p>
+      <p class="step-title">어떤 점이 좋으셨나요?</p>
+      <p class="step-desc">담당자별로 좋았던 점을 골라주세요 (중복 가능)</p>
+      <div id="experienceGroups"></div>
+    </div>
+
+    <div class="step" data-step="5">
+      <p class="step-eyebrow">⑥ 개선사항 <span class="step-optional-tag">선택사항</span></p>
+      <p class="step-title">아쉬웠던 점이 있으셨나요?</p>
+      <p class="step-desc">있으시면 골라주세요. 없으시면 바로 다음으로 넘어가도 돼요</p>
+      <div id="improvementGroups"></div>
+      <p class="note-label">더 남기고 싶은 말 (선택)</p>
+      <textarea id="additionalNote" placeholder="예) 대기 공간에 물이 있으면 좋을 것 같아요"></textarea>
+    </div>
+
+    <div class="step" data-step="manual">
+      <p class="step-eyebrow">✍️ 직접 입력</p>
+      <p class="step-title">리뷰 내용을 적어주세요</p>
+      <textarea id="manualText" placeholder="예) 상담부터 시술까지 친절하게 설명해주셔서 편안하게 진료받았어요."></textarea>
+    </div>
+
+    <div class="loading" id="loading">
+      <div class="spinner"></div>
+      <span>리뷰를 작성하고 있어요...</span>
+    </div>
+
+    <div class="result-card" id="resultCard">
+      <div class="result-badge">✅ 리뷰가 준비됐어요</div>
+      <p class="result-text" id="resultText"></p>
+      <p class="platform-label" id="platformLabel" style="font-size:12.5px;color:var(--muted);margin:0 0 10px;">리뷰는 자동으로 복사됩니다. 원하시는 플랫폼을 선택하세요</p>
+      <div class="platform-actions" id="platformActions" style="display:flex;flex-direction:column;gap:10px;">
+        <button class="platform-btn google" id="googleBtn" style="width:100%;padding:15px;border:1.5px solid var(--deep);color:var(--deep);background:#FBFCFB;border-radius:12px;font-size:14.5px;font-weight:700;cursor:pointer;font-family:inherit;">📋 복사 + 구글 리뷰로</button>
+        <button class="platform-btn naver" id="naverBtn" style="width:100%;padding:15px;border:1.5px solid #03C75A;color:#03A94D;background:#FBFCFB;border-radius:12px;font-size:14.5px;font-weight:700;cursor:pointer;font-family:inherit;display:none;">📋 복사 + 네이버 리뷰로</button>
+      </div>
+    </div>
+
+    <p class="privacy-note">선택하신 항목은 리뷰 문구를 만드는 데만 일시적으로 사용되며 별도로 저장되지 않아요. 실명 등 개인 식별 정보는 입력하지 않아도 됩니다.</p>
+  </div>
+</div>
+
+<div class="toast" id="toast">복사되었어요</div>
+
+<div class="bar" id="bar" style="display:none;">
+  <div class="bar-inner">
+    <button class="btn btn-primary" id="mainBtn" disabled>다음</button>
+    <button class="btn-ghost" id="ghostBtn" style="display:none;"></button>
+  </div>
+</div>
+
+<script>
+const VISIT_TYPES = [
+  "초진 (첫 방문)", "정기 재진", "교정상담 방문", "재상담 방문"
+];
+const CATEGORIES = [
+  { id:"general", emoji:"🦷", label:"일반진료" },
+  { id:"ortho",   emoji:"😁", label:"교정전문" }
+];
+const TREATMENTS = {
+  general: [
+    { emoji:"🪥", label:"충치치료" }, { emoji:"🔩", label:"신경치료" },
+    { emoji:"🦷", label:"임플란트" }, { emoji:"👑", label:"보철·크라운" },
+    { emoji:"✨", label:"스케일링·미백" }, { emoji:"😬", label:"사랑니 발치" },
+    { emoji:"🩹", label:"잇몸치료" }, { emoji:"🦷", label:"틀니" },
+    { emoji:"🔍", label:"정기검진" }, { emoji:"💙", label:"전반적 만족" }
+  ],
+  ortho: [
+    { emoji:"⚙️", label:"메탈교정" }, { emoji:"🤍", label:"세라믹교정" },
+    { emoji:"👻", label:"투명교정 (인비절라인 등)" }, { emoji:"🙊", label:"설측교정 (안보이는교정)" },
+    { emoji:"🔹", label:"부분교정" }, { emoji:"🧒", label:"소아교정" },
+    { emoji:"🔁", label:"재교정" }, { emoji:"💬", label:"교정상담" },
+    { emoji:"💙", label:"전반적 만족" }
+  ]
+};
+const EXPERIENCE_GROUPS = [
+  { role:"원장님",     items:["정확한 진단","꼼꼼한 시술","통증 최소화","충분한 설명"] },
+  { role:"상담실장님", items:["친절한 상담","투명한 비용 안내","과잉권유 없음","맞춤 플랜 제안"] },
+  { role:"진료실 스텝", items:["능숙한 어시스트","세심한 케어","편안한 분위기","청결한 위생관리"] },
+  { role:"데스크·예약", items:["편리한 예약","친절한 응대","짧은 대기시간"] }
+];
+const IMPROVEMENT_GROUPS = [
+  { category:"⏰ 대기·예약", items:["대기시간이 길었어요","예약 변경이 어려웠어요"] },
+  { category:"💳 비용·안내", items:["비용 안내가 아쉬웠어요","진료비가 부담됐어요"] },
+  { category:"🅿️ 시설·환경", items:["주차가 불편했어요","대기공간이 좁았어요"] },
+  { category:"💬 설명·소통", items:["설명이 조금 부족했어요","진료 후 안내가 아쉬웠어요"] }
+];
+
+const params = new URLSearchParams(window.location.search);
+const CLINIC_NAME = params.get('name');
+const GOOGLE_REVIEW_URL = params.get('google');
+const NAVER_REVIEW_URL = params.get('naver');
+
+if(!CLINIC_NAME || !GOOGLE_REVIEW_URL){
+  document.getElementById('setupNeeded').style.display = 'block';
+} else {
+  document.getElementById('mainContent').style.display = 'block';
+  document.getElementById('bar').style.display = 'flex';
+  document.getElementById('clinicNameLabel').textContent = decodeURIComponent(CLINIC_NAME);
+  initFlow();
+}
+
+function initFlow(){
+  const visitBox = document.getElementById('visitOptions');
+  VISIT_TYPES.forEach(v=>{
+    const d = document.createElement('div');
+    d.className='opt'; d.dataset.group='visit'; d.dataset.value=v;
+    d.textContent = v;
+    visitBox.appendChild(d);
+  });
+
+  const categoryBox = document.getElementById('categoryOptions');
+  CATEGORIES.forEach(c=>{
+    const d = document.createElement('div');
+    d.className='opt category'; d.dataset.group='category'; d.dataset.value=c.id;
+    d.textContent = `${c.emoji} ${c.label}`;
+    categoryBox.appendChild(d);
+  });
+
+  const experienceGroupsBox = document.getElementById('experienceGroups');
+  EXPERIENCE_GROUPS.forEach(g=>{
+    const wrap = document.createElement('div');
+    wrap.className = 'role-group';
+    const header = document.createElement('p');
+    header.className = 'role-header';
+    header.textContent = `👤 ${g.role}`;
+    wrap.appendChild(header);
+    const grid = document.createElement('div');
+    grid.className = 'options';
+    g.items.forEach(item=>{
+      const d = document.createElement('div');
+      d.className='opt'; d.dataset.group='experience'; d.dataset.role=g.role; d.dataset.value=item;
+      d.textContent = item;
+      grid.appendChild(d);
+    });
+    wrap.appendChild(grid);
+    experienceGroupsBox.appendChild(wrap);
+  });
+
+  const improvementGroupsBox = document.getElementById('improvementGroups');
+  IMPROVEMENT_GROUPS.forEach(g=>{
+    const wrap = document.createElement('div');
+    wrap.className = 'role-group';
+    const header = document.createElement('p');
+    header.className = 'role-header';
+    header.textContent = g.category;
+    wrap.appendChild(header);
+    const grid = document.createElement('div');
+    grid.className = 'options';
+    g.items.forEach(item=>{
+      const d = document.createElement('div');
+      d.className='opt improvement'; d.dataset.group='improvement'; d.dataset.category=g.category; d.dataset.value=item;
+      d.textContent = item;
+      grid.appendChild(d);
+    });
+    wrap.appendChild(grid);
+    improvementGroupsBox.appendChild(wrap);
+  });
+
+  const state = { method:null, visit:null, category:null, treatment:null, experience:[], improvements:[], additionalNote:'' };
+  let flow = [];
+  let stepIndex = 0;
+  let generatedText = "";
+
+  const smileFill = document.getElementById('smileFill');
+  const smileLabel = document.getElementById('smileLabel');
+  const mainBtn = document.getElementById('mainBtn');
+  const ghostBtn = document.getElementById('ghostBtn');
+  const loadingEl = document.getElementById('loading');
+  const resultCard = document.getElementById('resultCard');
+  const resultText = document.getElementById('resultText');
+  const toast = document.getElementById('toast');
+
+  function showToast(msg){
+    toast.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(()=>toast.classList.remove('show'), 1600);
+  }
+  function setSmile(fraction, label){
+    smileFill.style.strokeDashoffset = 128 - (128 * fraction);
+    smileLabel.textContent = label;
+  }
+  function goToStep(name){
+    document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
+    document.querySelector(`.step[data-step="${name}"]`).classList.add('active');
+  }
+  function currentStepName(){ return flow[stepIndex]; }
+
+  function renderTreatments(categoryId){
+    const box = document.getElementById('treatmentOptions');
+    box.innerHTML = '';
+    const cat = CATEGORIES.find(c=>c.id===categoryId);
+    document.getElementById('treatmentTitle').textContent =
+      cat ? `${cat.label} 중 어떤 치료를 받으셨나요?` : '어떤 치료를 받으셨나요?';
+    (TREATMENTS[categoryId] || []).forEach(t=>{
+      const d = document.createElement('div');
+      d.className='opt'; d.dataset.group='treatment'; d.dataset.value=t.label;
+      d.textContent = `${t.emoji} ${t.label}`;
+      box.appendChild(d);
+    });
+  }
+
+  function refreshButton(){
+    if(state.method === null){ mainBtn.textContent='다음'; mainBtn.disabled=true; setSmile(0,'시작해볼까요?'); return; }
+    if(state.method === 'manual'){
+      const txt = document.getElementById('manualText').value.trim();
+      mainBtn.textContent = '리뷰 확인하기';
+      mainBtn.disabled = txt.length === 0;
+      setSmile(txt.length ? 1 : 0.15, txt.length ? '준비됐어요' : '내용을 적어주세요');
+      return;
+    }
+    const name = currentStepName();
+    if(name === '1') mainBtn.disabled = !state.visit;
+    else if(name === '2') mainBtn.disabled = !state.category;
+    else if(name === '3') mainBtn.disabled = !state.treatment;
+    else if(name === '4'){ mainBtn.disabled = state.experience.length===0; mainBtn.textContent='다음'; }
+    else if(name === '5'){ mainBtn.disabled = false; mainBtn.textContent='✨ 리뷰 만들기'; }
+    else mainBtn.textContent = '다음';
+    const done = [state.visit, state.category, state.treatment, state.experience.length>0].filter(Boolean).length;
+    setSmile(done/4, done===4 ? '준비됐어요' : `${done}/4 선택완료`);
+  }
+
+  function nextStep(){
+    if(state.method === 'manual'){ generatedText = document.getElementById('manualText').value.trim(); showResult(); return; }
+    if(currentStepName() === '5'){ generateReview(); return; }
+    stepIndex++;
+    goToStep(currentStepName());
+    refreshButton();
+  }
+
+  document.addEventListener('click', (e)=>{
+    const opt = e.target.closest('.opt');
+    if(!opt) return;
+    const group = opt.dataset.group, value = opt.dataset.value;
+    if(group === 'method'){
+      document.querySelectorAll('[data-group="method"]').forEach(o=>o.classList.remove('selected'));
+      opt.classList.add('selected');
+      state.method = value;
+      if(value === 'ai'){ flow=['1','2','3','4','5']; stepIndex=0; goToStep('1'); }
+      else goToStep('manual');
+      refreshButton(); return;
+    }
+    if(group === 'visit'){
+      document.querySelectorAll('[data-group="visit"]').forEach(o=>o.classList.remove('selected'));
+      opt.classList.add('selected'); state.visit = value;
+    }
+    if(group === 'category'){
+      document.querySelectorAll('[data-group="category"]').forEach(o=>o.classList.remove('selected'));
+      opt.classList.add('selected'); state.category = value; state.treatment = null;
+      renderTreatments(value);
+    }
+    if(group === 'treatment'){
+      document.querySelectorAll('[data-group="treatment"]').forEach(o=>o.classList.remove('selected'));
+      opt.classList.add('selected'); state.treatment = value;
+    }
+    if(group === 'experience'){
+      opt.classList.toggle('selected');
+      const role = opt.dataset.role, key = `${role}::${value}`;
+      const idx = state.experience.findIndex(x=>x.key===key);
+      if(idx >= 0) state.experience.splice(idx,1);
+      else state.experience.push({ key, role, label:value });
+    }
+    if(group === 'improvement'){
+      opt.classList.toggle('selected');
+      const category = opt.dataset.category, key = `${category}::${value}`;
+      const idx = state.improvements.findIndex(x=>x.key===key);
+      if(idx >= 0) state.improvements.splice(idx,1);
+      else state.improvements.push({ key, category, label:value });
+    }
+    refreshButton();
+  });
+
+  document.getElementById('manualText').addEventListener('input', refreshButton);
+  document.getElementById('additionalNote').addEventListener('input', (e)=>{ state.additionalNote = e.target.value.trim(); });
+
+  mainBtn.addEventListener('click', ()=>{
+    nextStep();
+  });
+
+  async function generateReview(){
+    document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
+    loadingEl.classList.add('active');
+    mainBtn.style.display = 'none';
+    try{
+      const res = await fetch('/api/generate-review', {
+        method:'POST',
+        headers:{ 'Content-Type':'application/json' },
+        body: JSON.stringify({
+          clinicName: decodeURIComponent(CLINIC_NAME),
+          visit: state.visit,
+          category: (CATEGORIES.find(c=>c.id===state.category) || {}).label || '',
+          treatment: state.treatment,
+          experience: state.experience.map(e=>({ role:e.role, label:e.label })),
+          improvements: state.improvements.map(i=>i.label),
+          additionalNote: state.additionalNote
+        })
+      });
+      const data = await res.json();
+      generatedText = data.text || "리뷰 생성에 실패했어요. 다시 시도해주세요.";
+    }catch(err){
+      generatedText = "리뷰 생성 중 오류가 발생했어요. 다시 시도해주세요.";
+    }
+    loadingEl.classList.remove('active');
+    showResult();
+  }
+
+  function showResult(){
+    resultText.textContent = generatedText;
+    resultCard.classList.add('active');
+    mainBtn.style.display = 'none';
+    if(NAVER_REVIEW_URL) document.getElementById('naverBtn').style.display = 'block';
+    ghostBtn.style.display = 'block';
+    ghostBtn.textContent = '🔄 다시 만들기';
+    setSmile(1, '리뷰가 준비됐어요');
+  }
+
+  ghostBtn.addEventListener('click', ()=>{
+    resultCard.classList.remove('active');
+    ghostBtn.style.display = 'none';
+    mainBtn.style.display = 'block';
+    mainBtn.textContent = state.method === 'manual' ? '리뷰 확인하기' : '✨ 리뷰 만들기';
+    if(state.method === 'manual') goToStep('manual');
+    else { stepIndex = flow.indexOf('5'); goToStep('5'); generateReview(); }
+  });
+
+  function copyText(text){ return navigator.clipboard.writeText(text); }
+
+  document.getElementById('googleBtn').addEventListener('click', ()=>{
+    const finalText = state.method === 'manual' ? document.getElementById('manualText').value.trim() : generatedText;
+    copyText(finalText).then(()=>{
+      showToast('복사되었어요 · 구글 리뷰로 이동합니다');
+    }).catch(()=>{ showToast('복사에 실패했어요'); });
+    setTimeout(()=>{ window.open(decodeURIComponent(GOOGLE_REVIEW_URL), '_blank'); }, 500);
+  });
+
+  document.getElementById('naverBtn').addEventListener('click', ()=>{
+    const finalText = state.method === 'manual' ? document.getElementById('manualText').value.trim() : generatedText;
+    copyText(finalText).then(()=>{
+      showToast('복사되었어요 · 네이버 리뷰로 이동합니다');
+    }).catch(()=>{ showToast('복사에 실패했어요'); });
+    setTimeout(()=>{ window.open(decodeURIComponent(NAVER_REVIEW_URL), '_blank'); }, 500);
+  });
+
+  refreshButton();
+}
+</script>
+</body>
+</html>

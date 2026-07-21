@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>치과 정보 등록</title>
+<link rel="stylesheet" as="style" crossorigin
+  href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  :root{
+    --bg:#F3F6F4; --surface:#FFFFFF; --deep:#163832; --deep-light:#2C5D54;
+    --text:#1B2624; --muted:#5B6B67; --gold:#C89B3C; --gold-soft:#EADFC2;
+    --border:#E1E8E5; --radius:18px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:'Pretendard',-apple-system,BlinkMacSystemFont,sans-serif;
+    display:flex; justify-content:center; padding:40px 20px 60px;
+  }
+  .wrap{ width:100%; max-width:460px; }
+  .eyebrow{ font-size:12px; font-weight:700; color:var(--gold); letter-spacing:.03em; margin:0 0 6px; }
+  h1{ font-size:23px; font-weight:800; color:var(--deep); margin:0 0 6px; }
+  .sub{ font-size:14px; color:var(--muted); margin:0 0 26px; line-height:1.6; }
+  .card{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:22px; margin-bottom:16px; }
+  label{ display:block; font-size:13.5px; font-weight:700; color:var(--deep); margin-bottom:8px; }
+  .help{ font-size:12.5px; color:var(--muted); margin:6px 0 14px; line-height:1.6; }
+  input[type=text]{
+    width:100%; border:1.5px solid var(--border); border-radius:10px; padding:13px 14px;
+    font-size:14.5px; font-family:inherit; color:var(--text); margin-bottom:4px;
+  }
+  input[type=text]:focus{ outline:none; border-color:var(--deep-light); }
+  .btn{
+    width:100%; padding:15px; border:none; border-radius:12px; font-size:15px; font-weight:700;
+    cursor:pointer; background:var(--deep); color:#fff; font-family:inherit; margin-top:6px;
+  }
+  .btn:active{ transform:scale(.98); }
+  .result{ display:none; }
+  .result.active{ display:block; }
+  .url-box{
+    display:flex; gap:8px; align-items:center; background:#FBFCFB; border:1.5px solid var(--border);
+    border-radius:10px; padding:10px 12px; margin-top:10px;
+  }
+  .url-box input{ border:none; flex:1; font-size:13px; color:var(--muted); background:transparent; }
+  .url-box input:focus{ outline:none; }
+  .copy-btn{
+    border:none; background:var(--gold-soft); color:var(--deep); font-weight:700; font-size:12.5px;
+    padding:8px 12px; border-radius:8px; cursor:pointer; white-space:nowrap;
+  }
+  #qrcode{ display:flex; justify-content:center; margin:18px 0 6px; }
+  .toast{
+    position:fixed; top:24px; left:50%; transform:translateX(-50%) translateY(-20px);
+    background:var(--deep); color:#fff; font-size:13px; font-weight:600; padding:9px 16px;
+    border-radius:999px; opacity:0; pointer-events:none; transition:.25s ease; z-index:99;
+  }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow">치과 관리자용</p>
+  <h1>리뷰 페이지 정보 등록</h1>
+  <p class="sub">치과 이름과 구글 리뷰 링크를 입력하면, 이 정보가 담긴 전용 링크와 QR 코드가 생성돼요. 이 QR 코드를 대기실이나 데스크에 두시면 됩니다.</p>
+
+  <div class="card">
+    <label>치과 이름</label>
+    <input type="text" id="clinicName" placeholder="예: 서울바른이앤유교정치과 이수점">
+
+    <label style="margin-top:18px;">구글 리뷰 작성 링크</label>
+    <input type="text" id="googleUrl" placeholder="https://search.google.com/local/writereview?placeid=...">
+    <p class="help">
+      구글맵에서 치과 이름 검색 → <b>"리뷰 작성"</b> 버튼 클릭 → 주소창 URL을 복사해서 붙여넣으세요.
+    </p>
+
+    <label style="margin-top:18px;">네이버 리뷰 링크 <span style="font-weight:500;color:var(--muted);">(선택)</span></label>
+    <input type="text" id="naverUrl" placeholder="https://naver.me/... 또는 네이버 플레이스 링크">
+    <p class="help">
+      네이버지도에서 치과 검색 → 플레이스 페이지 링크를 복사해서 붙여넣으세요. 비워두면 네이버 버튼 없이 구글만 표시돼요.
+    </p>
+
+    <button class="btn" id="generateBtn">링크 · QR 코드 생성</button>
+  </div>
+
+  <div class="card result" id="resultCard">
+    <label>패치 완료 — 전용 링크</label>
+    <div class="url-box">
+      <input type="text" id="finalUrl" readonly>
+      <button class="copy-btn" id="copyBtn">복사</button>
+    </div>
+    <div id="qrcode"></div>
+    <p class="help" style="text-align:center;">이 QR 코드를 스캔하면 바로 리뷰 작성 페이지로 연결돼요</p>
+  </div>
+</div>
+
+<div class="toast" id="toast">복사되었어요</div>
+
+<script>
+const generateBtn = document.getElementById('generateBtn');
+const resultCard = document.getElementById('resultCard');
+const finalUrlInput = document.getElementById('finalUrl');
+const toast = document.getElementById('toast');
+let qr = null;
+
+function showToast(msg){
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(()=>toast.classList.remove('show'), 1500);
+}
+
+generateBtn.addEventListener('click', ()=>{
+  const name = document.getElementById('clinicName').value.trim();
+  const google = document.getElementById('googleUrl').value.trim();
+  const naver = document.getElementById('naverUrl').value.trim();
+  if(!name || !google){
+    showToast('치과 이름과 구글 리뷰 링크는 필수예요');
+    return;
+  }
+  const base = window.location.href.replace(/setup\.html.*$/, 'index.html');
+  let url = `${base}?name=${encodeURIComponent(name)}&google=${encodeURIComponent(google)}`;
+  if(naver) url += `&naver=${encodeURIComponent(naver)}`;
+  finalUrlInput.value = url;
+  resultCard.classList.add('active');
+
+  document.getElementById('qrcode').innerHTML = '';
+  qr = new QRCode(document.getElementById('qrcode'), {
+    text: url, width: 180, height: 180,
+    colorDark: '#163832', colorLight: '#ffffff'
+  });
+});
+
+document.getElementById('copyBtn').addEventListener('click', ()=>{
+  finalUrlInput.select();
+  navigator.clipboard.writeText(finalUrlInput.value).then(()=>showToast('링크가 복사되었어요'));
+});
+</script>
+</body>
+</html>
