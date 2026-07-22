@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>리뷰 작성</title>
+<title>Review</title>
 <link rel="stylesheet" as="style" crossorigin
   href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
 <style>
@@ -16,12 +16,14 @@
   html,body{margin:0;padding:0;}
   body{
     background:var(--bg); color:var(--text);
-    font-family:'Pretendard',-apple-system,BlinkMacSystemFont,sans-serif;
+    font-family:'Pretendard',-apple-system,BlinkMacSystemFont,'Noto Sans SC','Noto Sans JP',sans-serif;
     -webkit-font-smoothing:antialiased; min-height:100vh;
     display:flex; justify-content:center; padding-bottom:110px;
   }
   .app{ width:100%; max-width:480px; padding:28px 20px 24px; }
   .clinic-name{ font-size:13px; font-weight:600; letter-spacing:.02em; color:var(--deep-light); margin:0 0 6px; }
+  .homepage-link{ display:inline-block; font-size:12px; font-weight:700; color:var(--gold); text-decoration:none; margin:0 0 10px; }
+  .lang-switch{ font-size:12px; font-weight:700; color:var(--muted); background:none; border:none; cursor:pointer; padding:0; margin:0 0 10px; }
   h1{ font-size:24px; font-weight:800; line-height:1.35; margin:0 0 4px; color:var(--deep); }
   .sub{ font-size:14px; color:var(--muted); margin:0 0 22px; }
   .smile-wrap{ display:flex; flex-direction:column; align-items:center; margin-bottom:26px; }
@@ -41,6 +43,14 @@
   .opt:active{ transform:scale(.97); }
   .opt.selected{ border-color:var(--deep); background:var(--deep); color:#fff; }
   .opt.category{ padding:18px 10px; font-size:15px; }
+  .opt.lang{ padding:18px 10px; font-size:15px; }
+  .translate-link{
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    margin-top:16px; padding:13px; border-radius:12px; border:1.5px dashed var(--border);
+    background:#FBFCFB; color:var(--deep-light); font-size:13.5px; font-weight:700;
+    text-decoration:none; transition:.15s ease;
+  }
+  .translate-link:active{ transform:scale(.98); }
   .opt.improvement.selected{ border-color:var(--gold); background:var(--gold); color:#fff; }
   .role-group{ margin-bottom:18px; }
   .role-group:last-child{ margin-bottom:0; }
@@ -59,7 +69,12 @@
   .result-card{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:20px; display:none; }
   .result-card.active{ display:block; animation:rise .4s ease; }
   .result-badge{ display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:700; color:var(--deep-light); background:var(--gold-soft); padding:5px 10px; border-radius:999px; margin-bottom:12px; }
-  .result-text{ font-size:15px; line-height:1.75; color:var(--text); white-space:pre-wrap; }
+  .result-text{ font-size:15px; line-height:1.75; color:var(--text); white-space:pre-wrap; margin:0 0 18px; }
+  .platform-label{ font-size:12.5px; color:var(--muted); margin:0 0 10px; }
+  .platform-actions{ display:flex; flex-direction:column; gap:10px; }
+  .platform-btn{ width:100%; padding:15px; border:1.5px solid var(--border); background:#FBFCFB; border-radius:12px; font-size:14.5px; font-weight:700; cursor:pointer; font-family:inherit; color:var(--text); }
+  .platform-btn.google{ border-color:var(--deep); color:var(--deep); }
+  .platform-btn.naver{ border-color:#03C75A; color:#03A94D; display:none; }
   .loading{ display:none; align-items:center; gap:10px; padding:24px 4px; color:var(--muted); font-size:14px; font-weight:600; }
   .loading.active{ display:flex; }
   .spinner{ width:18px; height:18px; border:2.5px solid var(--border); border-top-color:var(--gold); border-radius:50%; animation:spin .8s linear infinite; flex-shrink:0; }
@@ -69,148 +84,428 @@
   .setup-needed{ text-align:center; padding:60px 24px; }
   .setup-needed a{ display:inline-block; margin-top:18px; background:var(--deep); color:#fff; text-decoration:none; padding:14px 22px; border-radius:12px; font-weight:700; font-size:14px; }
   .privacy-note{ font-size:11.5px; color:var(--muted); text-align:center; line-height:1.6; margin-top:22px; padding:0 8px; }
+  .footer-section{ margin-top:22px; padding-top:18px; border-top:1px dashed var(--border); }
+  .share-row{ display:flex; gap:8px; margin-bottom:16px; }
+  .icon-btn{ flex:1; display:flex; flex-direction:column; align-items:center; gap:5px; padding:13px 6px; border:1.5px solid var(--border); background:#FBFCFB; border-radius:12px; text-decoration:none; color:var(--text); font-size:11.5px; font-weight:700; cursor:pointer; font-family:inherit; transition:.15s ease; }
+  .icon-btn:active{ transform:scale(.96); background:var(--bg); }
+  .icon-btn-emoji{ font-size:21px; line-height:1; }
+  .guide-box{ background:var(--gold-soft); border-radius:12px; padding:14px 16px; margin-bottom:10px; font-size:12.5px; line-height:1.7; color:var(--deep); }
+  .thanks-box{ background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:16px; font-size:12.5px; line-height:1.75; color:var(--muted); text-align:center; }
+  .doctor-card{ display:flex; align-items:center; gap:12px; background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:12px 14px; margin-bottom:16px; }
+  .doctor-card img{ width:44px; height:44px; border-radius:50%; object-fit:cover; flex-shrink:0; background:var(--bg); }
+  .doctor-card p{ margin:0; font-size:12.5px; line-height:1.55; color:var(--text); }
+  .call-btn{ display:flex; align-items:center; justify-content:center; gap:8px; width:100%; padding:15px; border:none; border-radius:12px; background:var(--deep); color:#fff; font-size:14.5px; font-weight:700; text-decoration:none; margin-bottom:12px; font-family:inherit; }
+  .call-btn:active{ transform:scale(.98); }
+  .referral-btn{ display:flex; align-items:center; justify-content:center; gap:8px; width:100%; padding:13px; border:1.5px dashed var(--gold); border-radius:12px; background:none; color:var(--gold); font-size:13.5px; font-weight:700; margin-bottom:16px; cursor:pointer; font-family:inherit; }
+  .referral-btn:active{ transform:scale(.98); }
+  .sns-row{ display:flex; gap:8px; margin-bottom:16px; }
+  .event-banner{ background:linear-gradient(135deg,var(--gold-soft),#fff); border:1px solid var(--gold-soft); border-radius:12px; padding:13px 15px; margin-bottom:16px; font-size:12px; line-height:1.6; color:var(--deep); }
+  .event-banner-tag{ display:inline-block; font-size:10.5px; font-weight:800; color:#fff; background:var(--gold); padding:2px 8px; border-radius:999px; margin-bottom:6px; letter-spacing:.02em; }
 </style>
 </head>
 <body>
 
 <div class="app" id="app">
   <div class="setup-needed" id="setupNeeded" style="display:none;">
-    <p class="step-eyebrow">⚠️ 설정 필요</p>
-    <p class="step-title">이 링크에는 아직 치과 정보가<br>연결되어 있지 않아요</p>
-    <a href="./setup.html">치과 정보 등록하러 가기 →</a>
+    <p class="step-eyebrow">⚠️ Setup required</p>
+    <p class="step-title">This link isn't connected to a clinic yet<br>이 링크에는 아직 치과 정보가 연결되어 있지 않아요</p>
+    <a href="./setup.html">Go to setup →</a>
   </div>
 
   <div id="mainContent" style="display:none;">
+    <img id="clinicLogo" src="" alt="" style="display:none;height:32px;margin:0 0 10px;">
     <p class="clinic-name" id="clinicNameLabel"></p>
-    <h1>진료, 어떠셨나요?</h1>
-    <p class="sub">잠깐만 알려주시면 리뷰를 만들어드려요</p>
+    <a href="#" id="homepageLink" class="homepage-link" target="_blank" rel="noopener" style="display:none;">🏠 <span id="homepageLinkText"></span></a>
+    <button class="lang-switch" id="langSwitchBtn" style="display:none;">🌐 </button>
+    <div class="doctor-card" id="doctorCard" style="display:none;">
+      <img id="doctorPhotoImg" src="" alt="">
+      <p id="doctorGreetingText"></p>
+    </div>
+    <h1 id="txtHeading"></h1>
+    <p class="sub" id="txtSubtitle"></p>
 
     <div class="smile-wrap">
       <svg width="140" height="76" viewBox="0 0 140 76">
         <path class="smile-track" d="M10,20 Q70,76 130,20"/>
         <path class="smile-fill" id="smileFill" d="M10,20 Q70,76 130,20" stroke-dasharray="128" stroke-dashoffset="128"/>
       </svg>
-      <p class="smile-label" id="smileLabel">시작해볼까요?</p>
+      <p class="smile-label" id="smileLabel"></p>
     </div>
 
-    <div class="step active" data-step="0">
-      <p class="step-eyebrow">① 작성방식</p>
-      <p class="step-title">리뷰를 어떻게 작성할까요?</p>
+    <!-- Step lang: 언어 선택 -->
+    <div class="step active" data-step="lang">
+      <p class="step-eyebrow">🌐 Language / 언어 / 语言 / 言語 / Idioma</p>
+      <p class="step-title">Select your language</p>
+      <div class="options single-col" id="langOptions"></div>
+      <a href="https://translate.google.com/" target="_blank" rel="noopener" class="translate-link">
+        🗣️ Google Translate
+      </a>
+    </div>
+
+    <div class="step" data-step="0">
+      <p class="step-eyebrow" id="txtEyebrow0"></p>
+      <p class="step-title" id="txtTitle0"></p>
       <div class="options">
-        <div class="opt" data-group="method" data-value="ai">AI 문구 생성 ✨</div>
-        <div class="opt" data-group="method" data-value="manual">직접 입력 ✍️</div>
+        <div class="opt" data-group="method" data-value="ai" id="optMethodAI"></div>
+        <div class="opt" data-group="method" data-value="manual" id="optMethodManual"></div>
       </div>
     </div>
 
     <div class="step" data-step="1">
-      <p class="step-eyebrow">② 방문유형</p>
-      <p class="step-title">이번 방문은?</p>
+      <p class="step-eyebrow" id="txtEyebrow1"></p>
+      <p class="step-title" id="txtTitle1"></p>
       <div class="options" id="visitOptions"></div>
     </div>
 
     <div class="step" data-step="2">
-      <p class="step-eyebrow">③ 진료분야</p>
-      <p class="step-title">어느 분야로 진료받으셨나요?</p>
+      <p class="step-eyebrow" id="txtEyebrow2"></p>
+      <p class="step-title" id="txtTitle2"></p>
       <div class="options single-col" id="categoryOptions"></div>
     </div>
 
     <div class="step" data-step="3">
-      <p class="step-eyebrow">④ 세부 치료</p>
-      <p class="step-title" id="treatmentTitle">어떤 치료를 받으셨나요?</p>
+      <p class="step-eyebrow" id="txtEyebrow3"></p>
+      <p class="step-title" id="treatmentTitle"></p>
       <div class="options" id="treatmentOptions"></div>
     </div>
 
     <div class="step" data-step="4">
-      <p class="step-eyebrow">⑤ 경험선택</p>
-      <p class="step-title">어떤 점이 좋으셨나요?</p>
-      <p class="step-desc">담당자별로 좋았던 점을 골라주세요 (중복 가능)</p>
+      <p class="step-eyebrow" id="txtEyebrow4"></p>
+      <p class="step-title" id="txtTitle4"></p>
+      <p class="step-desc" id="txtDesc4"></p>
       <div id="experienceGroups"></div>
     </div>
 
     <div class="step" data-step="5">
-      <p class="step-eyebrow">⑥ 개선사항 <span class="step-optional-tag">선택사항</span></p>
-      <p class="step-title">아쉬웠던 점이 있으셨나요?</p>
-      <p class="step-desc">있으시면 골라주세요. 없으시면 바로 다음으로 넘어가도 돼요</p>
+      <p class="step-eyebrow" id="txtEyebrow5"></p>
+      <p class="step-title" id="txtTitle5"></p>
+      <p class="step-desc" id="txtDesc5"></p>
       <div id="improvementGroups"></div>
-      <p class="note-label">더 남기고 싶은 말 (선택)</p>
-      <textarea id="additionalNote" placeholder="예) 대기 공간에 물이 있으면 좋을 것 같아요"></textarea>
+      <p class="note-label" id="txtNoteLabel"></p>
+      <textarea id="additionalNote"></textarea>
     </div>
 
     <div class="step" data-step="manual">
-      <p class="step-eyebrow">✍️ 직접 입력</p>
-      <p class="step-title">리뷰 내용을 적어주세요</p>
-      <textarea id="manualText" placeholder="예) 상담부터 시술까지 친절하게 설명해주셔서 편안하게 진료받았어요."></textarea>
+      <p class="step-eyebrow" id="txtManualEyebrow"></p>
+      <p class="step-title" id="txtManualTitle"></p>
+      <textarea id="manualText"></textarea>
     </div>
 
     <div class="loading" id="loading">
       <div class="spinner"></div>
-      <span>리뷰를 작성하고 있어요...</span>
+      <span id="txtLoading"></span>
     </div>
 
     <div class="result-card" id="resultCard">
-      <div class="result-badge">✅ 리뷰가 준비됐어요</div>
+      <div class="result-badge" id="txtResultBadge"></div>
       <p class="result-text" id="resultText"></p>
-      <p class="platform-label" id="platformLabel" style="font-size:12.5px;color:var(--muted);margin:0 0 10px;">리뷰는 자동으로 복사됩니다. 원하시는 플랫폼을 선택하세요</p>
-      <div class="platform-actions" id="platformActions" style="display:flex;flex-direction:column;gap:10px;">
-        <button class="platform-btn google" id="googleBtn" style="width:100%;padding:15px;border:1.5px solid var(--deep);color:var(--deep);background:#FBFCFB;border-radius:12px;font-size:14.5px;font-weight:700;cursor:pointer;font-family:inherit;">📋 복사 + 구글 리뷰로</button>
-        <button class="platform-btn naver" id="naverBtn" style="width:100%;padding:15px;border:1.5px solid #03C75A;color:#03A94D;background:#FBFCFB;border-radius:12px;font-size:14.5px;font-weight:700;cursor:pointer;font-family:inherit;display:none;">📋 복사 + 네이버 리뷰로</button>
+      <p class="platform-label" id="txtPlatformLabel"></p>
+      <div class="platform-actions">
+        <button class="platform-btn google" id="googleBtn"></button>
+        <button class="platform-btn naver" id="naverBtn"></button>
+      </div>
+
+      <div class="footer-section">
+        <a href="#" id="callBtn" class="call-btn" style="display:none;">
+          <span>📞</span><span id="txtCallLabel"></span>
+        </a>
+
+        <div class="share-row">
+          <a href="#" id="homepageIconBtn" class="icon-btn" target="_blank" rel="noopener" style="display:none;">
+            <span class="icon-btn-emoji">🏠</span><span id="txtHomepageIconLabel"></span>
+          </a>
+          <button type="button" class="icon-btn" id="kakaoShareBtn">
+            <span class="icon-btn-emoji">💬</span><span id="txtKakaoLabel"></span>
+          </button>
+          <button type="button" class="icon-btn" id="wechatShareBtn">
+            <span class="icon-btn-emoji">🟢</span><span id="txtWechatLabel"></span>
+          </button>
+        </div>
+
+        <div class="sns-row" id="snsRow" style="display:none;">
+          <a href="#" id="instagramBtn" class="icon-btn" target="_blank" rel="noopener" style="display:none;">
+            <span class="icon-btn-emoji">📷</span><span id="txtInstagramLabel"></span>
+          </a>
+          <a href="#" id="blogBtn" class="icon-btn" target="_blank" rel="noopener" style="display:none;">
+            <span class="icon-btn-emoji">✍️</span><span id="txtBlogLabel"></span>
+          </a>
+        </div>
+
+        <div class="event-banner" id="eventBanner" style="display:none;">
+          <span class="event-banner-tag" id="txtEventTag"></span>
+          <p id="txtEventNote" style="margin:0;"></p>
+        </div>
+
+        <button type="button" class="referral-btn" id="referralBtn">
+          <span>🎁</span><span id="txtReferralLabel"></span>
+        </button>
+
+        <div class="guide-box" id="txtGuideNote"></div>
+        <div class="thanks-box" id="txtThanksNote"></div>
       </div>
     </div>
 
-    <p class="privacy-note">선택하신 항목은 리뷰 문구를 만드는 데만 일시적으로 사용되며 별도로 저장되지 않아요. 실명 등 개인 식별 정보는 입력하지 않아도 됩니다.</p>
+    <p class="privacy-note" id="txtPrivacyNote"></p>
   </div>
 </div>
 
-<div class="toast" id="toast">복사되었어요</div>
+<div class="toast" id="toast"></div>
 
 <div class="bar" id="bar" style="display:none;">
   <div class="bar-inner">
-    <button class="btn btn-primary" id="mainBtn" disabled>다음</button>
+    <button class="btn btn-primary" id="mainBtn" disabled></button>
     <button class="btn-ghost" id="ghostBtn" style="display:none;"></button>
   </div>
 </div>
 
 <script>
-const VISIT_TYPES = [
-  "초진 (첫 방문)", "정기 재진", "교정상담 방문", "재상담 방문"
+/* ============================================================
+   다국어 데이터 (ko / en / zh / ja / es)
+   ============================================================ */
+const LANG_META = [
+  { code:'ko', flag:'🇰🇷', name:'한국어' },
+  { code:'en', flag:'🇺🇸', name:'English' },
+  { code:'zh', flag:'🇨🇳', name:'中文' },
+  { code:'ja', flag:'🇯🇵', name:'日本語' },
+  { code:'es', flag:'🇪🇸', name:'Español' }
 ];
-const CATEGORIES = [
-  { id:"general", emoji:"🦷", label:"일반진료" },
-  { id:"ortho",   emoji:"😁", label:"교정전문" }
-];
-const TREATMENTS = {
-  general: [
-    { emoji:"🪥", label:"충치치료" }, { emoji:"🔩", label:"신경치료" },
-    { emoji:"🦷", label:"임플란트" }, { emoji:"👑", label:"보철·크라운" },
-    { emoji:"✨", label:"스케일링·미백" }, { emoji:"😬", label:"사랑니 발치" },
-    { emoji:"🩹", label:"잇몸치료" }, { emoji:"🦷", label:"틀니" },
-    { emoji:"🔍", label:"정기검진" }, { emoji:"💙", label:"전반적 만족" }
-  ],
-  ortho: [
-    { emoji:"⚙️", label:"메탈교정" }, { emoji:"🤍", label:"세라믹교정" },
-    { emoji:"👻", label:"투명교정 (인비절라인 등)" }, { emoji:"🙊", label:"설측교정 (안보이는교정)" },
-    { emoji:"🔹", label:"부분교정" }, { emoji:"🧒", label:"소아교정" },
-    { emoji:"🔁", label:"재교정" }, { emoji:"💬", label:"교정상담" },
-    { emoji:"💙", label:"전반적 만족" }
-  ]
+const LANG_FULL_NAME = { ko:'Korean', en:'English', zh:'Chinese (Simplified)', ja:'Japanese', es:'Spanish' };
+
+const VISIT_ORDER = ['first_visit','regular_followup','ortho_consult','re_consult'];
+const CATEGORY_ORDER = ['general','ortho'];
+const TREATMENT_ORDER = {
+  general: ['cavity','root_canal','implant','crown','whitening_scaling','wisdom_tooth','gum_treatment','denture','checkup','overall'],
+  ortho: ['metal_braces','ceramic_braces','clear_aligner','lingual_braces','partial_braces','pediatric_ortho','re_treatment','ortho_consult_treat','overall']
 };
-const EXPERIENCE_GROUPS = [
-  { role:"원장님",     items:["정확한 진단","꼼꼼한 시술","통증 최소화","충분한 설명"] },
-  { role:"상담 실장님", items:["친절한 상담","투명한 비용 안내","과잉권유 없음","맞춤 플랜 제안"] },
-  { role:"진료실 선생님", items:["능숙한 어시스트","세심한 케어","편안한 분위기","청결한 위생관리"] },
-  { role:"데스크·예약 선생님", items:["편리한 예약","친절한 응대","짧은 대기시간"] }
-];
-const IMPROVEMENT_GROUPS = [
-  { category:"⏰ 대기·예약", items:["대기시간이 길었어요","예약 변경이 어려웠어요"] },
-  { category:"💳 비용·안내", items:["비용 안내가 아쉬웠어요","진료비가 부담됐어요"] },
-  { category:"🅿️ 시설·환경", items:["주차가 불편했어요","대기공간이 좁았어요"] },
-  { category:"💬 설명·소통", items:["설명이 조금 부족했어요","진료 후 안내가 아쉬웠어요"] }
-];
+const ROLE_ORDER = ['doctor','counselor','staff','desk'];
+const EXPERIENCE_ITEM_ORDER = {
+  doctor: ['accurate_diagnosis','careful_procedure','pain_minimization','thorough_explanation'],
+  counselor: ['kind_consult','transparent_cost','no_overselling','tailored_plan'],
+  staff: ['skilled_assist','careful_care','comfortable_atmosphere','hygiene'],
+  desk: ['easy_booking','kind_response','short_wait']
+};
+const IMPROVEMENT_CATEGORY_ORDER = ['wait_booking','cost_info','facility','communication'];
+const IMPROVEMENT_ITEM_ORDER = {
+  wait_booking: ['long_wait','hard_reschedule'],
+  cost_info: ['cost_info_lacking','cost_burden'],
+  facility: ['parking_inconvenient','waiting_area_small'],
+  communication: ['explanation_lacking','followup_lacking']
+};
+
+const ICONS = {
+  category: { general:'🦷', ortho:'😁' },
+  treatment: {
+    cavity:'🪥', root_canal:'🔩', implant:'🦷', crown:'👑', whitening_scaling:'✨',
+    wisdom_tooth:'😬', gum_treatment:'🩹', denture:'🦷', checkup:'🔍', overall:'💙',
+    metal_braces:'⚙️', ceramic_braces:'🤍', clear_aligner:'👻', lingual_braces:'🙊',
+    partial_braces:'🔹', pediatric_ortho:'🧒', re_treatment:'🔁', ortho_consult_treat:'💬'
+  },
+  role: { doctor:'🩺', counselor:'💬', staff:'🧑\u200d⚕️', desk:'🗓️' },
+  improvementCategory: { wait_booking:'⏰', cost_info:'💳', facility:'🅿️', communication:'💬' }
+};
+
+const TRANSLATIONS = {
+ko: {
+  ui:{
+    heading:'진료, 어떠셨나요?', subtitle:'잠깐만 알려주시면 리뷰를 만들어드려요',
+    smileStart:'시작해볼까요?', smileReady:'준비됐어요', smileProgress:(n,t)=>`${n}/${t} 선택완료`,
+    eyebrow0:'① 작성방식', title0:'리뷰를 어떻게 작성할까요?', methodAI:'AI 문구 생성 ✨', methodManual:'직접 입력 ✍️',
+    eyebrow1:'② 방문유형', title1:'이번 방문은?',
+    eyebrow2:'③ 진료분야', title2:'어느 분야로 진료받으셨나요?',
+    eyebrow3:'④ 세부 치료', title3Suffix:'중 어떤 치료를 받으셨나요?', title3Default:'어떤 치료를 받으셨나요?',
+    eyebrow4:'⑤ 경험선택', title4:'어떤 점이 좋으셨나요?', desc4:'담당자별로 좋았던 점을 골라주세요 (중복 가능)',
+    eyebrow5:'⑥ 개선사항', tag5:'선택사항', title5:'아쉬웠던 점이 있으셨나요?', desc5:'있으시면 골라주세요. 없으시면 바로 다음으로 넘어가도 돼요',
+    noteLabel:'더 남기고 싶은 말 (선택)', notePlaceholder:'예) 대기 공간에 물이 있으면 좋을 것 같아요',
+    manualEyebrow:'✍️ 직접 입력', manualTitle:'리뷰 내용을 적어주세요', manualPlaceholder:'예) 상담부터 시술까지 친절하게 설명해주셔서 편안하게 진료받았어요.',
+    loadingText:'리뷰를 작성하고 있어요...',
+    resultBadge:'✅ 리뷰가 준비됐어요', platformLabel:'리뷰는 자동으로 복사됩니다. 원하시는 플랫폼을 선택하세요',
+    btnNext:'다음', btnMakeReview:'✨ 리뷰 만들기', btnCheckReview:'리뷰 확인하기', btnRegenerate:'🔄 다시 만들기',
+    googleBtnLabel:'📋 복사 + 구글 리뷰로', naverBtnLabel:'📋 복사 + 네이버 리뷰로',
+    toastCopyGoogle:'복사되었어요 · 구글 리뷰로 이동합니다', toastCopyNaver:'복사되었어요 · 네이버 리뷰로 이동합니다', toastCopyFail:'복사에 실패했어요',
+    privacyNote:'선택하신 항목은 리뷰 문구를 만드는 데만 일시적으로 사용되며 별도로 저장되지 않아요. 실명 등 개인 식별 정보는 입력하지 않아도 됩니다.',
+    changeLanguage:'언어 변경', homepageLinkLabel:'치과 홈페이지',
+    homepageIconLabel:'홈페이지', kakaoShareLabel:'카카오톡 공유', wechatShareLabel:'위챗 공유',
+    toastCopyKakao:'복사되었어요 · 카카오톡에서 붙여넣어 공유해주세요', toastCopyWechat:'복사되었어요 · 위챗에서 붙여넣어 공유해주세요',
+    callLabel:'전화로 예약하기', instagramLabel:'인스타그램 팔로우', blogLabel:'블로그 구독', eventTag:'📸 이벤트',
+    referralLabel:'지인에게 병원 추천하기', toastReferralCopy:'링크가 복사되었어요 · 공유해보세요',
+    referralShareText:(name)=>`제가 다녀온 ${name}, 진료가 꼼꼼하고 좋았어요. 한번 방문해보세요 🙂`,
+    guideNote:'✏️ 작성하신 리뷰는 복사한 뒤 구글 또는 네이버 리뷰 화면에 붙여넣어 등록해주세요. 원장님 또는 치과 사진을 2~3장 함께 올려주시면 더욱 좋아요!',
+    thanksNote:'소중한 시간 내어 남겨주신 리뷰, 진심으로 감사드립니다 🙏 환자분의 의견에 귀 기울여 앞으로 더 프리미엄 진료와 서비스로 보답하겠습니다.'
+  },
+  visit:{ first_visit:'초진 (첫 방문)', regular_followup:'정기 재진', ortho_consult:'교정상담 방문', re_consult:'재상담 방문' },
+  category:{ general:'일반진료', ortho:'교정전문' },
+  treatment:{ cavity:'충치치료', root_canal:'신경치료', implant:'임플란트', crown:'보철·크라운', whitening_scaling:'스케일링·미백', wisdom_tooth:'사랑니 발치', gum_treatment:'잇몸치료', denture:'틀니', checkup:'정기검진', overall:'전반적 만족', metal_braces:'메탈교정', ceramic_braces:'세라믹교정', clear_aligner:'투명교정 (인비절라인 등)', lingual_braces:'설측교정 (안보이는교정)', partial_braces:'부분교정', pediatric_ortho:'소아교정', re_treatment:'재교정', ortho_consult_treat:'교정상담' },
+  role:{ doctor:'원장님', counselor:'상담실장님', staff:'진료실 스텝', desk:'데스크·예약' },
+  experienceItem:{ accurate_diagnosis:'정확한 진단', careful_procedure:'꼼꼼한 시술', pain_minimization:'통증 최소화', thorough_explanation:'충분한 설명', kind_consult:'친절한 상담', transparent_cost:'투명한 비용 안내', no_overselling:'과잉권유 없음', tailored_plan:'맞춤 플랜 제안', skilled_assist:'능숙한 어시스트', careful_care:'세심한 케어', comfortable_atmosphere:'편안한 분위기', hygiene:'청결한 위생관리', easy_booking:'편리한 예약', kind_response:'친절한 응대', short_wait:'짧은 대기시간' },
+  improvementCategory:{ wait_booking:'대기·예약', cost_info:'비용·안내', facility:'시설·환경', communication:'설명·소통' },
+  improvementItem:{ long_wait:'대기시간이 길었어요', hard_reschedule:'예약 변경이 어려웠어요', cost_info_lacking:'비용 안내가 아쉬웠어요', cost_burden:'진료비가 부담됐어요', parking_inconvenient:'주차가 불편했어요', waiting_area_small:'대기공간이 좁았어요', explanation_lacking:'설명이 조금 부족했어요', followup_lacking:'진료 후 안내가 아쉬웠어요' }
+},
+en: {
+  ui:{
+    heading:'How was your visit?', subtitle:"Answer a few quick questions and we'll write your review",
+    smileStart:'Ready to start?', smileReady:"You're all set", smileProgress:(n,t)=>`${n}/${t} selected`,
+    eyebrow0:'STEP 1 · METHOD', title0:'How would you like to write your review?', methodAI:'AI-generated ✨', methodManual:'Write it myself ✍️',
+    eyebrow1:'STEP 2 · VISIT TYPE', title1:'What kind of visit was this?',
+    eyebrow2:'STEP 3 · TREATMENT AREA', title2:'Which area were you treated in?',
+    eyebrow3:'STEP 4 · TREATMENT', title3Suffix:'— which treatment did you receive?', title3Default:'Which treatment did you receive?',
+    eyebrow4:'STEP 5 · EXPERIENCE', title4:'What did you like?', desc4:'Pick what stood out for each staff member (multiple choice)',
+    eyebrow5:'STEP 6 · FEEDBACK', tag5:'optional', title5:'Anything that could be improved?', desc5:'Pick any that apply, or skip straight to the next step',
+    noteLabel:'Anything else to add? (optional)', notePlaceholder:'e.g. It would be nice to have water in the waiting area',
+    manualEyebrow:'✍️ Write it myself', manualTitle:'Write your review', manualPlaceholder:'e.g. The staff explained everything clearly and I felt comfortable throughout the treatment.',
+    loadingText:'Writing your review...',
+    resultBadge:'✅ Your review is ready', platformLabel:'Your review is copied automatically — choose a platform',
+    btnNext:'Next', btnMakeReview:'✨ Generate review', btnCheckReview:'Review my text', btnRegenerate:'🔄 Regenerate',
+    googleBtnLabel:'📋 Copy + Open Google', naverBtnLabel:'📋 Copy + Open Naver',
+    toastCopyGoogle:'Copied · opening Google Review', toastCopyNaver:'Copied · opening Naver Review', toastCopyFail:'Copy failed',
+    privacyNote:'Your selections are used only to generate the review text and are not stored. You do not need to enter your name or any identifying information.',
+    changeLanguage:'Change language', homepageLinkLabel:'Clinic website',
+    homepageIconLabel:'Website', kakaoShareLabel:'Share on KakaoTalk', wechatShareLabel:'Share on WeChat',
+    toastCopyKakao:'Copied · paste it into KakaoTalk to share', toastCopyWechat:'Copied · paste it into WeChat to share',
+    callLabel:'Call to book an appointment', instagramLabel:'Follow on Instagram', blogLabel:'Follow the blog', eventTag:'📸 Event',
+    referralLabel:'Recommend this clinic to a friend', toastReferralCopy:'Link copied · share it with someone',
+    referralShareText:(name)=>`I visited ${name} and the care was thorough and great. Worth checking out 🙂`,
+    guideNote:'✏️ Copy your review and paste it into Google or Naver Reviews. Adding 2–3 photos of the doctor or the clinic makes it even better!',
+    thanksNote:'Thank you so much for taking the time to share your review 🙏 We truly value your feedback and will use it to keep offering more premium care and service.'
+  },
+  visit:{ first_visit:'First visit', regular_followup:'Regular follow-up', ortho_consult:'Orthodontic consultation', re_consult:'Follow-up consultation' },
+  category:{ general:'General dentistry', ortho:'Orthodontics' },
+  treatment:{ cavity:'Cavity treatment', root_canal:'Root canal', implant:'Implant', crown:'Crown / Prosthetics', whitening_scaling:'Scaling / Whitening', wisdom_tooth:'Wisdom tooth extraction', gum_treatment:'Gum treatment', denture:'Dentures', checkup:'Regular checkup', overall:'Overall satisfaction', metal_braces:'Metal braces', ceramic_braces:'Ceramic braces', clear_aligner:'Clear aligners (Invisalign, etc.)', lingual_braces:'Lingual braces (hidden)', partial_braces:'Partial braces', pediatric_ortho:'Pediatric orthodontics', re_treatment:'Re-treatment', ortho_consult_treat:'Orthodontic consultation' },
+  role:{ doctor:'Dentist', counselor:'Treatment Coordinator', staff:'Clinical Staff', desk:'Front Desk' },
+  experienceItem:{ accurate_diagnosis:'Accurate diagnosis', careful_procedure:'Careful procedure', pain_minimization:'Minimal pain', thorough_explanation:'Thorough explanation', kind_consult:'Friendly consultation', transparent_cost:'Transparent pricing', no_overselling:'No pressure to upsell', tailored_plan:'Tailored treatment plan', skilled_assist:'Skilled assistance', careful_care:'Attentive care', comfortable_atmosphere:'Comfortable atmosphere', hygiene:'Clean & hygienic', easy_booking:'Easy booking', kind_response:'Friendly service', short_wait:'Short wait time' },
+  improvementCategory:{ wait_booking:'Wait & booking', cost_info:'Cost & information', facility:'Facilities', communication:'Explanation & communication' },
+  improvementItem:{ long_wait:'The wait was long', hard_reschedule:'Rescheduling was difficult', cost_info_lacking:'Cost info could be clearer', cost_burden:'The cost felt like a burden', parking_inconvenient:'Parking was inconvenient', waiting_area_small:'The waiting area was small', explanation_lacking:'Explanation could be more thorough', followup_lacking:'Follow-up guidance was lacking' }
+},
+zh: {
+  ui:{
+    heading:'您的就诊体验如何？', subtitle:'只需简单几步，我们就能帮您写好评价',
+    smileStart:'准备好了吗？', smileReady:'已完成', smileProgress:(n,t)=>`已选择 ${n}/${t}`,
+    eyebrow0:'① 撰写方式', title0:'您想如何撰写评价？', methodAI:'AI 自动生成 ✨', methodManual:'自己输入 ✍️',
+    eyebrow1:'② 就诊类型', title1:'这次是什么类型的就诊？',
+    eyebrow2:'③ 诊疗领域', title2:'您接受的是哪个领域的诊疗？',
+    eyebrow3:'④ 具体治疗', title3Suffix:'中您接受了哪种治疗？', title3Default:'您接受了哪种治疗？',
+    eyebrow4:'⑤ 体验选择', title4:'哪些方面让您满意？', desc4:'请按负责人分别选择满意之处（可多选）',
+    eyebrow5:'⑥ 改进建议', tag5:'可选', title5:'有没有觉得不满意的地方？', desc5:'如果有请选择，没有的话可以直接进入下一步',
+    noteLabel:'还想补充的话（可选）', notePlaceholder:'例如：候诊区如果有饮水机就更好了',
+    manualEyebrow:'✍️ 自己输入', manualTitle:'请输入评价内容', manualPlaceholder:'例如：从咨询到治疗，医护人员都耐心讲解，让我很安心。',
+    loadingText:'正在为您生成评价...',
+    resultBadge:'✅ 评价已生成', platformLabel:'评价内容已自动复制，请选择您要使用的平台',
+    btnNext:'下一步', btnMakeReview:'✨ 生成评价', btnCheckReview:'确认评价内容', btnRegenerate:'🔄 重新生成',
+    googleBtnLabel:'📋 复制并前往 Google 评价', naverBtnLabel:'📋 复制并前往 Naver 评价',
+    toastCopyGoogle:'已复制 · 正在前往 Google 评价', toastCopyNaver:'已复制 · 正在前往 Naver 评价', toastCopyFail:'复制失败',
+    privacyNote:'您选择的内容仅用于生成评价文本，不会被保存。无需输入姓名等可识别个人身份的信息。',
+    changeLanguage:'切换语言', homepageLinkLabel:'医院官网',
+    homepageIconLabel:'官网', kakaoShareLabel:'分享到 KakaoTalk', wechatShareLabel:'分享到微信',
+    toastCopyKakao:'已复制 · 请在 KakaoTalk 中粘贴分享', toastCopyWechat:'已复制 · 请在微信中粘贴分享',
+    callLabel:'致电预约', instagramLabel:'关注 Instagram', blogLabel:'订阅博客', eventTag:'📸 活动',
+    referralLabel:'推荐给朋友', toastReferralCopy:'链接已复制 · 快分享出去吧',
+    referralShareText:(name)=>`我去了${name}，诊疗很细致，体验很好，推荐大家去看看 🙂`,
+    guideNote:'✏️ 请复制您撰写的评价，粘贴到 Google 或 Naver 的评价页面。若能一起上传2~3张院长或医院的照片，效果会更好！',
+    thanksNote:'衷心感谢您抽出宝贵时间留下评价 🙏 我们会认真倾听您的意见，以更优质的高端诊疗与服务回馈各位患者。'
+  },
+  visit:{ first_visit:'首次就诊', regular_followup:'定期复诊', ortho_consult:'正畸咨询', re_consult:'复诊咨询' },
+  category:{ general:'普通诊疗', ortho:'正畸专科' },
+  treatment:{ cavity:'龋齿治疗', root_canal:'根管治疗', implant:'种植牙', crown:'补牙·牙冠', whitening_scaling:'洁牙·美白', wisdom_tooth:'智齿拔除', gum_treatment:'牙龈治疗', denture:'义齿', checkup:'定期检查', overall:'整体满意', metal_braces:'金属矫正', ceramic_braces:'陶瓷矫正', clear_aligner:'隐形矫正（隐适美等）', lingual_braces:'舌侧矫正（隐形）', partial_braces:'局部矫正', pediatric_ortho:'儿童矫正', re_treatment:'二次矫正', ortho_consult_treat:'正畸咨询' },
+  role:{ doctor:'院长', counselor:'咨询师', staff:'诊疗室员工', desk:'前台·预约' },
+  experienceItem:{ accurate_diagnosis:'诊断准确', careful_procedure:'操作细致', pain_minimization:'疼痛感极小', thorough_explanation:'讲解充分', kind_consult:'咨询亲切', transparent_cost:'费用透明', no_overselling:'不过度推销', tailored_plan:'个性化方案', skilled_assist:'助理操作娴熟', careful_care:'照护细心', comfortable_atmosphere:'氛围舒适', hygiene:'环境卫生清洁', easy_booking:'预约方便', kind_response:'服务亲切', short_wait:'等待时间短' },
+  improvementCategory:{ wait_booking:'等待·预约', cost_info:'费用·说明', facility:'设施·环境', communication:'讲解·沟通' },
+  improvementItem:{ long_wait:'等待时间较长', hard_reschedule:'改约时间比较困难', cost_info_lacking:'费用说明不够清楚', cost_burden:'诊疗费用有些负担', parking_inconvenient:'停车不太方便', waiting_area_small:'候诊空间较小', explanation_lacking:'讲解略显不足', followup_lacking:'诊后指导有些欠缺' }
+},
+ja: {
+  ui:{
+    heading:'診療はいかがでしたか？', subtitle:'簡単な質問にお答えいただくだけで、レビューを作成します',
+    smileStart:'始めましょうか？', smileReady:'準備完了です', smileProgress:(n,t)=>`${n}/${t} 選択済み`,
+    eyebrow0:'① 作成方法', title0:'レビューをどのように作成しますか？', methodAI:'AI文章生成 ✨', methodManual:'自分で入力 ✍️',
+    eyebrow1:'② 来院タイプ', title1:'今回の来院は？',
+    eyebrow2:'③ 診療分野', title2:'どの分野の診療を受けましたか？',
+    eyebrow3:'④ 詳細治療', title3Suffix:'のうち、どの治療を受けましたか？', title3Default:'どの治療を受けましたか？',
+    eyebrow4:'⑤ 体験選択', title4:'どんな点が良かったですか？', desc4:'担当者ごとに良かった点を選んでください（複数選択可）',
+    eyebrow5:'⑥ 改善点', tag5:'任意', title5:'気になった点はありましたか？', desc5:'あれば選んでください。なければそのまま次に進んでも大丈夫です',
+    noteLabel:'その他ご意見（任意）', notePlaceholder:'例）待合スペースにお水があるとうれしいです',
+    manualEyebrow:'✍️ 自分で入力', manualTitle:'レビュー内容を入力してください', manualPlaceholder:'例）カウンセリングから施術まで丁寧に説明していただき、安心して診療を受けられました。',
+    loadingText:'レビューを作成しています...',
+    resultBadge:'✅ レビューが完成しました', platformLabel:'レビューは自動的にコピーされます。ご希望のプラットフォームをお選びください',
+    btnNext:'次へ', btnMakeReview:'✨ レビューを作成', btnCheckReview:'内容を確認する', btnRegenerate:'🔄 作り直す',
+    googleBtnLabel:'📋 コピーしてGoogleレビューへ', naverBtnLabel:'📋 コピーしてNaverレビューへ',
+    toastCopyGoogle:'コピーしました・Googleレビューへ移動します', toastCopyNaver:'コピーしました・Naverレビューへ移動します', toastCopyFail:'コピーに失敗しました',
+    privacyNote:'選択いただいた内容はレビュー文章の作成にのみ一時的に使用され、保存されません。氏名など個人を特定できる情報は入力不要です。',
+    changeLanguage:'言語を変更', homepageLinkLabel:'医院ホームページ',
+    homepageIconLabel:'ホームページ', kakaoShareLabel:'カカオトークで共有', wechatShareLabel:'WeChatで共有',
+    toastCopyKakao:'コピーしました・カカオトークに貼り付けて共有してください', toastCopyWechat:'コピーしました・WeChatに貼り付けて共有してください',
+    callLabel:'電話で予約する', instagramLabel:'Instagramをフォロー', blogLabel:'ブログを購読', eventTag:'📸 イベント',
+    referralLabel:'友人にクリニックを紹介する', toastReferralCopy:'リンクをコピーしました・共有してみてください',
+    referralShareText:(name)=>`${name}に通っているのですが、診療が丁寧でとても良かったです。一度訪れてみてください 🙂`,
+    guideNote:'✏️ 作成したレビューをコピーして、GoogleまたはNaverのレビュー画面に貼り付けてください。院長先生や医院の写真を2〜3枚一緒に投稿していただくと、さらに効果的です！',
+    thanksNote:'貴重なお時間を割いてレビューを残してくださり、心より感謝申し上げます 🙏 いただいたご意見に耳を傾け、今後さらにプレミアムな診療とサービスでお応えしてまいります。'
+  },
+  visit:{ first_visit:'初診（初めての来院）', regular_followup:'定期通院', ortho_consult:'矯正相談', re_consult:'再相談' },
+  category:{ general:'一般診療', ortho:'矯正専門' },
+  treatment:{ cavity:'虫歯治療', root_canal:'神経治療', implant:'インプラント', crown:'補綴・クラウン', whitening_scaling:'スケーリング・ホワイトニング', wisdom_tooth:'親知らず抜歯', gum_treatment:'歯周病治療', denture:'入れ歯', checkup:'定期検診', overall:'全体的な満足', metal_braces:'メタル矯正', ceramic_braces:'セラミック矯正', clear_aligner:'マウスピース矯正（インビザラインなど）', lingual_braces:'舌側矯正（見えない矯正）', partial_braces:'部分矯正', pediatric_ortho:'小児矯正', re_treatment:'再矯正', ortho_consult_treat:'矯正相談' },
+  role:{ doctor:'院長', counselor:'カウンセラー', staff:'診療室スタッフ', desk:'受付・予約' },
+  experienceItem:{ accurate_diagnosis:'正確な診断', careful_procedure:'丁寧な施術', pain_minimization:'痛みが少ない', thorough_explanation:'十分な説明', kind_consult:'親切なカウンセリング', transparent_cost:'透明な費用案内', no_overselling:'過剰な勧誘なし', tailored_plan:'オーダーメイドの提案', skilled_assist:'熟練したアシスト', careful_care:'きめ細やかなケア', comfortable_atmosphere:'落ち着いた雰囲気', hygiene:'清潔な衛生管理', easy_booking:'予約のしやすさ', kind_response:'親切な対応', short_wait:'待ち時間が短い' },
+  improvementCategory:{ wait_booking:'待ち時間・予約', cost_info:'費用・案内', facility:'施設・環境', communication:'説明・コミュニケーション' },
+  improvementItem:{ long_wait:'待ち時間が長かった', hard_reschedule:'予約変更が難しかった', cost_info_lacking:'費用案内が不十分だった', cost_burden:'費用が負担に感じた', parking_inconvenient:'駐車場が不便だった', waiting_area_small:'待合スペースが狭かった', explanation_lacking:'説明がやや不足していた', followup_lacking:'診療後の案内が不十分だった' }
+},
+es: {
+  ui:{
+    heading:'¿Qué tal estuvo su visita?', subtitle:'Responda unas breves preguntas y crearemos su reseña',
+    smileStart:'¿Empezamos?', smileReady:'Todo listo', smileProgress:(n,t)=>`${n}/${t} seleccionado(s)`,
+    eyebrow0:'① MÉTODO', title0:'¿Cómo desea escribir su reseña?', methodAI:'Generar con IA ✨', methodManual:'Escribir yo mismo ✍️',
+    eyebrow1:'② TIPO DE VISITA', title1:'¿Qué tipo de visita fue esta?',
+    eyebrow2:'③ ÁREA DE TRATAMIENTO', title2:'¿En qué área recibió tratamiento?',
+    eyebrow3:'④ TRATAMIENTO', title3Suffix:': ¿qué tratamiento recibió?', title3Default:'¿Qué tratamiento recibió?',
+    eyebrow4:'⑤ EXPERIENCIA', title4:'¿Qué fue lo que más le gustó?', desc4:'Elija lo que más destacó de cada persona (puede elegir varias opciones)',
+    eyebrow5:'⑥ SUGERENCIAS', tag5:'opcional', title5:'¿Hubo algo que podría mejorar?', desc5:'Selecciónelo si lo hubo, o pase directamente al siguiente paso',
+    noteLabel:'¿Algo más que agregar? (opcional)', notePlaceholder:'Ej: estaría bien tener agua en la sala de espera',
+    manualEyebrow:'✍️ Escribir yo mismo', manualTitle:'Escriba su reseña', manualPlaceholder:'Ej: El personal me explicó todo con claridad y me sentí cómodo/a durante todo el tratamiento.',
+    loadingText:'Redactando su reseña...',
+    resultBadge:'✅ Su reseña está lista', platformLabel:'Su reseña se copia automáticamente. Elija una plataforma',
+    btnNext:'Siguiente', btnMakeReview:'✨ Generar reseña', btnCheckReview:'Revisar mi texto', btnRegenerate:'🔄 Generar de nuevo',
+    googleBtnLabel:'📋 Copiar y abrir Google', naverBtnLabel:'📋 Copiar y abrir Naver',
+    toastCopyGoogle:'Copiado · abriendo Google Reviews', toastCopyNaver:'Copiado · abriendo Naver Reviews', toastCopyFail:'Error al copiar',
+    privacyNote:'Sus selecciones se usan solo para generar el texto de la reseña y no se almacenan. No es necesario ingresar su nombre ni datos de identificación.',
+    changeLanguage:'Cambiar idioma', homepageLinkLabel:'Sitio web de la clínica',
+    homepageIconLabel:'Sitio web', kakaoShareLabel:'Compartir en KakaoTalk', wechatShareLabel:'Compartir en WeChat',
+    toastCopyKakao:'Copiado · péguelo en KakaoTalk para compartir', toastCopyWechat:'Copiado · péguelo en WeChat para compartir',
+    callLabel:'Llamar para reservar', instagramLabel:'Seguir en Instagram', blogLabel:'Seguir el blog', eventTag:'📸 Promoción',
+    referralLabel:'Recomendar esta clínica a un amigo', toastReferralCopy:'Enlace copiado · compártalo',
+    referralShareText:(name)=>`Visité ${name} y la atención fue muy completa y buena. Vale la pena conocerla 🙂`,
+    guideNote:'✏️ Copie su reseña y péguela en Google o Naver Reviews. ¡Subir 2–3 fotos del doctor o de la clínica hace que sea aún mejor!',
+    thanksNote:'Muchas gracias por tomarse el tiempo de dejar su reseña 🙏 Valoramos mucho su opinión y la usaremos para seguir ofreciendo una atención y un servicio de nivel premium.'
+  },
+  visit:{ first_visit:'Primera visita', regular_followup:'Control periódico', ortho_consult:'Consulta de ortodoncia', re_consult:'Consulta de seguimiento' },
+  category:{ general:'Odontología general', ortho:'Ortodoncia' },
+  treatment:{ cavity:'Tratamiento de caries', root_canal:'Endodoncia', implant:'Implante', crown:'Prótesis / Corona', whitening_scaling:'Limpieza / Blanqueamiento', wisdom_tooth:'Extracción de muela del juicio', gum_treatment:'Tratamiento de encías', denture:'Dentadura postiza', checkup:'Chequeo regular', overall:'Satisfacción general', metal_braces:'Brackets metálicos', ceramic_braces:'Brackets cerámicos', clear_aligner:'Alineadores transparentes (Invisalign, etc.)', lingual_braces:'Ortodoncia lingual (invisible)', partial_braces:'Ortodoncia parcial', pediatric_ortho:'Ortodoncia infantil', re_treatment:'Retratamiento', ortho_consult_treat:'Consulta de ortodoncia' },
+  role:{ doctor:'Dentista', counselor:'Coordinador/a de tratamiento', staff:'Personal clínico', desk:'Recepción' },
+  experienceItem:{ accurate_diagnosis:'Diagnóstico preciso', careful_procedure:'Procedimiento cuidadoso', pain_minimization:'Dolor mínimo', thorough_explanation:'Explicación detallada', kind_consult:'Consulta amable', transparent_cost:'Precios transparentes', no_overselling:'Sin presión para vender más', tailored_plan:'Plan personalizado', skilled_assist:'Asistencia experta', careful_care:'Cuidado atento', comfortable_atmosphere:'Ambiente agradable', hygiene:'Limpieza e higiene', easy_booking:'Fácil de reservar', kind_response:'Atención amable', short_wait:'Poco tiempo de espera' },
+  improvementCategory:{ wait_booking:'Espera y reservas', cost_info:'Costos e información', facility:'Instalaciones', communication:'Explicación y comunicación' },
+  improvementItem:{ long_wait:'El tiempo de espera fue largo', hard_reschedule:'Fue difícil cambiar la cita', cost_info_lacking:'La información de costos podría ser más clara', cost_burden:'El costo resultó algo elevado', parking_inconvenient:'El estacionamiento fue incómodo', waiting_area_small:'La sala de espera era pequeña', explanation_lacking:'La explicación podría ser más completa', followup_lacking:'Faltó orientación después del tratamiento' }
+}
+};
+
+/* ============================================================ */
 
 const params = new URLSearchParams(window.location.search);
 const CLINIC_NAME = params.get('name');
 const GOOGLE_REVIEW_URL = params.get('google');
 const NAVER_REVIEW_URL = params.get('naver');
+const HOMEPAGE_URL = params.get('homepage');
+
+// 온라인 브랜딩 확장 파라미터 (모두 선택값)
+const CLINIC_ID = params.get('cid');               // 관리자 알림/통계 매핑용 식별자 (없으면 병원명 사용)
+const REGION = params.get('region');                // 예: "강남 치과" — 리뷰 문구에 자연스럽게 1회만 반영
+const PHONE = params.get('phone');                  // 예: 0212345678 — 하단 "전화로 예약하기" 버튼
+const INSTAGRAM_URL = params.get('instagram');       // 인스타그램 팔로우 링크
+const BLOG_URL = params.get('blog');                 // 네이버 블로그 링크
+const EVENT_NOTE = params.get('event');              // 포토리뷰/SNS 이벤트 안내문 (자유 텍스트, 원문 그대로 표시)
+const DOCTOR_PHOTO = params.get('doctorPhoto');       // 원장님 사진 URL
+const DOCTOR_GREETING = params.get('doctorGreeting'); // 원장님 한줄 인사말 (자유 텍스트, 원문 그대로 표시)
+const LOGO_URL = params.get('logo');                  // 병원 로고 이미지 URL
+const BRAND_COLOR = params.get('color');              // 브랜드 포인트 컬러 (hex, # 없이. 예: 0F5132)
+
+if(BRAND_COLOR){
+  document.documentElement.style.setProperty('--deep', `#${BRAND_COLOR}`);
+  document.documentElement.style.setProperty('--deep-light', `#${BRAND_COLOR}cc`);
+}
 
 if(!CLINIC_NAME || !GOOGLE_REVIEW_URL){
   document.getElementById('setupNeeded').style.display = 'block';
@@ -218,66 +513,11 @@ if(!CLINIC_NAME || !GOOGLE_REVIEW_URL){
   document.getElementById('mainContent').style.display = 'block';
   document.getElementById('bar').style.display = 'flex';
   document.getElementById('clinicNameLabel').textContent = decodeURIComponent(CLINIC_NAME);
-  initFlow();
+  initApp();
 }
 
-function initFlow(){
-  const visitBox = document.getElementById('visitOptions');
-  VISIT_TYPES.forEach(v=>{
-    const d = document.createElement('div');
-    d.className='opt'; d.dataset.group='visit'; d.dataset.value=v;
-    d.textContent = v;
-    visitBox.appendChild(d);
-  });
-
-  const categoryBox = document.getElementById('categoryOptions');
-  CATEGORIES.forEach(c=>{
-    const d = document.createElement('div');
-    d.className='opt category'; d.dataset.group='category'; d.dataset.value=c.id;
-    d.textContent = `${c.emoji} ${c.label}`;
-    categoryBox.appendChild(d);
-  });
-
-  const experienceGroupsBox = document.getElementById('experienceGroups');
-  EXPERIENCE_GROUPS.forEach(g=>{
-    const wrap = document.createElement('div');
-    wrap.className = 'role-group';
-    const header = document.createElement('p');
-    header.className = 'role-header';
-    header.textContent = `👤 ${g.role}`;
-    wrap.appendChild(header);
-    const grid = document.createElement('div');
-    grid.className = 'options';
-    g.items.forEach(item=>{
-      const d = document.createElement('div');
-      d.className='opt'; d.dataset.group='experience'; d.dataset.role=g.role; d.dataset.value=item;
-      d.textContent = item;
-      grid.appendChild(d);
-    });
-    wrap.appendChild(grid);
-    experienceGroupsBox.appendChild(wrap);
-  });
-
-  const improvementGroupsBox = document.getElementById('improvementGroups');
-  IMPROVEMENT_GROUPS.forEach(g=>{
-    const wrap = document.createElement('div');
-    wrap.className = 'role-group';
-    const header = document.createElement('p');
-    header.className = 'role-header';
-    header.textContent = g.category;
-    wrap.appendChild(header);
-    const grid = document.createElement('div');
-    grid.className = 'options';
-    g.items.forEach(item=>{
-      const d = document.createElement('div');
-      d.className='opt improvement'; d.dataset.group='improvement'; d.dataset.category=g.category; d.dataset.value=item;
-      d.textContent = item;
-      grid.appendChild(d);
-    });
-    wrap.appendChild(grid);
-    improvementGroupsBox.appendChild(wrap);
-  });
-
+function initApp(){
+  let LANG = null;
   const state = { method:null, visit:null, category:null, treatment:null, experience:[], improvements:[], additionalNote:'' };
   let flow = [];
   let stepIndex = 0;
@@ -291,6 +531,219 @@ function initFlow(){
   const resultCard = document.getElementById('resultCard');
   const resultText = document.getElementById('resultText');
   const toast = document.getElementById('toast');
+  const langSwitchBtn = document.getElementById('langSwitchBtn');
+
+  // 언어 선택 옵션 렌더 (항상 5개 언어명은 고유하게 표시)
+  const langBox = document.getElementById('langOptions');
+  LANG_META.forEach(l=>{
+    const d = document.createElement('div');
+    d.className = 'opt lang';
+    d.dataset.lang = l.code;
+    d.textContent = `${l.flag} ${l.name}`;
+    langBox.appendChild(d);
+  });
+
+  langBox.addEventListener('click', (e)=>{
+    const el = e.target.closest('[data-lang]');
+    if(!el) return;
+    LANG = el.dataset.lang;
+    langSwitchBtn.style.display = 'block';
+    langSwitchBtn.textContent = `🌐 ${T().ui.changeLanguage}`;
+    applyLanguage();
+    goToStep('0');
+  });
+
+  langSwitchBtn.addEventListener('click', ()=>{
+    resultCard.classList.remove('active');
+    ghostBtn.style.display = 'none';
+    mainBtn.style.display = 'block';
+    state.method = null; state.visit = null; state.category = null; state.treatment = null;
+    state.experience = []; state.improvements = []; state.additionalNote = '';
+    goToStep('lang');
+  });
+
+  function T(){ return TRANSLATIONS[LANG]; }
+
+  function applyLanguage(){
+    const t = T();
+    document.getElementById('txtHeading').textContent = t.ui.heading;
+    document.getElementById('txtSubtitle').textContent = t.ui.subtitle;
+    document.getElementById('txtEyebrow0').textContent = t.ui.eyebrow0;
+    document.getElementById('txtTitle0').textContent = t.ui.title0;
+    document.getElementById('optMethodAI').textContent = t.ui.methodAI;
+    document.getElementById('optMethodManual').textContent = t.ui.methodManual;
+    document.getElementById('txtEyebrow1').textContent = t.ui.eyebrow1;
+    document.getElementById('txtTitle1').textContent = t.ui.title1;
+    document.getElementById('txtEyebrow2').textContent = t.ui.eyebrow2;
+    document.getElementById('txtTitle2').textContent = t.ui.title2;
+    document.getElementById('txtEyebrow3').textContent = t.ui.eyebrow3;
+    document.getElementById('txtEyebrow4').textContent = t.ui.eyebrow4;
+    document.getElementById('txtTitle4').textContent = t.ui.title4;
+    document.getElementById('txtDesc4').textContent = t.ui.desc4;
+    document.getElementById('txtEyebrow5').innerHTML = `${t.ui.eyebrow5} <span class="step-optional-tag">${t.ui.tag5}</span>`;
+    document.getElementById('txtTitle5').textContent = t.ui.title5;
+    document.getElementById('txtDesc5').textContent = t.ui.desc5;
+    document.getElementById('txtNoteLabel').textContent = t.ui.noteLabel;
+    document.getElementById('additionalNote').placeholder = t.ui.notePlaceholder;
+    document.getElementById('txtManualEyebrow').textContent = t.ui.manualEyebrow;
+    document.getElementById('txtManualTitle').textContent = t.ui.manualTitle;
+    document.getElementById('manualText').placeholder = t.ui.manualPlaceholder;
+    document.getElementById('txtLoading').textContent = t.ui.loadingText;
+    document.getElementById('txtResultBadge').textContent = t.ui.resultBadge;
+    document.getElementById('txtPlatformLabel').textContent = t.ui.platformLabel;
+    document.getElementById('googleBtn').textContent = t.ui.googleBtnLabel;
+    document.getElementById('naverBtn').textContent = t.ui.naverBtnLabel;
+    document.getElementById('txtPrivacyNote').textContent = t.ui.privacyNote;
+    document.getElementById('treatmentTitle').textContent = t.ui.title3Default;
+    document.getElementById('txtHomepageIconLabel').textContent = t.ui.homepageIconLabel;
+    document.getElementById('txtKakaoLabel').textContent = t.ui.kakaoShareLabel;
+    document.getElementById('txtWechatLabel').textContent = t.ui.wechatShareLabel;
+    document.getElementById('txtGuideNote').textContent = t.ui.guideNote;
+    document.getElementById('txtThanksNote').textContent = t.ui.thanksNote;
+    document.getElementById('txtCallLabel').textContent = t.ui.callLabel;
+    document.getElementById('txtInstagramLabel').textContent = t.ui.instagramLabel;
+    document.getElementById('txtBlogLabel').textContent = t.ui.blogLabel;
+    document.getElementById('txtEventTag').textContent = t.ui.eventTag;
+    document.getElementById('txtReferralLabel').textContent = t.ui.referralLabel;
+
+    if(HOMEPAGE_URL){
+      const link = document.getElementById('homepageLink');
+      link.style.display = 'inline-block';
+      link.href = decodeURIComponent(HOMEPAGE_URL);
+      document.getElementById('homepageLinkText').textContent = t.ui.homepageLinkLabel;
+
+      const iconLink = document.getElementById('homepageIconBtn');
+      iconLink.style.display = 'flex';
+      iconLink.href = decodeURIComponent(HOMEPAGE_URL);
+    }
+
+    if(LOGO_URL){
+      const logo = document.getElementById('clinicLogo');
+      logo.src = decodeURIComponent(LOGO_URL);
+      logo.alt = decodeURIComponent(CLINIC_NAME);
+      logo.style.display = 'block';
+    }
+
+    if(DOCTOR_PHOTO || DOCTOR_GREETING){
+      document.getElementById('doctorCard').style.display = 'flex';
+      if(DOCTOR_PHOTO) document.getElementById('doctorPhotoImg').src = decodeURIComponent(DOCTOR_PHOTO);
+      if(DOCTOR_GREETING) document.getElementById('doctorGreetingText').textContent = decodeURIComponent(DOCTOR_GREETING);
+    }
+
+    if(PHONE){
+      const callBtn = document.getElementById('callBtn');
+      callBtn.style.display = 'flex';
+      callBtn.href = `tel:${decodeURIComponent(PHONE)}`;
+    }
+
+    if(INSTAGRAM_URL || BLOG_URL){
+      document.getElementById('snsRow').style.display = 'flex';
+      if(INSTAGRAM_URL){
+        const ig = document.getElementById('instagramBtn');
+        ig.style.display = 'flex';
+        ig.href = decodeURIComponent(INSTAGRAM_URL);
+      }
+      if(BLOG_URL){
+        const bl = document.getElementById('blogBtn');
+        bl.style.display = 'flex';
+        bl.href = decodeURIComponent(BLOG_URL);
+      }
+    }
+
+    if(EVENT_NOTE && (INSTAGRAM_URL || BLOG_URL)){
+      document.getElementById('eventBanner').style.display = 'block';
+      document.getElementById('txtEventNote').textContent = decodeURIComponent(EVENT_NOTE);
+    }
+
+    renderVisit(); renderCategory(); renderExperience(); renderImprovement();
+    if(state.category) renderTreatments(state.category);
+    refreshButton();
+  }
+
+  function renderVisit(){
+    const box = document.getElementById('visitOptions');
+    box.innerHTML = '';
+    VISIT_ORDER.forEach(id=>{
+      const d = document.createElement('div');
+      d.className='opt'; d.dataset.group='visit'; d.dataset.value=id;
+      d.textContent = T().visit[id];
+      if(state.visit === id) d.classList.add('selected');
+      box.appendChild(d);
+    });
+  }
+  function renderCategory(){
+    const box = document.getElementById('categoryOptions');
+    box.innerHTML = '';
+    CATEGORY_ORDER.forEach(id=>{
+      const d = document.createElement('div');
+      d.className='opt category'; d.dataset.group='category'; d.dataset.value=id;
+      d.textContent = `${ICONS.category[id]} ${T().category[id]}`;
+      if(state.category === id) d.classList.add('selected');
+      box.appendChild(d);
+    });
+  }
+  function renderTreatments(categoryId){
+    const box = document.getElementById('treatmentOptions');
+    box.innerHTML = '';
+    const t = T();
+    document.getElementById('treatmentTitle').textContent = categoryId
+      ? `${t.category[categoryId]} ${t.ui.title3Suffix}` : t.ui.title3Default;
+    (TREATMENT_ORDER[categoryId] || []).forEach(id=>{
+      const d = document.createElement('div');
+      d.className='opt'; d.dataset.group='treatment'; d.dataset.value=id;
+      d.textContent = `${ICONS.treatment[id]} ${t.treatment[id]}`;
+      if(state.treatment === id) d.classList.add('selected');
+      box.appendChild(d);
+    });
+  }
+  function renderExperience(){
+    const box = document.getElementById('experienceGroups');
+    box.innerHTML = '';
+    const t = T();
+    ROLE_ORDER.forEach(role=>{
+      const wrap = document.createElement('div');
+      wrap.className = 'role-group';
+      const header = document.createElement('p');
+      header.className = 'role-header';
+      header.textContent = `${ICONS.role[role]} ${t.role[role]}`;
+      wrap.appendChild(header);
+      const grid = document.createElement('div');
+      grid.className = 'options';
+      EXPERIENCE_ITEM_ORDER[role].forEach(id=>{
+        const d = document.createElement('div');
+        d.className='opt'; d.dataset.group='experience'; d.dataset.role=role; d.dataset.value=id;
+        d.textContent = t.experienceItem[id];
+        if(state.experience.some(e=>e.key === `${role}::${id}`)) d.classList.add('selected');
+        grid.appendChild(d);
+      });
+      wrap.appendChild(grid);
+      box.appendChild(wrap);
+    });
+  }
+  function renderImprovement(){
+    const box = document.getElementById('improvementGroups');
+    box.innerHTML = '';
+    const t = T();
+    IMPROVEMENT_CATEGORY_ORDER.forEach(cat=>{
+      const wrap = document.createElement('div');
+      wrap.className = 'role-group';
+      const header = document.createElement('p');
+      header.className = 'role-header';
+      header.textContent = `${ICONS.improvementCategory[cat]} ${t.improvementCategory[cat]}`;
+      wrap.appendChild(header);
+      const grid = document.createElement('div');
+      grid.className = 'options';
+      IMPROVEMENT_ITEM_ORDER[cat].forEach(id=>{
+        const d = document.createElement('div');
+        d.className='opt improvement'; d.dataset.group='improvement'; d.dataset.category=cat; d.dataset.value=id;
+        d.textContent = t.improvementItem[id];
+        if(state.improvements.some(i=>i.key === `${cat}::${id}`)) d.classList.add('selected');
+        grid.appendChild(d);
+      });
+      wrap.appendChild(grid);
+      box.appendChild(wrap);
+    });
+  }
 
   function showToast(msg){
     toast.textContent = msg;
@@ -307,38 +760,30 @@ function initFlow(){
   }
   function currentStepName(){ return flow[stepIndex]; }
 
-  function renderTreatments(categoryId){
-    const box = document.getElementById('treatmentOptions');
-    box.innerHTML = '';
-    const cat = CATEGORIES.find(c=>c.id===categoryId);
-    document.getElementById('treatmentTitle').textContent =
-      cat ? `${cat.label} 중 어떤 치료를 받으셨나요?` : '어떤 치료를 받으셨나요?';
-    (TREATMENTS[categoryId] || []).forEach(t=>{
-      const d = document.createElement('div');
-      d.className='opt'; d.dataset.group='treatment'; d.dataset.value=t.label;
-      d.textContent = `${t.emoji} ${t.label}`;
-      box.appendChild(d);
-    });
-  }
-
   function refreshButton(){
-    if(state.method === null){ mainBtn.textContent='다음'; mainBtn.disabled=true; setSmile(0,'시작해볼까요?'); return; }
+    if(!LANG) return;
+    const t = T();
+    if(state.method === null){
+      mainBtn.textContent = t.ui.btnNext; mainBtn.disabled = true;
+      setSmile(0, t.ui.smileStart);
+      return;
+    }
     if(state.method === 'manual'){
       const txt = document.getElementById('manualText').value.trim();
-      mainBtn.textContent = '리뷰 확인하기';
+      mainBtn.textContent = t.ui.btnCheckReview;
       mainBtn.disabled = txt.length === 0;
-      setSmile(txt.length ? 1 : 0.15, txt.length ? '준비됐어요' : '내용을 적어주세요');
+      setSmile(txt.length ? 1 : 0.15, txt.length ? t.ui.smileReady : t.ui.title5);
       return;
     }
     const name = currentStepName();
     if(name === '1') mainBtn.disabled = !state.visit;
     else if(name === '2') mainBtn.disabled = !state.category;
     else if(name === '3') mainBtn.disabled = !state.treatment;
-    else if(name === '4'){ mainBtn.disabled = state.experience.length===0; mainBtn.textContent='다음'; }
-    else if(name === '5'){ mainBtn.disabled = false; mainBtn.textContent='✨ 리뷰 만들기'; }
-    else mainBtn.textContent = '다음';
+    else if(name === '4'){ mainBtn.disabled = state.experience.length===0; mainBtn.textContent = t.ui.btnNext; }
+    else if(name === '5'){ mainBtn.disabled = false; mainBtn.textContent = t.ui.btnMakeReview; }
+    else mainBtn.textContent = t.ui.btnNext;
     const done = [state.visit, state.category, state.treatment, state.experience.length>0].filter(Boolean).length;
-    setSmile(done/4, done===4 ? '준비됐어요' : `${done}/4 선택완료`);
+    setSmile(done/4, done===4 ? t.ui.smileReady : t.ui.smileProgress(done,4));
   }
 
   function nextStep(){
@@ -351,7 +796,7 @@ function initFlow(){
 
   document.addEventListener('click', (e)=>{
     const opt = e.target.closest('.opt');
-    if(!opt) return;
+    if(!opt || opt.dataset.lang) return;
     const group = opt.dataset.group, value = opt.dataset.value;
     if(group === 'method'){
       document.querySelectorAll('[data-group="method"]').forEach(o=>o.classList.remove('selected'));
@@ -379,14 +824,14 @@ function initFlow(){
       const role = opt.dataset.role, key = `${role}::${value}`;
       const idx = state.experience.findIndex(x=>x.key===key);
       if(idx >= 0) state.experience.splice(idx,1);
-      else state.experience.push({ key, role, label:value });
+      else state.experience.push({ key, role, id:value });
     }
     if(group === 'improvement'){
       opt.classList.toggle('selected');
       const category = opt.dataset.category, key = `${category}::${value}`;
       const idx = state.improvements.findIndex(x=>x.key===key);
       if(idx >= 0) state.improvements.splice(idx,1);
-      else state.improvements.push({ key, category, label:value });
+      else state.improvements.push({ key, category, id:value });
     }
     refreshButton();
   });
@@ -394,52 +839,59 @@ function initFlow(){
   document.getElementById('manualText').addEventListener('input', refreshButton);
   document.getElementById('additionalNote').addEventListener('input', (e)=>{ state.additionalNote = e.target.value.trim(); });
 
-  mainBtn.addEventListener('click', ()=>{
-    nextStep();
-  });
+  mainBtn.addEventListener('click', ()=>{ nextStep(); });
 
   async function generateReview(){
     document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
     loadingEl.classList.add('active');
     mainBtn.style.display = 'none';
+    const t = T();
+
+    const experiencePayload = state.experience.map(e => ({ role: t.role[e.role], label: t.experienceItem[e.id] }));
+    const improvementPayload = state.improvements.map(i => t.improvementItem[i.id]);
+
     try{
       const res = await fetch('/api/generate-review', {
         method:'POST',
         headers:{ 'Content-Type':'application/json' },
         body: JSON.stringify({
           clinicName: decodeURIComponent(CLINIC_NAME),
-          visit: state.visit,
-          category: (CATEGORIES.find(c=>c.id===state.category) || {}).label || '',
-          treatment: state.treatment,
-          experience: state.experience.map(e=>({ role:e.role, label:e.label })),
-          improvements: state.improvements.map(i=>i.label),
-          additionalNote: state.additionalNote
+          language: LANG_FULL_NAME[LANG],
+          visit: t.visit[state.visit],
+          category: t.category[state.category] || '',
+          treatment: t.treatment[state.treatment],
+          experience: experiencePayload,
+          improvements: improvementPayload,
+          additionalNote: state.additionalNote,
+          region: REGION ? decodeURIComponent(REGION) : ''
         })
       });
       const data = await res.json();
-      generatedText = data.text || "리뷰 생성에 실패했어요. 다시 시도해주세요.";
+      generatedText = data.text || "Something went wrong. Please try again.";
     }catch(err){
-      generatedText = "리뷰 생성 중 오류가 발생했어요. 다시 시도해주세요.";
+      generatedText = "Something went wrong. Please try again.";
     }
+    logReviewEvent(state.improvements.length > 0 || !!state.additionalNote);
     loadingEl.classList.remove('active');
     showResult();
   }
 
   function showResult(){
+    const t = T();
     resultText.textContent = generatedText;
     resultCard.classList.add('active');
     mainBtn.style.display = 'none';
     if(NAVER_REVIEW_URL) document.getElementById('naverBtn').style.display = 'block';
     ghostBtn.style.display = 'block';
-    ghostBtn.textContent = '🔄 다시 만들기';
-    setSmile(1, '리뷰가 준비됐어요');
+    ghostBtn.textContent = t.ui.btnRegenerate;
+    setSmile(1, t.ui.smileReady);
   }
 
   ghostBtn.addEventListener('click', ()=>{
     resultCard.classList.remove('active');
     ghostBtn.style.display = 'none';
     mainBtn.style.display = 'block';
-    mainBtn.textContent = state.method === 'manual' ? '리뷰 확인하기' : '✨ 리뷰 만들기';
+    mainBtn.textContent = state.method === 'manual' ? T().ui.btnCheckReview : T().ui.btnMakeReview;
     if(state.method === 'manual') goToStep('manual');
     else { stepIndex = flow.indexOf('5'); goToStep('5'); generateReview(); }
   });
@@ -448,21 +900,66 @@ function initFlow(){
 
   document.getElementById('googleBtn').addEventListener('click', ()=>{
     const finalText = state.method === 'manual' ? document.getElementById('manualText').value.trim() : generatedText;
-    copyText(finalText).then(()=>{
-      showToast('복사되었어요 · 구글 리뷰로 이동합니다');
-    }).catch(()=>{ showToast('복사에 실패했어요'); });
+    copyText(finalText).then(()=>{ showToast(T().ui.toastCopyGoogle); }).catch(()=>{ showToast(T().ui.toastCopyFail); });
     setTimeout(()=>{ window.open(decodeURIComponent(GOOGLE_REVIEW_URL), '_blank'); }, 500);
   });
-
   document.getElementById('naverBtn').addEventListener('click', ()=>{
     const finalText = state.method === 'manual' ? document.getElementById('manualText').value.trim() : generatedText;
-    copyText(finalText).then(()=>{
-      showToast('복사되었어요 · 네이버 리뷰로 이동합니다');
-    }).catch(()=>{ showToast('복사에 실패했어요'); });
+    copyText(finalText).then(()=>{ showToast(T().ui.toastCopyNaver); }).catch(()=>{ showToast(T().ui.toastCopyFail); });
     setTimeout(()=>{ window.open(decodeURIComponent(NAVER_REVIEW_URL), '_blank'); }, 500);
   });
 
-  refreshButton();
+  document.getElementById('kakaoShareBtn').addEventListener('click', ()=>{
+    const finalText = state.method === 'manual' ? document.getElementById('manualText').value.trim() : generatedText;
+    if(navigator.share){
+      navigator.share({ text: finalText }).catch(()=>{});
+    } else {
+      copyText(finalText).then(()=>{ showToast(T().ui.toastCopyKakao); }).catch(()=>{ showToast(T().ui.toastCopyFail); });
+    }
+  });
+  document.getElementById('wechatShareBtn').addEventListener('click', ()=>{
+    const finalText = state.method === 'manual' ? document.getElementById('manualText').value.trim() : generatedText;
+    if(navigator.share){
+      navigator.share({ text: finalText }).catch(()=>{
+        copyText(finalText).then(()=>{ showToast(T().ui.toastCopyWechat); }).catch(()=>{ showToast(T().ui.toastCopyFail); });
+      });
+    } else {
+      copyText(finalText).then(()=>{ showToast(T().ui.toastCopyWechat); }).catch(()=>{ showToast(T().ui.toastCopyFail); });
+    }
+  });
+
+  document.getElementById('referralBtn').addEventListener('click', ()=>{
+    const t = T();
+    const clinicName = decodeURIComponent(CLINIC_NAME);
+    const shareText = t.ui.referralShareText(clinicName);
+    const pageUrl = window.location.href;
+    if(navigator.share){
+      navigator.share({ title: clinicName, text: shareText, url: pageUrl }).catch(()=>{});
+    } else {
+      copyText(`${shareText} ${pageUrl}`).then(()=>{ showToast(t.ui.toastReferralCopy); }).catch(()=>{ showToast(t.ui.toastCopyFail); });
+    }
+  });
+
+  // 병원 운영진용 익명 통계 · 부정 피드백 알림 (리뷰 원문/개인정보는 전송하지 않음)
+  function logReviewEvent(hasImprovement){
+    if(state.method !== 'ai') return;
+    try{
+      fetch('/api/log-review', {
+        method:'POST',
+        headers:{ 'Content-Type':'application/json' },
+        body: JSON.stringify({
+          clinicId: CLINIC_ID ? decodeURIComponent(CLINIC_ID) : decodeURIComponent(CLINIC_NAME),
+          language: LANG,
+          visit: state.visit,
+          category: state.category,
+          treatment: state.treatment,
+          experienceRoles: [...new Set(state.experience.map(e=>e.role))],
+          hasImprovement,
+          improvementCategories: state.improvements.map(i=>i.category)
+        })
+      }).catch(()=>{});
+    }catch(e){}
+  }
 }
 </script>
 </body>
