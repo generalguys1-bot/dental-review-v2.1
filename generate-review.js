@@ -2,19 +2,66 @@
 // 배포 시 Vercel 프로젝트의 Environment Variables에 ANTHROPIC_API_KEY를 등록하세요.
 // (Anthropic API 키는 https://console.anthropic.com 에서 발급)
 
+// ------------------------------------------------------------
+// 간단한 IP 기준 rate limit (같은 사람의 반복 호출만 차단, 서로 다른
+// 환자·치과의 정상적인 동시 사용은 막지 않음)
+// 주의: 함수 인스턴스가 새로 뜨면(cold start) 초기화돼요. 완벽한 분산
+// rate limit이 필요하면 Upstash Redis 같은 외부 스토어 연동을 권장해요.
+// ------------------------------------------------------------
+const rateLimitStore = globalThis.__reviewRateLimitStore || (globalThis.__reviewRateLimitStore = new Map());
+const WINDOW_MS = 60 * 1000;   // 1분
+const MAX_REQUESTS = 6;        // 1분당 최대 6회 (동일 IP 기준)
+
+function isRateLimited(key) {
+  const now = Date.now();
+  const timestamps = (rateLimitStore.get(key) || []).filter(t => now - t < WINDOW_MS);
+  timestamps.push(now);
+  rateLimitStore.set(key, timestamps);
+
+  // 메모리 누수 방지: store가 너무 커지면 오래된 키 정리
+  if (rateLimitStore.size > 5000) {
+    for (const [k, v] of rateLimitStore) {
+      if (v.every(t => now - t > WINDOW_MS)) rateLimitStore.delete(k);
+    }
+  }
+  return timestamps.length > MAX_REQUESTS;
+}
+
+function getClientIp(req) {
+  const forwarded = req.headers['x-forwarded-for'];
+  if (forwarded) return forwarded.split(',')[0].trim();
+  return req.socket?.remoteAddress || 'unknown';
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
+  const clientIp = getClientIp(req);
+  if (isRateLimited(clientIp)) {
+    return res.status(429).json({
+      error: 'rate_limited',
+      text: '요청이 너무 많아요. 잠시 후 다시 시도해주세요.'
+    });
+  }
+
   const {
-    clinicName, visit, category, treatment,
-    experience, improvements, additionalNote
+    clinicName, language, visit, category, treatment,
+    experience, improvements, additionalNote, region
   } = req.body || {};
 
   if (!clinicName || !visit || !treatment || !Array.isArray(experience) || experience.length === 0) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
+
+  const targetLanguage = language || 'Korean';
+
+  // 지역/키워드는 선택 입력이며, 억지로 반복 삽입하지 않고 자연스러울 때만
+  // 한 번 언급되도록 유도한다 (리뷰 품질과 플랫폼 정책 준수가 우선).
+  const regionLine = region
+    ? `- Clinic area (mention naturally at most once ONLY if it fits smoothly into a sentence, e.g. when referring to location convenience; never force it or repeat it, never turn it into a keyword list): ${region}`
+    : '';
 
   // 담당자별 경험 항목 정리
   const byRole = {};
@@ -29,35 +76,39 @@ export default async function handler(req, res) {
   const improvementItems = Array.isArray(improvements) ? [...improvements] : [];
   if (additionalNote) improvementItems.push(additionalNote);
   const improvementLine = improvementItems.length
-    ? `- 아쉬웠던 점 (있다면 리뷰 끝에 부드럽고 건설적인 한 문장으로만 짧게 포함, 전체 톤은 여전히 긍정적으로 유지): ${improvementItems.join(', ')}`
-    : `- 아쉬웠던 점: 없음 (부정적인 내용을 지어내지 말 것)`;
+    ? `- Minor thing that could be improved (if present, weave in ONE gentle, constructive sentence near the end; keep overall tone positive): ${improvementItems.join(', ')}`
+    : `- Nothing to improve mentioned (do not invent any negative content)`;
 
-  const prompt = `너는 실제 환자가 남기는 자연스러운 구글 치과 리뷰를 대신 작성해주는 도우미야.
-아래 정보를 참고해서, 실제 사람이 쓴 것처럼 자연스럽고 담백한 한국어 구글 리뷰를 1개 작성해줘.
+  const prompt = `You are helping a real dental patient write a natural, authentic Google review.
+Using the information below, write ONE natural review as if written by the patient themselves.
 
-- 치과 이름: ${clinicName}
-- 방문 유형: ${visit}
-- 진료 분야: ${category || ''}
-- 받은 치료: ${treatment}
-- 담당자별로 좋았던 점:
+IMPORTANT: Write the entire review ONLY in ${targetLanguage}. Do not include any other language, translation, or commentary — output only the review text itself, in ${targetLanguage}.
+
+- Clinic name: ${clinicName}
+- Visit type: ${visit}
+- Treatment area: ${category || ''}
+- Treatment received: ${treatment}
+- What stood out, by staff member:
 ${experienceLines}
 ${improvementLine}
+${regionLine}
 
-조건:
-- 3~5문장 정도의 자연스러운 리뷰체 (과장된 광고 문구 금지)
-- 담당자별 항목이 여러 개면, 자연스럽게 한두 명(예: 원장님, 상담실장님)을 실제 후기처럼 언급해도 좋음
-- 아쉬운 점이 있다면 비난조가 아니라 담백한 개선 제안처럼 한 문장만 넣기
-- 이모지는 쓰지 않기
-- 마크다운, 따옴표, 별점 텍스트 없이 리뷰 본문만 출력
-- 클리셰 표현("매우 만족", "강추") 남발하지 말고, 담백하고 구체적으로
+Requirements:
+- 3-5 natural sentences, written the way a real person writes a review (not like an advertisement)
+- If there are multiple staff members mentioned, naturally reference one or two of them (e.g. the dentist, the treatment coordinator) the way a genuine review would
+- If there's something to improve, phrase it as a gentle, constructive note, not a complaint — only one sentence for this
+- No emojis
+- No markdown, no quotation marks, no star ratings — output only the review body text
+- Avoid overused clichés ("highly recommend", "very satisfied") — be specific and natural instead
 
-[의료광고 준수 가드레일 — 반드시 지킬 것]
-- "완치", "100% 효과", "부작용 없음", "무통증", "평생 보장" 등 의료 효과를 단정·보장하는 표현은 절대 쓰지 말 것
-- 다른 치과나 특정 치료법과 비교·폄하하는 표현 금지
-- 치료 결과를 객관적으로 확인할 수 없는 수치(예: "통증 90% 감소")를 임의로 만들어내지 말 것
-- 할인, 이벤트, 금전적 혜택을 암시하거나 리뷰 작성의 대가를 언급하는 내용 금지
-- 환자 개인을 특정할 수 있는 정보(실명, 생년월일, 연락처 등)는 생성하지 말 것
-- 어디까지나 "환자 개인의 주관적 경험 후기"처럼 담백하게 작성하고, 병원이 작성한 광고처럼 보이지 않게 할 것`;
+[Medical advertising compliance guardrails — must follow]
+- Never use absolute or guaranteed claims about medical outcomes (e.g. "fully cured", "100% effective", "no side effects", "painless", "guaranteed for life")
+- Never compare to or disparage other clinics or specific competing treatments
+- Never invent unverifiable statistics about treatment outcomes (e.g. "90% less pain")
+- Never imply or mention any discount, promotion, or reward in exchange for writing this review
+- Never generate any personally identifying information (real name, birth date, phone number, etc.)
+- Never stuff or repeat location/keyword phrases — a genuine patient mentions their area naturally at most once, if at all
+- The review must read like a genuine, understated personal account from a patient — never like an advertisement written by the clinic`;
 
   try {
     const response = await fetch('https://api.anthropic.com/v1/messages', {
