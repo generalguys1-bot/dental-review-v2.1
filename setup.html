@@ -6,7 +6,6 @@
 <title>치과 정보 등록</title>
 <link rel="stylesheet" as="style" crossorigin
   href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
   :root{
     --bg:#F3F6F4; --surface:#FFFFFF; --deep:#163832; --deep-light:#2C5D54;
@@ -48,13 +47,21 @@
     border:none; background:var(--gold-soft); color:var(--deep); font-weight:700; font-size:12.5px;
     padding:8px 12px; border-radius:8px; cursor:pointer; white-space:nowrap;
   }
-  #qrcode{ display:flex; justify-content:center; margin:18px 0 6px; }
+  #qrcode{ display:flex; flex-direction:column; align-items:center; margin:18px 0 6px; }
+  #qrcode img{ border-radius:12px; border:1px solid var(--border); }
+  .qr-download{ display:inline-block; margin-top:10px; font-size:12.5px; font-weight:700; color:var(--deep-light); text-decoration:none; }
   .toast{
     position:fixed; top:24px; left:50%; transform:translateX(-50%) translateY(-20px);
     background:var(--deep); color:#fff; font-size:13px; font-weight:600; padding:9px 16px;
     border-radius:999px; opacity:0; pointer-events:none; transition:.25s ease; z-index:99;
   }
   .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+  .section-title{ font-size:14px; font-weight:800; color:var(--deep); margin:0 0 4px; }
+  .section-sub{ font-size:12.5px; color:var(--muted); margin:0 0 18px; line-height:1.6; }
+  .row2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .color-swatch{ display:inline-block; width:22px; height:22px; border-radius:6px; vertical-align:middle; margin-left:8px; border:1px solid var(--border); }
+  .info-box{ background:var(--bg); border:1px dashed var(--border); border-radius:10px; padding:12px 14px; font-size:12px; color:var(--muted); line-height:1.7; margin-top:6px; }
+  code{ background:#fff; border:1px solid var(--border); border-radius:6px; padding:1px 6px; font-size:11.5px; }
 </style>
 </head>
 <body>
@@ -65,7 +72,7 @@
 
   <div class="card">
     <label>치과 이름</label>
-    <input type="text" id="clinicName" placeholder="예: 참좋은치과">
+    <input type="text" id="clinicName" placeholder="예: 밝은미소치과">
 
     <label style="margin-top:18px;">구글 리뷰 작성 링크</label>
     <input type="text" id="googleUrl" placeholder="https://search.google.com/local/writereview?placeid=...">
@@ -79,7 +86,80 @@
       네이버지도에서 치과 검색 → 플레이스 페이지 링크를 복사해서 붙여넣으세요. 비워두면 네이버 버튼 없이 구글만 표시돼요.
     </p>
 
+    <label style="margin-top:18px;">치과 홈페이지 링크 <span style="font-weight:500;color:var(--muted);">(선택)</span></label>
+    <input type="text" id="homepageUrl" placeholder="https://www.치과홈페이지.com">
+    <p class="help">
+      입력하시면 리뷰 페이지 상단에 홈페이지 방문 링크가 함께 표시돼요. 외국인 환자가 병원 정보를 더 찾아볼 때 유용해요. 비워두면 표시되지 않아요.
+    </p>
+
     <button class="btn" id="generateBtn">링크 · QR 코드 생성</button>
+  </div>
+
+  <div class="card">
+    <p class="section-title">🎨 브랜딩</p>
+    <p class="section-sub">로고와 브랜드 컬러, 원장님 소개를 넣으면 리뷰 페이지가 우리 병원만의 톤으로 보여요.</p>
+
+    <label>로고 이미지 URL <span style="font-weight:500;color:var(--muted);">(선택)</span></label>
+    <input type="text" id="logoUrl" placeholder="https://.../logo.png">
+
+    <label style="margin-top:18px;">브랜드 포인트 컬러 <span style="font-weight:500;color:var(--muted);">(선택, # 없이 hex 6자리)</span></label>
+    <input type="text" id="brandColor" placeholder="예: 0F5132" maxlength="6">
+    <p class="help">입력하면 버튼·포인트 색상이 이 컬러로 바뀌어요. 비워두면 기본 그린 톤이 적용돼요.</p>
+
+    <label style="margin-top:18px;">원장님 사진 URL <span style="font-weight:500;color:var(--muted);">(선택)</span></label>
+    <input type="text" id="doctorPhoto" placeholder="https://.../doctor.jpg">
+
+    <label style="margin-top:18px;">원장님 한줄 인사말 <span style="font-weight:500;color:var(--muted);">(선택)</span></label>
+    <input type="text" id="doctorGreeting" placeholder="예: 방문해주셔서 감사합니다. 편하게 이용해주세요 :)">
+    <p class="help">현재 이 문구는 선택하신 언어와 무관하게 입력한 그대로 표시돼요. 외국인 환자 비중이 높다면 짧고 쉬운 문장을 권장드려요.</p>
+  </div>
+
+  <div class="card">
+    <p class="section-title">🔍 검색 노출 (SEO)</p>
+    <p class="section-sub">AI가 리뷰를 쓸 때 아래 지역·키워드를 자연스러울 때만 한 번 참고해요. 억지로 반복 삽입하지 않아서 리뷰가 부자연스러워지지 않아요.</p>
+    <label>지역 · 진료 키워드 <span style="font-weight:500;color:var(--muted);">(선택)</span></label>
+    <input type="text" id="region" placeholder="예: 강남 치과, 판교 임플란트">
+  </div>
+
+  <div class="card">
+    <p class="section-title">📲 온라인 채널 & 리텐션</p>
+    <p class="section-sub">리뷰를 남긴 환자를 병원 SNS 구독자·재방문·추천으로 자연스럽게 이어줘요.</p>
+
+    <label>예약 전화번호 <span style="font-weight:500;color:var(--muted);">(선택)</span></label>
+    <input type="text" id="phone" placeholder="예: 0212345678">
+    <p class="help">입력하면 리뷰 작성 완료 화면에 "전화로 예약하기" 버튼이 표시돼요.</p>
+
+    <div class="row2">
+      <div>
+        <label>인스타그램 링크 <span style="font-weight:500;color:var(--muted);">(선택)</span></label>
+        <input type="text" id="instagramUrl" placeholder="https://instagram.com/...">
+      </div>
+      <div>
+        <label>블로그 링크 <span style="font-weight:500;color:var(--muted);">(선택)</span></label>
+        <input type="text" id="blogUrl" placeholder="https://blog.naver.com/...">
+      </div>
+    </div>
+
+    <label style="margin-top:18px;">SNS 이벤트 안내문 <span style="font-weight:500;color:var(--muted);">(선택)</span></label>
+    <input type="text" id="eventNote" placeholder="예: 인스타그램 팔로우 + 스토리 공유 시 다음 방문 시 텀블러 증정">
+    <div class="info-box">
+      ⚠️ 인스타그램/블로그 링크 중 하나 이상 입력했을 때만 배너로 표시돼요. 그리고 이 이벤트는 <b>"리뷰 작성"</b>이 아니라 <b>"SNS 팔로우/공유"</b>에 대한 보상으로 문구를 구성해주세요. 구글 리뷰 정책은 리뷰 작성 자체에 대한 보상 제공을 금지하고 있어요.
+    </div>
+  </div>
+
+  <div class="card">
+    <p class="section-title">🔔 관리자 알림 · 통계 (선택, 개발자 설정 필요)</p>
+    <p class="section-sub">환자가 "아쉬웠던 점"을 선택하면, 그 리뷰가 외부에 올라가기 전에 병원이 먼저 알 수 있도록 실시간 알림을 보낼 수 있어요. 또한 어떤 진료·스탭이 자주 칭찬받는지 익명 통계도 모을 수 있어요. (리뷰 원문이나 환자 개인정보는 전송되지 않아요)</p>
+    <div class="info-box">
+      이 기능은 보안을 위해 <b>이 페이지가 아니라 서버(Vercel 환경변수)</b>에서 설정해요:<br><br>
+      1) 아래 "병원 식별자"를 하나 정해서 입력하세요 (안 정하면 병원 이름이 대신 쓰여요)<br>
+      2) Vercel 프로젝트 → Environment Variables에 등록:<br>
+      &nbsp;&nbsp;• <code>ADMIN_WEBHOOK_URL__병원식별자</code> = Slack/카카오워크 Webhook 주소 (부정 피드백 알림용)<br>
+      &nbsp;&nbsp;• <code>STATS_WEBHOOK_URL__병원식별자</code> = 통계를 쌓을 Webhook 주소 (Google Sheets 등)<br>
+      3) 병원식별자에 특수문자가 있으면 영문/숫자만 남기고 대문자로 변환해서 등록하세요 (예: <code>bright-smile</code> → <code>ADMIN_WEBHOOK_URL__BRIGHT_SMILE</code>)
+    </div>
+    <label style="margin-top:18px;">병원 식별자 <span style="font-weight:500;color:var(--muted);">(선택)</span></label>
+    <input type="text" id="clinicId" placeholder="예: bright-smile">
   </div>
 
   <div class="card result" id="resultCard">
@@ -100,7 +180,6 @@ const generateBtn = document.getElementById('generateBtn');
 const resultCard = document.getElementById('resultCard');
 const finalUrlInput = document.getElementById('finalUrl');
 const toast = document.getElementById('toast');
-let qr = null;
 
 function showToast(msg){
   toast.textContent = msg;
@@ -112,6 +191,17 @@ generateBtn.addEventListener('click', ()=>{
   const name = document.getElementById('clinicName').value.trim();
   const google = document.getElementById('googleUrl').value.trim();
   const naver = document.getElementById('naverUrl').value.trim();
+  const homepage = document.getElementById('homepageUrl').value.trim();
+  const logo = document.getElementById('logoUrl').value.trim();
+  const brandColor = document.getElementById('brandColor').value.trim().replace(/^#/, '');
+  const doctorPhoto = document.getElementById('doctorPhoto').value.trim();
+  const doctorGreeting = document.getElementById('doctorGreeting').value.trim();
+  const region = document.getElementById('region').value.trim();
+  const phone = document.getElementById('phone').value.trim();
+  const instagram = document.getElementById('instagramUrl').value.trim();
+  const blog = document.getElementById('blogUrl').value.trim();
+  const eventNote = document.getElementById('eventNote').value.trim();
+  const clinicId = document.getElementById('clinicId').value.trim();
   if(!name || !google){
     showToast('치과 이름과 구글 리뷰 링크는 필수예요');
     return;
@@ -119,14 +209,35 @@ generateBtn.addEventListener('click', ()=>{
   const base = window.location.href.replace(/setup\.html.*$/, 'index.html');
   let url = `${base}?name=${encodeURIComponent(name)}&google=${encodeURIComponent(google)}`;
   if(naver) url += `&naver=${encodeURIComponent(naver)}`;
+  if(homepage) url += `&homepage=${encodeURIComponent(homepage)}`;
+  if(logo) url += `&logo=${encodeURIComponent(logo)}`;
+  if(brandColor) url += `&color=${encodeURIComponent(brandColor)}`;
+  if(doctorPhoto) url += `&doctorPhoto=${encodeURIComponent(doctorPhoto)}`;
+  if(doctorGreeting) url += `&doctorGreeting=${encodeURIComponent(doctorGreeting)}`;
+  if(region) url += `&region=${encodeURIComponent(region)}`;
+  if(phone) url += `&phone=${encodeURIComponent(phone)}`;
+  if(instagram) url += `&instagram=${encodeURIComponent(instagram)}`;
+  if(blog) url += `&blog=${encodeURIComponent(blog)}`;
+  if(eventNote) url += `&event=${encodeURIComponent(eventNote)}`;
+  if(clinicId) url += `&cid=${encodeURIComponent(clinicId)}`;
   finalUrlInput.value = url;
   resultCard.classList.add('active');
 
   document.getElementById('qrcode').innerHTML = '';
-  qr = new QRCode(document.getElementById('qrcode'), {
-    text: url, width: 180, height: 180,
-    colorDark: '#163832', colorLight: '#ffffff'
-  });
+  const qrImgUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=8&data=${encodeURIComponent(url)}`;
+  const img = document.createElement('img');
+  img.src = qrImgUrl;
+  img.width = 220;
+  img.height = 220;
+  img.alt = '리뷰 페이지 QR 코드';
+  document.getElementById('qrcode').appendChild(img);
+
+  const downloadLink = document.createElement('a');
+  downloadLink.href = qrImgUrl;
+  downloadLink.download = `${name}_리뷰QR.png`;
+  downloadLink.className = 'qr-download';
+  downloadLink.textContent = '⬇ QR 이미지 다운로드';
+  document.getElementById('qrcode').appendChild(downloadLink);
 });
 
 document.getElementById('copyBtn').addEventListener('click', ()=>{
