@@ -159,6 +159,13 @@
       <div class="options" id="visitOptions"></div>
     </div>
 
+    <div class="step" data-step="motive">
+      <p class="step-eyebrow" id="txtEyebrowMotive"></p>
+      <p class="step-title" id="txtTitleMotive"></p>
+      <p class="step-desc" id="txtDescMotive"></p>
+      <div class="options single-col" id="motiveOptions"></div>
+    </div>
+
     <div class="step" data-step="2">
       <p class="step-eyebrow" id="txtEyebrow2"></p>
       <p class="step-title" id="txtTitle2"></p>
@@ -169,6 +176,13 @@
       <p class="step-eyebrow" id="txtEyebrow3"></p>
       <p class="step-title" id="treatmentTitle"></p>
       <div class="options" id="treatmentOptions"></div>
+    </div>
+
+    <div class="step" data-step="concern">
+      <p class="step-eyebrow" id="txtEyebrowConcern"></p>
+      <p class="step-title" id="txtTitleConcern"></p>
+      <p class="step-desc" id="txtDescConcern"></p>
+      <div class="options" id="concernOptions"></div>
     </div>
 
     <div class="step" data-step="4">
@@ -183,6 +197,14 @@
       <p class="step-title" id="txtTitle5"></p>
       <p class="step-desc" id="txtDesc5"></p>
       <div id="improvementGroups"></div>
+      <div class="role-group">
+        <p class="role-header" id="txtPriorityHeader"></p>
+        <div class="options" id="priorityOptions"></div>
+      </div>
+      <div class="role-group">
+        <p class="role-header" id="txtHesitationHeader"></p>
+        <div class="options" id="hesitationOptions"></div>
+      </div>
       <p class="note-label" id="txtNoteLabel"></p>
       <textarea id="additionalNote"></textarea>
     </div>
@@ -299,6 +321,13 @@ const IMPROVEMENT_ITEM_ORDER = {
   facility: ['parking_inconvenient','waiting_area_small'],
   communication: ['explanation_lacking','followup_lacking']
 };
+const MOTIVE_ORDER = ['self_concern','family_referral','other_clinic_referral','checkup_found','online_research','time_available'];
+const CONCERN_ORDER = {
+  general: ['cavity_pain','tooth_sensitive','gum_bleeding','chewing_discomfort','worn_prosthetic','tooth_color'],
+  ortho: ['crooked_teeth','protruding_teeth','jaw_protrusion','teeth_gap','gummy_smile','bite_mismatch']
+};
+const PRIORITY_ORDER = ['doctor_expertise','reasonable_cost','kind_explanation','location_access','clean_facility','short_wait','modern_equipment','aftercare'];
+const HESITATION_ORDER = ['cost_burden','treatment_duration','pain_fear','time_shortage','vague_fear','others_experience'];
 
 const ICONS = {
   category: { general:'🦷', ortho:'😁' },
@@ -339,7 +368,11 @@ ko: {
     referralLabel:'지인에게 병원 추천하기', toastReferralCopy:'링크가 복사되었어요 · 공유해보세요',
     referralShareText:(name)=>`제가 다녀온 ${name}, 진료가 꼼꼼하고 좋았어요. 한번 방문해보세요 🙂`,
     guideNote:'✏️ 작성하신 리뷰는 복사한 뒤 구글 또는 네이버 리뷰 화면에 붙여넣어 등록해주세요. 원장님 또는 치과 사진을 2~3장 함께 올려주시면 더욱 좋아요!',
-    thanksNote:'소중한 시간 내어 남겨주신 리뷰, 진심으로 감사드립니다 🙏 환자분의 의견에 귀 기울여 앞으로 더 프리미엄 진료와 서비스로 보답하겠습니다.'
+    thanksNote:'소중한 시간 내어 남겨주신 리뷰, 진심으로 감사드립니다 🙏 환자분의 의견에 귀 기울여 앞으로 더 프리미엄 진료와 서비스로 보답하겠습니다.',
+    eyebrowMotive:'방문 계기', titleMotive:'병원을 찾게 된 계기가 있으신가요?', descMotive:'해당되는 항목이 있으면 골라주세요', tagMotive:'선택사항',
+    eyebrowConcern:'신경쓰였던 부분', titleConcern:'치료 전 신경 쓰이셨던 부분이 있었나요?', descConcern:'해당되는 항목이 있으면 골라주세요 (중복 가능)', tagConcern:'선택사항',
+    priorityHeader:'🏥 병원 선택 시 가장 중요했던 부분 (최대 3개)', priorityMaxToast:'최대 3개까지 선택할 수 있어요',
+    hesitationHeader:'💭 그동안 진료를 망설이게 했던 이유가 있다면'
   },
   visit:{ first_visit:'초진 (첫 방문)', regular_followup:'정기 재진', ortho_consult:'교정상담 방문', re_consult:'재상담 방문' },
   category:{ general:'일반진료', ortho:'교정전문' },
@@ -347,7 +380,14 @@ ko: {
   role:{ doctor:'원장님', counselor:'상담실장님', staff:'진료실 스텝', desk:'데스크·예약' },
   experienceItem:{ accurate_diagnosis:'정확한 진단', careful_procedure:'꼼꼼한 시술', pain_minimization:'통증 최소화', thorough_explanation:'충분한 설명', digital_cadcam:'최신 디지털 캐드캠 장비', oral_scan:'정밀 구강 스캔', simulation_3d:'3D 시뮬레이션 상담', digital_xray:'디지털 엑스레이·CT 촬영', gentle_chairside:'편안한 진료 태도', kind_consult:'친절한 상담', transparent_cost:'투명한 비용 안내', no_overselling:'과잉권유 없음', tailored_plan:'맞춤 플랜 제안', skilled_assist:'능숙한 어시스트', careful_care:'세심한 케어', comfortable_atmosphere:'편안한 분위기', hygiene:'청결한 위생관리', easy_booking:'편리한 예약', kind_response:'친절한 응대', short_wait:'짧은 대기시간' },
   improvementCategory:{ wait_booking:'대기·예약', cost_info:'비용·안내', facility:'시설·환경', communication:'설명·소통' },
-  improvementItem:{ long_wait:'대기시간이 길었어요', hard_reschedule:'예약 변경이 어려웠어요', cost_info_lacking:'비용 안내가 아쉬웠어요', cost_burden:'진료비가 부담됐어요', parking_inconvenient:'주차가 불편했어요', waiting_area_small:'대기공간이 좁았어요', explanation_lacking:'설명이 조금 부족했어요', followup_lacking:'진료 후 안내가 아쉬웠어요' }
+  improvementItem:{ long_wait:'대기시간이 길었어요', hard_reschedule:'예약 변경이 어려웠어요', cost_info_lacking:'비용 안내가 아쉬웠어요', cost_burden:'진료비가 부담됐어요', parking_inconvenient:'주차가 불편했어요', waiting_area_small:'대기공간이 좁았어요', explanation_lacking:'설명이 조금 부족했어요', followup_lacking:'진료 후 안내가 아쉬웠어요' },
+  motive:{ self_concern:'예전부터 스스로 신경 쓰여서', family_referral:'가족/지인 추천으로', other_clinic_referral:'다른 병원에서 진료받다가 권유받아서', checkup_found:'정기검진 중 발견해서', online_research:'인터넷/SNS에서 찾아보고', time_available:'마침 시간 여유가 생겨서' },
+  concern:{
+    general:{ cavity_pain:'충치로 인한 통증', tooth_sensitive:'시린 이', gum_bleeding:'잇몸 출혈·붓기', chewing_discomfort:'씹을 때 불편함', worn_prosthetic:'오래된 보철물 마모', tooth_color:'치아 색·미백 고민' },
+    ortho:{ crooked_teeth:'삐뚤빼뚤한 치아', protruding_teeth:'튀어나온 입/치아', jaw_protrusion:'주걱턱', teeth_gap:'치아 사이 틈', gummy_smile:'웃을 때 잇몸이 많이 보임', bite_mismatch:'위아래 앞니가 안 물림' }
+  },
+  priority:{ doctor_expertise:'원장님의 경력·전문성', reasonable_cost:'합리적인 진료비', kind_explanation:'친절하고 자세한 설명', location_access:'병원 위치·접근성', clean_facility:'청결한 시설 환경', short_wait:'짧은 진료 대기시간', modern_equipment:'최신 장비·시스템', aftercare:'꼼꼼한 사후관리' },
+  hesitationItem:{ cost_burden:'비용에 대한 부담', treatment_duration:'치료 기간에 대한 부담', pain_fear:'통증에 대한 두려움', time_shortage:'시간 내기 어려움', vague_fear:'병원에 대한 막연한 두려움', others_experience:'주변의 경험담' },
 },
 en: {
   ui:{
@@ -375,7 +415,11 @@ en: {
     referralLabel:'Recommend this clinic to a friend', toastReferralCopy:'Link copied · share it with someone',
     referralShareText:(name)=>`I visited ${name} and the care was thorough and great. Worth checking out 🙂`,
     guideNote:'✏️ Copy your review and paste it into Google or Naver Reviews. Adding 2–3 photos of the doctor or the clinic makes it even better!',
-    thanksNote:'Thank you so much for taking the time to share your review 🙏 We truly value your feedback and will use it to keep offering more premium care and service.'
+    thanksNote:'Thank you so much for taking the time to share your review 🙏 We truly value your feedback and will use it to keep offering more premium care and service.',
+    eyebrowMotive:'Reason for visiting', titleMotive:'What brought you in?', descMotive:'Select if any apply', tagMotive:'Optional',
+    eyebrowConcern:'Concerns beforehand', titleConcern:'Was there anything that concerned you before treatment?', descConcern:'Select if any apply (multiple OK)', tagConcern:'Optional',
+    priorityHeader:'🏥 What mattered most when choosing this clinic (up to 3)', priorityMaxToast:'You can select up to 3',
+    hesitationHeader:'💭 If anything made you hesitate about treatment before'
   },
   visit:{ first_visit:'First visit', regular_followup:'Regular follow-up', ortho_consult:'Orthodontic consultation', re_consult:'Follow-up consultation' },
   category:{ general:'General dentistry', ortho:'Orthodontics' },
@@ -383,7 +427,14 @@ en: {
   role:{ doctor:'Dentist', counselor:'Treatment Coordinator', staff:'Clinical Staff', desk:'Front Desk' },
   experienceItem:{ accurate_diagnosis:'Accurate diagnosis', careful_procedure:'Careful procedure', pain_minimization:'Minimal pain', thorough_explanation:'Thorough explanation', digital_cadcam:'Latest digital CAD/CAM equipment', oral_scan:'Precise intraoral scan', simulation_3d:'3D simulation consultation', digital_xray:'Digital X-ray / CT imaging', gentle_chairside:'Comfortable chairside manner', kind_consult:'Friendly consultation', transparent_cost:'Transparent pricing', no_overselling:'No pressure to upsell', tailored_plan:'Tailored treatment plan', skilled_assist:'Skilled assistance', careful_care:'Attentive care', comfortable_atmosphere:'Comfortable atmosphere', hygiene:'Clean & hygienic', easy_booking:'Easy booking', kind_response:'Friendly service', short_wait:'Short wait time' },
   improvementCategory:{ wait_booking:'Wait & booking', cost_info:'Cost & information', facility:'Facilities', communication:'Explanation & communication' },
-  improvementItem:{ long_wait:'The wait was long', hard_reschedule:'Rescheduling was difficult', cost_info_lacking:'Cost info could be clearer', cost_burden:'The cost felt like a burden', parking_inconvenient:'Parking was inconvenient', waiting_area_small:'The waiting area was small', explanation_lacking:'Explanation could be more thorough', followup_lacking:'Follow-up guidance was lacking' }
+  improvementItem:{ long_wait:'The wait was long', hard_reschedule:'Rescheduling was difficult', cost_info_lacking:'Cost info could be clearer', cost_burden:'The cost felt like a burden', parking_inconvenient:'Parking was inconvenient', waiting_area_small:'The waiting area was small', explanation_lacking:'Explanation could be more thorough', followup_lacking:'Follow-up guidance was lacking' },
+  motive:{ self_concern:"It's something I'd been thinking about for a while", family_referral:'Recommended by family/friends', other_clinic_referral:'Referred by another clinic', checkup_found:'Found during a regular checkup', online_research:'Found while researching online/SNS', time_available:'Finally had some free time' },
+  concern:{
+    general:{ cavity_pain:'Pain from a cavity', tooth_sensitive:'Tooth sensitivity', gum_bleeding:'Gum bleeding/swelling', chewing_discomfort:'Discomfort while chewing', worn_prosthetic:'Worn-out old dental work', tooth_color:'Tooth color/whitening concerns' },
+    ortho:{ crooked_teeth:'Crooked teeth', protruding_teeth:'Protruding teeth/mouth', jaw_protrusion:'Underbite/protruding jaw', teeth_gap:'Gaps between teeth', gummy_smile:'Gummy smile', bite_mismatch:'Upper and lower front teeth not meeting' }
+  },
+  priority:{ doctor_expertise:"The doctor's experience and expertise", reasonable_cost:'Reasonable treatment cost', kind_explanation:'Kind, detailed explanations', location_access:'Convenient location', clean_facility:'Clean facilities', short_wait:'Short waiting time', modern_equipment:'Modern equipment/systems', aftercare:'Thorough aftercare' },
+  hesitationItem:{ cost_burden:'Cost concerns', treatment_duration:'Concerns about treatment length', pain_fear:'Fear of pain', time_shortage:'Difficulty finding time', vague_fear:'General anxiety about the dentist', others_experience:"Stories I'd heard from others" }
 },
 zh: {
   ui:{
@@ -411,7 +462,11 @@ zh: {
     referralLabel:'推荐给朋友', toastReferralCopy:'链接已复制 · 快分享出去吧',
     referralShareText:(name)=>`我去了${name}，诊疗很细致，体验很好，推荐大家去看看 🙂`,
     guideNote:'✏️ 请复制您撰写的评价，粘贴到 Google 或 Naver 的评价页面。若能一起上传2~3张院长或医院的照片，效果会更好！',
-    thanksNote:'衷心感谢您抽出宝贵时间留下评价 🙏 我们会认真倾听您的意见，以更优质的高端诊疗与服务回馈各位患者。'
+    thanksNote:'衷心感谢您抽出宝贵时间留下评价 🙏 我们会认真倾听您的意见，以更优质的高端诊疗与服务回馈各位患者。',
+    eyebrowMotive:'就诊契机', titleMotive:'是什么让您来到这里？', descMotive:'如有符合的项目请选择', tagMotive:'可选',
+    eyebrowConcern:'治疗前在意的部分', titleConcern:'治疗前有让您在意的部分吗？', descConcern:'如有符合的项目请选择（可多选）', tagConcern:'可选',
+    priorityHeader:'🏥 选择医院时最看重的部分（最多3个）', priorityMaxToast:'最多可选择3个',
+    hesitationHeader:'💭 如果之前有让您犹豫治疗的原因'
   },
   visit:{ first_visit:'首次就诊', regular_followup:'定期复诊', ortho_consult:'正畸咨询', re_consult:'复诊咨询' },
   category:{ general:'普通诊疗', ortho:'正畸专科' },
@@ -419,7 +474,14 @@ zh: {
   role:{ doctor:'院长', counselor:'咨询师', staff:'诊疗室员工', desk:'前台·预约' },
   experienceItem:{ accurate_diagnosis:'诊断准确', careful_procedure:'操作细致', pain_minimization:'疼痛感极小', thorough_explanation:'讲解充分', digital_cadcam:'最新数字化CAD/CAM设备', oral_scan:'精确口腔扫描', simulation_3d:'3D模拟方案咨询', digital_xray:'数字化X光/CT拍摄', gentle_chairside:'诊疗态度舒适', kind_consult:'咨询亲切', transparent_cost:'费用透明', no_overselling:'不过度推销', tailored_plan:'个性化方案', skilled_assist:'助理操作娴熟', careful_care:'照护细心', comfortable_atmosphere:'氛围舒适', hygiene:'环境卫生清洁', easy_booking:'预约方便', kind_response:'服务亲切', short_wait:'等待时间短' },
   improvementCategory:{ wait_booking:'等待·预约', cost_info:'费用·说明', facility:'设施·环境', communication:'讲解·沟通' },
-  improvementItem:{ long_wait:'等待时间较长', hard_reschedule:'改约时间比较困难', cost_info_lacking:'费用说明不够清楚', cost_burden:'诊疗费用有些负担', parking_inconvenient:'停车不太方便', waiting_area_small:'候诊空间较小', explanation_lacking:'讲解略显不足', followup_lacking:'诊后指导有些欠缺' }
+  improvementItem:{ long_wait:'等待时间较长', hard_reschedule:'改约时间比较困难', cost_info_lacking:'费用说明不够清楚', cost_burden:'诊疗费用有些负担', parking_inconvenient:'停车不太方便', waiting_area_small:'候诊空间较小', explanation_lacking:'讲解略显不足', followup_lacking:'诊后指导有些欠缺' },
+  motive:{ self_concern:'一直以来自己比较在意', family_referral:'家人/朋友推荐', other_clinic_referral:'在其他医院就诊时被推荐', checkup_found:'定期检查时发现的', online_research:'在网络/社交媒体上查到的', time_available:'刚好有空闲时间' },
+  concern:{
+    general:{ cavity_pain:'蛀牙引起的疼痛', tooth_sensitive:'牙齿敏感', gum_bleeding:'牙龈出血·肿胀', chewing_discomfort:'咀嚼时不适', worn_prosthetic:'旧修复体磨损', tooth_color:'牙齿颜色·美白问题' },
+    ortho:{ crooked_teeth:'牙齿不齐', protruding_teeth:'龅牙/嘴突出', jaw_protrusion:'下巴前突', teeth_gap:'牙缝', gummy_smile:'笑起来露牙龈较多', bite_mismatch:'上下前牙咬合不齐' }
+  },
+  priority:{ doctor_expertise:'院长的经验·专业性', reasonable_cost:'合理的治疗费用', kind_explanation:'亲切细致的说明', location_access:'医院位置·交通便利', clean_facility:'清洁的设施环境', short_wait:'较短的候诊时间', modern_equipment:'最新设备·系统', aftercare:'细致的后续管理' },
+  hesitationItem:{ cost_burden:'费用负担', treatment_duration:'治疗周期负担', pain_fear:'对疼痛的担忧', time_shortage:'难以抽出时间', vague_fear:'对医院的莫名恐惧', others_experience:'周围人的经历' }
 },
 ja: {
   ui:{
@@ -447,7 +509,11 @@ ja: {
     referralLabel:'友人にクリニックを紹介する', toastReferralCopy:'リンクをコピーしました・共有してみてください',
     referralShareText:(name)=>`${name}に通っているのですが、診療が丁寧でとても良かったです。一度訪れてみてください 🙂`,
     guideNote:'✏️ 作成したレビューをコピーして、GoogleまたはNaverのレビュー画面に貼り付けてください。院長先生や医院の写真を2〜3枚一緒に投稿していただくと、さらに効果的です！',
-    thanksNote:'貴重なお時間を割いてレビューを残してくださり、心より感謝申し上げます 🙏 いただいたご意見に耳を傾け、今後さらにプレミアムな診療とサービスでお応えしてまいります。'
+    thanksNote:'貴重なお時間を割いてレビューを残してくださり、心より感謝申し上げます 🙏 いただいたご意見に耳を傾け、今後さらにプレミアムな診療とサービスでお応えしてまいります。',
+    eyebrowMotive:'来院のきっかけ', titleMotive:'来院のきっかけはありましたか？', descMotive:'当てはまるものがあれば選んでください', tagMotive:'任意',
+    eyebrowConcern:'治療前に気になっていたこと', titleConcern:'治療前に気になっていたことはありましたか？', descConcern:'当てはまるものがあれば選んでください（複数可）', tagConcern:'任意',
+    priorityHeader:'🏥 病院を選ぶ際に重視した部分（最大3つ）', priorityMaxToast:'最大3つまで選択できます',
+    hesitationHeader:'💭 これまで治療をためらっていた理由があれば'
   },
   visit:{ first_visit:'初診（初めての来院）', regular_followup:'定期通院', ortho_consult:'矯正相談', re_consult:'再相談' },
   category:{ general:'一般診療', ortho:'矯正専門' },
@@ -455,7 +521,14 @@ ja: {
   role:{ doctor:'院長', counselor:'カウンセラー', staff:'診療室スタッフ', desk:'受付・予約' },
   experienceItem:{ accurate_diagnosis:'正確な診断', careful_procedure:'丁寧な施術', pain_minimization:'痛みが少ない', thorough_explanation:'十分な説明', digital_cadcam:'最新デジタルCAD/CAM機器', oral_scan:'精密な口腔内スキャン', simulation_3d:'3Dシミュレーション相談', digital_xray:'デジタルX線・CT撮影', gentle_chairside:'落ち着いた診療態度', kind_consult:'親切なカウンセリング', transparent_cost:'透明な費用案内', no_overselling:'過剰な勧誘なし', tailored_plan:'オーダーメイドの提案', skilled_assist:'熟練したアシスト', careful_care:'きめ細やかなケア', comfortable_atmosphere:'落ち着いた雰囲気', hygiene:'清潔な衛生管理', easy_booking:'予約のしやすさ', kind_response:'親切な対応', short_wait:'待ち時間が短い' },
   improvementCategory:{ wait_booking:'待ち時間・予約', cost_info:'費用・案内', facility:'施設・環境', communication:'説明・コミュニケーション' },
-  improvementItem:{ long_wait:'待ち時間が長かった', hard_reschedule:'予約変更が難しかった', cost_info_lacking:'費用案内が不十分だった', cost_burden:'費用が負担に感じた', parking_inconvenient:'駐車場が不便だった', waiting_area_small:'待合スペースが狭かった', explanation_lacking:'説明がやや不足していた', followup_lacking:'診療後の案内が不十分だった' }
+  improvementItem:{ long_wait:'待ち時間が長かった', hard_reschedule:'予約変更が難しかった', cost_info_lacking:'費用案内が不十分だった', cost_burden:'費用が負担に感じた', parking_inconvenient:'駐車場が不便だった', waiting_area_small:'待合スペースが狭かった', explanation_lacking:'説明がやや不足していた', followup_lacking:'診療後の案内が不十分だった' },
+  motive:{ self_concern:'以前から自分で気になっていた', family_referral:'家族・知人の勧めで', other_clinic_referral:'他の病院で診療を受けて勧められて', checkup_found:'定期検診で見つかって', online_research:'インターネット・SNSで調べて', time_available:'ちょうど時間に余裕ができて' },
+  concern:{
+    general:{ cavity_pain:'虫歯による痛み', tooth_sensitive:'歯がしみる', gum_bleeding:'歯茎の出血・腫れ', chewing_discomfort:'噛むときの不快感', worn_prosthetic:'古い補綴物のすり減り', tooth_color:'歯の色・ホワイトニングの悩み' },
+    ortho:{ crooked_teeth:'ガタガタの歯並び', protruding_teeth:'出っ歯・口元の突出', jaw_protrusion:'受け口', teeth_gap:'すきっ歯', gummy_smile:'笑うと歯茎が見えすぎる', bite_mismatch:'上下の前歯が噛み合わない' }
+  },
+  priority:{ doctor_expertise:'院長の経歴・専門性', reasonable_cost:'適正な診療費', kind_explanation:'親切で丁寧な説明', location_access:'病院の立地・アクセス', clean_facility:'清潔な施設環境', short_wait:'短い待ち時間', modern_equipment:'最新の設備・システム', aftercare:'きめ細かなアフターケア' },
+  hesitationItem:{ cost_burden:'費用への負担', treatment_duration:'治療期間への負担', pain_fear:'痛みへの不安', time_shortage:'時間を作りにくいこと', vague_fear:'病院への漠然とした不安', others_experience:'周囲の体験談' }
 },
 es: {
   ui:{
@@ -483,7 +556,11 @@ es: {
     referralLabel:'Recomendar esta clínica a un amigo', toastReferralCopy:'Enlace copiado · compártalo',
     referralShareText:(name)=>`Visité ${name} y la atención fue muy completa y buena. Vale la pena conocerla 🙂`,
     guideNote:'✏️ Copie su reseña y péguela en Google o Naver Reviews. ¡Subir 2–3 fotos del doctor o de la clínica hace que sea aún mejor!',
-    thanksNote:'Muchas gracias por tomarse el tiempo de dejar su reseña 🙏 Valoramos mucho su opinión y la usaremos para seguir ofreciendo una atención y un servicio de nivel premium.'
+    thanksNote:'Muchas gracias por tomarse el tiempo de dejar su reseña 🙏 Valoramos mucho su opinión y la usaremos para seguir ofreciendo una atención y un servicio de nivel premium.',
+    eyebrowMotive:'Motivo de la visita', titleMotive:'¿Qué le trajo a la clínica?', descMotive:'Seleccione si aplica', tagMotive:'Opcional',
+    eyebrowConcern:'Preocupaciones previas', titleConcern:'¿Había algo que le preocupara antes del tratamiento?', descConcern:'Seleccione si aplica (puede elegir varios)', tagConcern:'Opcional',
+    priorityHeader:'🏥 Lo más importante al elegir esta clínica (hasta 3)', priorityMaxToast:'Puede seleccionar hasta 3',
+    hesitationHeader:'💭 Si algo le hizo dudar sobre el tratamiento anteriormente'
   },
   visit:{ first_visit:'Primera visita', regular_followup:'Control periódico', ortho_consult:'Consulta de ortodoncia', re_consult:'Consulta de seguimiento' },
   category:{ general:'Odontología general', ortho:'Ortodoncia' },
@@ -491,7 +568,14 @@ es: {
   role:{ doctor:'Dentista', counselor:'Coordinador/a de tratamiento', staff:'Personal clínico', desk:'Recepción' },
   experienceItem:{ accurate_diagnosis:'Diagnóstico preciso', careful_procedure:'Procedimiento cuidadoso', pain_minimization:'Dolor mínimo', thorough_explanation:'Explicación detallada', digital_cadcam:'Equipo CAD/CAM digital de última generación', oral_scan:'Escaneo intraoral preciso', simulation_3d:'Consulta con simulación 3D', digital_xray:'Radiografía digital / TC', gentle_chairside:'Trato cómodo durante la consulta', kind_consult:'Consulta amable', transparent_cost:'Precios transparentes', no_overselling:'Sin presión para vender más', tailored_plan:'Plan personalizado', skilled_assist:'Asistencia experta', careful_care:'Cuidado atento', comfortable_atmosphere:'Ambiente agradable', hygiene:'Limpieza e higiene', easy_booking:'Fácil de reservar', kind_response:'Atención amable', short_wait:'Poco tiempo de espera' },
   improvementCategory:{ wait_booking:'Espera y reservas', cost_info:'Costos e información', facility:'Instalaciones', communication:'Explicación y comunicación' },
-  improvementItem:{ long_wait:'El tiempo de espera fue largo', hard_reschedule:'Fue difícil cambiar la cita', cost_info_lacking:'La información de costos podría ser más clara', cost_burden:'El costo resultó algo elevado', parking_inconvenient:'El estacionamiento fue incómodo', waiting_area_small:'La sala de espera era pequeña', explanation_lacking:'La explicación podría ser más completa', followup_lacking:'Faltó orientación después del tratamiento' }
+  improvementItem:{ long_wait:'El tiempo de espera fue largo', hard_reschedule:'Fue difícil cambiar la cita', cost_info_lacking:'La información de costos podría ser más clara', cost_burden:'El costo resultó algo elevado', parking_inconvenient:'El estacionamiento fue incómodo', waiting_area_small:'La sala de espera era pequeña', explanation_lacking:'La explicación podría ser más completa', followup_lacking:'Faltó orientación después del tratamiento' },
+  motive:{ self_concern:'Es algo que me preocupaba desde hace tiempo', family_referral:'Por recomendación de familia/amigos', other_clinic_referral:'Me lo recomendaron en otra clínica', checkup_found:'Lo descubrí durante un chequeo regular', online_research:'Lo encontré investigando en internet/redes', time_available:'Por fin tuve tiempo libre' },
+  concern:{
+    general:{ cavity_pain:'Dolor por una caries', tooth_sensitive:'Sensibilidad dental', gum_bleeding:'Sangrado/inflamación de encías', chewing_discomfort:'Molestia al masticar', worn_prosthetic:'Desgaste de una prótesis antigua', tooth_color:'Preocupación por el color/blanqueamiento' },
+    ortho:{ crooked_teeth:'Dientes torcidos', protruding_teeth:'Dientes/boca protruidos', jaw_protrusion:'Mandíbula prominente', teeth_gap:'Espacios entre los dientes', gummy_smile:'Sonrisa gingival', bite_mismatch:'Los dientes superiores e inferiores no encajan' }
+  },
+  priority:{ doctor_expertise:'La experiencia del doctor', reasonable_cost:'Costo razonable del tratamiento', kind_explanation:'Explicaciones amables y detalladas', location_access:'Ubicación conveniente', clean_facility:'Instalaciones limpias', short_wait:'Poco tiempo de espera', modern_equipment:'Equipos y sistemas modernos', aftercare:'Seguimiento cuidadoso' },
+  hesitationItem:{ cost_burden:'Preocupación por el costo', treatment_duration:'Preocupación por la duración del tratamiento', pain_fear:'Miedo al dolor', time_shortage:'Dificultad para encontrar tiempo', vague_fear:'Ansiedad general hacia el dentista', others_experience:'Historias que había escuchado de otros' }
 }
 };
 
@@ -532,7 +616,7 @@ if(!CLINIC_NAME || !GOOGLE_REVIEW_URL){
 
 function initApp(){
   let LANG = null;
-  const state = { method:null, visit:[], category:null, treatment:[], experience:[], improvements:[], additionalNote:'' };
+  const state = { method:null, visit:[], category:null, treatment:[], motive:null, concern:[], experience:[], priority:[], hesitation:[], improvements:[], additionalNote:'' };
   let flow = [];
   let stepIndex = 0;
   let generatedText = "";
@@ -574,6 +658,7 @@ function initApp(){
     ghostBtn.style.display = 'none';
     mainBtn.style.display = 'block';
     state.method = null; state.visit = []; state.category = null; state.treatment = [];
+    state.motive = null; state.concern = []; state.priority = []; state.hesitation = [];
     state.experience = []; state.improvements = []; state.additionalNote = '';
     goToStep('lang');
     updateBackButtonVisibility();
@@ -591,15 +676,23 @@ function initApp(){
     document.getElementById('optMethodManual').textContent = t.ui.methodManual;
     document.getElementById('txtEyebrow1').textContent = t.ui.eyebrow1;
     document.getElementById('txtTitle1').textContent = t.ui.title1;
+    document.getElementById('txtEyebrowMotive').innerHTML = `${t.ui.eyebrowMotive} <span class="step-optional-tag">${t.ui.tagMotive}</span>`;
+    document.getElementById('txtTitleMotive').textContent = t.ui.titleMotive;
+    document.getElementById('txtDescMotive').textContent = t.ui.descMotive;
     document.getElementById('txtEyebrow2').textContent = t.ui.eyebrow2;
     document.getElementById('txtTitle2').textContent = t.ui.title2;
     document.getElementById('txtEyebrow3').textContent = t.ui.eyebrow3;
+    document.getElementById('txtEyebrowConcern').innerHTML = `${t.ui.eyebrowConcern} <span class="step-optional-tag">${t.ui.tagConcern}</span>`;
+    document.getElementById('txtTitleConcern').textContent = t.ui.titleConcern;
+    document.getElementById('txtDescConcern').textContent = t.ui.descConcern;
     document.getElementById('txtEyebrow4').textContent = t.ui.eyebrow4;
     document.getElementById('txtTitle4').textContent = t.ui.title4;
     document.getElementById('txtDesc4').textContent = t.ui.desc4;
     document.getElementById('txtEyebrow5').innerHTML = `${t.ui.eyebrow5} <span class="step-optional-tag">${t.ui.tag5}</span>`;
     document.getElementById('txtTitle5').textContent = t.ui.title5;
     document.getElementById('txtDesc5').textContent = t.ui.desc5;
+    document.getElementById('txtPriorityHeader').textContent = t.ui.priorityHeader;
+    document.getElementById('txtHesitationHeader').textContent = t.ui.hesitationHeader;
     document.getElementById('txtNoteLabel').textContent = t.ui.noteLabel;
     document.getElementById('additionalNote').placeholder = t.ui.notePlaceholder;
     document.getElementById('txtManualEyebrow').textContent = t.ui.manualEyebrow;
@@ -679,7 +772,8 @@ function initApp(){
     }
 
     renderVisit(); renderCategory(); renderExperience(); renderImprovement();
-    if(state.category) renderTreatments(state.category);
+    renderMotive(); renderPriority(); renderHesitation();
+    if(state.category){ renderTreatments(state.category); renderConcern(state.category); }
     refreshButton();
   }
 
@@ -716,6 +810,54 @@ function initApp(){
       d.className='opt'; d.dataset.group='treatment'; d.dataset.value=id;
       d.textContent = `${ICONS.treatment[id]} ${t.treatment[id]}`;
       if(state.treatment.includes(id)) d.classList.add('selected');
+      box.appendChild(d);
+    });
+  }
+  function renderConcern(categoryId){
+    const box = document.getElementById('concernOptions');
+    box.innerHTML = '';
+    const t = T();
+    (CONCERN_ORDER[categoryId] || []).forEach(id=>{
+      const d = document.createElement('div');
+      d.className='opt'; d.dataset.group='concern'; d.dataset.value=id;
+      d.textContent = t.concern[categoryId][id];
+      if(state.concern.includes(id)) d.classList.add('selected');
+      box.appendChild(d);
+    });
+  }
+  function renderMotive(){
+    const box = document.getElementById('motiveOptions');
+    box.innerHTML = '';
+    const t = T();
+    MOTIVE_ORDER.forEach(id=>{
+      const d = document.createElement('div');
+      d.className='opt'; d.dataset.group='motive'; d.dataset.value=id;
+      d.textContent = t.motive[id];
+      if(state.motive === id) d.classList.add('selected');
+      box.appendChild(d);
+    });
+  }
+  function renderPriority(){
+    const box = document.getElementById('priorityOptions');
+    box.innerHTML = '';
+    const t = T();
+    PRIORITY_ORDER.forEach(id=>{
+      const d = document.createElement('div');
+      d.className='opt'; d.dataset.group='priority'; d.dataset.value=id;
+      d.textContent = t.priority[id];
+      if(state.priority.includes(id)) d.classList.add('selected');
+      box.appendChild(d);
+    });
+  }
+  function renderHesitation(){
+    const box = document.getElementById('hesitationOptions');
+    box.innerHTML = '';
+    const t = T();
+    HESITATION_ORDER.forEach(id=>{
+      const d = document.createElement('div');
+      d.className='opt'; d.dataset.group='hesitation'; d.dataset.value=id;
+      d.textContent = t.hesitationItem[id];
+      if(state.hesitation.includes(id)) d.classList.add('selected');
       box.appendChild(d);
     });
   }
@@ -802,8 +944,10 @@ function initApp(){
     }
     const name = currentStepName();
     if(name === '1') mainBtn.disabled = state.visit.length===0;
+    else if(name === 'motive'){ mainBtn.disabled = false; mainBtn.textContent = t.ui.btnNext; }
     else if(name === '2') mainBtn.disabled = !state.category;
     else if(name === '3') mainBtn.disabled = state.treatment.length===0;
+    else if(name === 'concern'){ mainBtn.disabled = false; mainBtn.textContent = t.ui.btnNext; }
     else if(name === '4'){ mainBtn.disabled = state.experience.length===0; mainBtn.textContent = t.ui.btnNext; }
     else if(name === '5'){ mainBtn.disabled = false; mainBtn.textContent = t.ui.btnMakeReview; }
     else mainBtn.textContent = t.ui.btnNext;
@@ -846,7 +990,7 @@ function initApp(){
       goToStep('lang');
     } else if(activeName === 'manual'){
       resetMethodStep();
-    } else if(['1','2','3','4','5'].includes(activeName)){
+    } else if(flow.includes(activeName)){
       if(stepIndex > 0){ stepIndex--; goToStep(flow[stepIndex]); }
       else { resetMethodStep(); }
     }
@@ -863,7 +1007,7 @@ function initApp(){
       document.querySelectorAll('[data-group="method"]').forEach(o=>o.classList.remove('selected'));
       opt.classList.add('selected');
       state.method = value;
-      if(value === 'ai'){ flow=['1','2','3','4','5']; stepIndex=0; goToStep('1'); }
+      if(value === 'ai'){ flow=['1','motive','2','3','concern','4','5']; stepIndex=0; goToStep('1'); }
       else goToStep('manual');
       refreshButton(); return;
     }
@@ -875,14 +1019,39 @@ function initApp(){
     }
     if(group === 'category'){
       document.querySelectorAll('[data-group="category"]').forEach(o=>o.classList.remove('selected'));
-      opt.classList.add('selected'); state.category = value; state.treatment = [];
+      opt.classList.add('selected'); state.category = value; state.treatment = []; state.concern = [];
       renderTreatments(value);
+      renderConcern(value);
     }
     if(group === 'treatment'){
       opt.classList.toggle('selected');
       const idx = state.treatment.indexOf(value);
       if(idx >= 0) state.treatment.splice(idx,1);
       else state.treatment.push(value);
+    }
+    if(group === 'motive'){
+      const wasSelected = opt.classList.contains('selected');
+      document.querySelectorAll('[data-group="motive"]').forEach(o=>o.classList.remove('selected'));
+      if(wasSelected){ state.motive = null; }
+      else { opt.classList.add('selected'); state.motive = value; }
+    }
+    if(group === 'concern'){
+      opt.classList.toggle('selected');
+      const idx = state.concern.indexOf(value);
+      if(idx >= 0) state.concern.splice(idx,1);
+      else state.concern.push(value);
+    }
+    if(group === 'priority'){
+      const idx = state.priority.indexOf(value);
+      if(idx >= 0){ state.priority.splice(idx,1); opt.classList.remove('selected'); }
+      else if(state.priority.length >= 3){ showToast(T().ui.priorityMaxToast); }
+      else { state.priority.push(value); opt.classList.add('selected'); }
+    }
+    if(group === 'hesitation'){
+      opt.classList.toggle('selected');
+      const idx = state.hesitation.indexOf(value);
+      if(idx >= 0) state.hesitation.splice(idx,1);
+      else state.hesitation.push(value);
     }
     if(group === 'experience'){
       opt.classList.toggle('selected');
@@ -917,6 +1086,10 @@ function initApp(){
     const improvementPayload = state.improvements.map(i => t.improvementItem[i.id]);
     const visitText = state.visit.map(v => t.visit[v]).join(', ');
     const treatmentText = state.treatment.map(tr => t.treatment[tr]).join(', ');
+    const motiveText = state.motive ? t.motive[state.motive] : '';
+    const concernText = state.category ? state.concern.map(c => t.concern[state.category][c]).join(', ') : '';
+    const priorityText = state.priority.map(p => t.priority[p]).join(', ');
+    const hesitationText = state.hesitation.map(h => t.hesitationItem[h]).join(', ');
 
     try{
       const res = await fetch('/api/generate-review', {
@@ -928,6 +1101,10 @@ function initApp(){
           visit: visitText,
           category: t.category[state.category] || '',
           treatment: treatmentText,
+          motive: motiveText,
+          concern: concernText,
+          priority: priorityText,
+          hesitation: hesitationText,
           experience: experiencePayload,
           improvements: improvementPayload,
           additionalNote: state.additionalNote,
