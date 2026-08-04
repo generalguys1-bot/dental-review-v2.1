@@ -48,7 +48,8 @@ export default async function handler(req, res) {
 
   const {
     clinicName, language, visit, category, treatment,
-    experience, improvements, additionalNote, region
+    experience, improvements, additionalNote, region,
+    motive, concern, priority, hesitation
   } = req.body || {};
 
   if (!clinicName || !visit || !treatment || !Array.isArray(experience) || experience.length === 0) {
@@ -79,6 +80,19 @@ export default async function handler(req, res) {
     ? `- Minor thing that could be improved (if present, weave in ONE gentle, constructive sentence near the end; keep overall tone positive): ${improvementItems.join(', ')}`
     : `- Nothing to improve mentioned (do not invent any negative content)`;
 
+  const motiveLine = motive
+    ? `- Reason for visiting/consulting (mention briefly and naturally ONLY if it fits smoothly, e.g. near the beginning; never force it): ${motive}`
+    : '';
+  const concernLine = concern
+    ? `- Dental concern that motivated treatment (optional — weave in naturally near the beginning if it fits, e.g. "I'd always been self-conscious about..."): ${concern}`
+    : '';
+  const priorityLine = priority
+    ? `- What mattered when choosing this clinic (mention naturally, at most one short phrase, if it fits — do not list them all mechanically): ${priority}`
+    : '';
+  const hesitationLine = hesitation
+    ? `- Hesitations the patient had before starting treatment, now resolved (frame positively and briefly, e.g. "I was a little worried about ... but ..." — only if it fits naturally, never dwell on it): ${hesitation}`
+    : '';
+
   const prompt = `You are helping a real dental patient write a natural, authentic Google review.
 Using the information below, write ONE natural review as if written by the patient themselves.
 
@@ -88,13 +102,17 @@ IMPORTANT: Write the entire review ONLY in ${targetLanguage}. Do not include any
 - Visit type: ${visit}
 - Treatment area: ${category || ''}
 - Treatment received: ${treatment}
+${motiveLine}
+${concernLine}
 - What stood out, by staff member:
 ${experienceLines}
 ${improvementLine}
+${priorityLine}
+${hesitationLine}
 ${regionLine}
 
 Requirements:
-- 3-5 natural sentences, written the way a real person writes a review (not like an advertisement)
+- 3-6 natural sentences, written the way a real person writes a review (not like an advertisement)
 - If there are multiple staff members mentioned, naturally reference one or two of them (e.g. the dentist, the treatment coordinator) the way a genuine review would
 - If there's something to improve, phrase it as a gentle, constructive note, not a complaint — only one sentence for this
 - No emojis
