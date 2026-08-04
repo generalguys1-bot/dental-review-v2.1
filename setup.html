@@ -72,7 +72,7 @@
 
   <div class="card">
     <label>치과 이름</label>
-    <input type="text" id="clinicName" placeholder="예: 스마일라인치과">
+    <input type="text" id="clinicName" placeholder="예: 밝은미소치과">
 
     <label style="margin-top:18px;">구글 리뷰 작성 링크</label>
     <input type="text" id="googleUrl" placeholder="https://search.google.com/local/writereview?placeid=...">
@@ -140,10 +140,14 @@
       </div>
     </div>
 
+    <label style="margin-top:18px;">유튜브 채널 링크 <span style="font-weight:500;color:var(--muted);">(선택)</span></label>
+    <input type="text" id="youtubeUrl" placeholder="https://youtube.com/@...">
+    <p class="help">입력하시면 리뷰 완료 화면에 "유튜브 구독" 버튼이 함께 표시돼요.</p>
+
     <label style="margin-top:18px;">SNS 이벤트 안내문 <span style="font-weight:500;color:var(--muted);">(선택)</span></label>
     <input type="text" id="eventNote" placeholder="예: 인스타그램 팔로우 + 스토리 공유 시 다음 방문 시 텀블러 증정">
     <div class="info-box">
-      ⚠️ 인스타그램/블로그 링크 중 하나 이상 입력했을 때만 배너로 표시돼요. 그리고 이 이벤트는 <b>"리뷰 작성"</b>이 아니라 <b>"SNS 팔로우/공유"</b>에 대한 보상으로 문구를 구성해주세요. 구글 리뷰 정책은 리뷰 작성 자체에 대한 보상 제공을 금지하고 있어요.
+      ⚠️ 인스타그램/블로그/유튜브 링크 중 하나 이상 입력했을 때만 배너로 표시돼요. 그리고 이 이벤트는 <b>"리뷰 작성"</b>이 아니라 <b>"SNS 팔로우/구독/공유"</b>에 대한 보상으로 문구를 구성해주세요. 구글 리뷰 정책은 리뷰 작성 자체에 대한 보상 제공을 금지하고 있어요.
     </div>
   </div>
 
@@ -200,6 +204,7 @@ generateBtn.addEventListener('click', ()=>{
   const phone = document.getElementById('phone').value.trim();
   const instagram = document.getElementById('instagramUrl').value.trim();
   const blog = document.getElementById('blogUrl').value.trim();
+  const youtube = document.getElementById('youtubeUrl').value.trim();
   const eventNote = document.getElementById('eventNote').value.trim();
   const clinicId = document.getElementById('clinicId').value.trim();
   if(!name || !google){
@@ -218,6 +223,7 @@ generateBtn.addEventListener('click', ()=>{
   if(phone) url += `&phone=${encodeURIComponent(phone)}`;
   if(instagram) url += `&instagram=${encodeURIComponent(instagram)}`;
   if(blog) url += `&blog=${encodeURIComponent(blog)}`;
+  if(youtube) url += `&youtube=${encodeURIComponent(youtube)}`;
   if(eventNote) url += `&event=${encodeURIComponent(eventNote)}`;
   if(clinicId) url += `&cid=${encodeURIComponent(clinicId)}`;
   finalUrlInput.value = url;
