@@ -9,7 +9,7 @@
 <style>
   :root{
     --bg:#F3F6F4; --surface:#FFFFFF; --deep:#163832; --deep-light:#2C5D54;
-    --text:#1B2624; --muted:#5B6B67; --gold:#C89B3C; --gold-soft:#EADFC2;
+    --text:#1B2624; --muted:#5B6B67; --gold:#8F6A16; --gold-soft:#EADFC2;
     --border:#E1E8E5; --radius:18px;
   }
   *{box-sizing:border-box;}
@@ -22,14 +22,14 @@
   }
   .app{ width:100%; max-width:480px; padding:28px 20px 24px; }
   .clinic-name{ font-size:28px; font-weight:800; letter-spacing:.01em; color:var(--deep-light); margin:0 0 8px; line-height:1.25; }
-  .homepage-link{ display:inline-block; font-size:14px; font-weight:700; color:var(--gold); text-decoration:none; margin:0 0 10px; }
-  .lang-switch{ font-size:14px; font-weight:700; color:var(--muted); background:none; border:none; cursor:pointer; padding:0; margin:0 0 10px; }
+  .homepage-link{ display:inline-block; font-size:15px; font-weight:700; color:var(--gold); text-decoration:none; margin:0 0 10px; }
+  .lang-switch{ font-size:15px; font-weight:700; color:var(--muted); background:none; border:none; cursor:pointer; padding:0; margin:0 0 10px; }
   h1{ font-size:30px; font-weight:800; line-height:1.3; margin:0 0 6px; color:var(--deep); }
   .sub{ font-size:18px; color:var(--muted); margin:0 0 22px; }
   .smile-wrap{ display:flex; flex-direction:column; align-items:center; margin-bottom:26px; }
   .smile-track{ fill:none; stroke:var(--border); stroke-width:6; stroke-linecap:round; }
   .smile-fill{ fill:none; stroke:var(--gold); stroke-width:6; stroke-linecap:round; transition:stroke-dashoffset .5s cubic-bezier(.4,0,.2,1); }
-  .smile-label{ font-size:12px; color:var(--muted); margin-top:6px; font-weight:600; }
+  .smile-label{ font-size:13.5px; color:var(--muted); margin-top:6px; font-weight:600; }
   .step{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:18px 18px 16px; margin-bottom:14px; display:none; animation:rise .35s ease; }
   .step.active{ display:block; }
   @keyframes rise{ from{ opacity:0; transform:translateY(8px);} to{ opacity:1; transform:translateY(0);} }
@@ -47,7 +47,7 @@
   .translate-link{
     display:flex; align-items:center; justify-content:center; gap:8px;
     margin-top:16px; padding:13px; border-radius:12px; border:1.5px dashed var(--border);
-    background:#FBFCFB; color:var(--deep-light); font-size:13.5px; font-weight:700;
+    background:#FBFCFB; color:var(--deep-light); font-size:15px; font-weight:700;
     text-decoration:none; transition:.15s ease;
   }
   .translate-link:active{ transform:scale(.98); }
@@ -81,14 +81,14 @@
   .loading.active{ display:flex; }
   .spinner{ width:18px; height:18px; border:2.5px solid var(--border); border-top-color:var(--gold); border-radius:50%; animation:spin .8s linear infinite; flex-shrink:0; }
   @keyframes spin{ to{ transform:rotate(360deg);} }
-  .toast{ position:fixed; top:24px; left:50%; transform:translateX(-50%) translateY(-20px); background:var(--deep); color:#fff; font-size:13.5px; font-weight:600; padding:10px 18px; border-radius:999px; opacity:0; pointer-events:none; transition:.25s ease; z-index:99; white-space:nowrap; }
+  .toast{ position:fixed; top:24px; left:50%; transform:translateX(-50%) translateY(-20px); background:var(--deep); color:#fff; font-size:14.5px; font-weight:600; padding:10px 18px; border-radius:999px; opacity:0; pointer-events:none; transition:.25s ease; z-index:99; white-space:nowrap; }
   .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
   .setup-needed{ text-align:center; padding:60px 24px; }
-  .setup-needed a{ display:inline-block; margin-top:18px; background:var(--deep); color:#fff; text-decoration:none; padding:14px 22px; border-radius:12px; font-weight:700; font-size:14px; }
+  .setup-needed a{ display:inline-block; margin-top:18px; background:var(--deep); color:#fff; text-decoration:none; padding:14px 22px; border-radius:12px; font-weight:700; font-size:16px; }
   .privacy-note{ font-size:14px; color:var(--muted); text-align:center; line-height:1.6; margin-top:22px; padding:0 8px; }
   .footer-section{ margin-top:22px; padding-top:18px; border-top:1px dashed var(--border); }
   .share-row{ display:flex; gap:8px; margin-bottom:16px; }
-  .icon-btn{ flex:1 1 90px; display:flex; flex-direction:column; align-items:center; gap:5px; padding:13px 6px; border:1.5px solid var(--border); background:#FBFCFB; border-radius:12px; text-decoration:none; color:var(--text); font-size:14px; font-weight:700; cursor:pointer; font-family:inherit; transition:.15s ease; }
+  .icon-btn{ flex:1 1 90px; display:flex; flex-direction:column; align-items:center; gap:5px; padding:13px 6px; border:1.5px solid var(--border); background:#FBFCFB; border-radius:12px; text-decoration:none; color:var(--text); font-size:15px; font-weight:700; cursor:pointer; font-family:inherit; transition:.15s ease; }
   .icon-btn:active{ transform:scale(.96); background:var(--bg); }
   .icon-btn-emoji{ font-size:24px; line-height:1; }
   .guide-box{ background:var(--gold-soft); border-radius:12px; padding:14px 16px; margin-bottom:10px; font-size:16px; line-height:1.7; color:var(--deep); }
@@ -98,6 +98,9 @@
   .doctor-card p{ margin:0; font-size:16px; line-height:1.55; color:var(--text); }
   .call-btn{ display:flex; align-items:center; justify-content:center; gap:8px; width:100%; padding:15px; border:none; border-radius:12px; background:var(--deep); color:#fff; font-size:19px; font-weight:700; text-decoration:none; margin-bottom:12px; font-family:inherit; }
   .call-btn:active{ transform:scale(.98); }
+  .kakao-channel-btn{ display:flex; align-items:center; justify-content:center; gap:8px; width:100%; padding:15px; border:none; border-radius:12px; background:#FEE500; color:#181600; font-size:19px; font-weight:700; text-decoration:none; margin-bottom:8px; font-family:inherit; }
+  .kakao-channel-btn:active{ transform:scale(.98); }
+  .kakao-channel-note{ font-size:15px; line-height:1.6; color:var(--text); text-align:center; margin:0 4px 16px; padding:0 4px; }
   .referral-btn{ display:flex; align-items:center; justify-content:center; gap:8px; width:100%; padding:13px; border:1.5px dashed var(--gold); border-radius:12px; background:none; color:var(--gold); font-size:17px; font-weight:700; margin-bottom:16px; cursor:pointer; font-family:inherit; }
   .referral-btn:active{ transform:scale(.98); }
   .sns-row{ display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap; }
@@ -169,6 +172,7 @@
     <div class="step" data-step="2">
       <p class="step-eyebrow" id="txtEyebrow2"></p>
       <p class="step-title" id="txtTitle2"></p>
+      <p class="step-desc" id="txtDescCategory"></p>
       <div class="options single-col" id="categoryOptions"></div>
     </div>
 
@@ -233,6 +237,11 @@
         <a href="#" id="callBtn" class="call-btn" style="display:none;">
           <span>📞</span><span id="txtCallLabel"></span>
         </a>
+
+        <a href="#" id="kakaoChannelBtn" class="kakao-channel-btn" target="_blank" rel="noopener" style="display:none;">
+          <span>💛</span><span id="txtKakaoChannelLabel"></span>
+        </a>
+        <p class="kakao-channel-note" id="txtKakaoChannelNote" style="display:none;"></p>
 
         <div class="share-row">
           <a href="#" id="homepageIconBtn" class="icon-btn" target="_blank" rel="noopener" style="display:none;">
@@ -348,7 +357,7 @@ ko: {
     smileStart:'시작해볼까요?', smileReady:'준비됐어요', smileProgress:(n,t)=>`${n}/${t} 선택완료`,
     eyebrow0:'① 작성방식', title0:'리뷰를 어떻게 작성할까요?', methodAI:'AI 문구 생성 ✨', methodManual:'직접 입력 ✍️',
     eyebrow1:'② 방문유형', title1:'이번 방문은?',
-    eyebrow2:'③ 진료분야', title2:'어느 분야로 진료받으셨나요?',
+    eyebrow2:'③ 진료분야', title2:'어느 분야로 진료받으셨나요?', descCategory:'해당되는 분야를 모두 선택해주세요 (복수 선택 가능)',
     eyebrow3:'④ 세부 치료', title3Suffix:'중 어떤 치료를 받으셨나요?', title3Default:'어떤 치료를 받으셨나요?',
     eyebrow4:'⑤ 경험선택', title4:'어떤 점이 좋으셨나요?', desc4:'담당자별로 좋았던 점을 골라주세요 (중복 가능)',
     eyebrow5:'⑥ 개선사항', tag5:'선택사항', title5:'아쉬웠던 점이 있으셨나요?', desc5:'있으시면 골라주세요. 없으시면 바로 다음으로 넘어가도 돼요',
@@ -364,12 +373,12 @@ ko: {
     homepageIconLabel:'홈페이지', kakaoShareLabel:'카카오톡 공유', wechatShareLabel:'위챗 공유',
     toastCopyKakao:'복사되었어요 · 카카오톡에서 붙여넣어 공유해주세요', toastCopyWechat:'복사되었어요 · 위챗에서 붙여넣어 공유해주세요',
     btnBack:'이전',
-    callLabel:'전화로 예약하기', instagramLabel:'인스타그램 팔로우', blogLabel:'블로그 구독', youtubeLabel:'유튜브 구독', eventTag:'📸 이벤트',
+    callLabel:'전화로 예약하기', kakaoChannelLabel:'카카오톡 채널 문의', kakaoChannelNote:'💬 진료받으시면서 만족하셨던 점, 개선했으면 하는 점, 칭찬하고 싶은 직원이 있다면 카카오톡 채널로 자유롭게 편하게 말씀해주세요.', instagramLabel:'인스타그램 팔로우', blogLabel:'블로그 구독', youtubeLabel:'유튜브 구독', eventTag:'📸 이벤트',
     referralLabel:'지인에게 병원 추천하기', toastReferralCopy:'링크가 복사되었어요 · 공유해보세요',
     referralShareText:(name)=>`제가 다녀온 ${name}, 진료가 꼼꼼하고 좋았어요. 한번 방문해보세요 🙂`,
     guideNote:'✏️ 작성하신 리뷰는 복사한 뒤 구글 또는 네이버 리뷰 화면에 붙여넣어 등록해주세요. 원장님 또는 치과 사진을 2~3장 함께 올려주시면 더욱 좋아요!',
     thanksNote:'소중한 시간 내어 남겨주신 리뷰, 진심으로 감사드립니다 🙏 환자분의 의견에 귀 기울여 앞으로 더 프리미엄 진료와 서비스로 보답하겠습니다.',
-    eyebrowMotive:'방문 계기', titleMotive:'병원을 찾게 된 계기가 있으신가요?', descMotive:'해당되는 항목이 있으면 골라주세요', tagMotive:'선택사항',
+    eyebrowMotive:'방문 계기', titleMotive:'병원을 찾게 된 계기가 있으신가요?', descMotive:'해당되는 항목을 모두 선택해주세요 (복수 선택 가능)', tagMotive:'선택사항',
     eyebrowConcern:'신경쓰였던 부분', titleConcern:'치료 전 신경 쓰이셨던 부분이 있었나요?', descConcern:'해당되는 항목이 있으면 골라주세요 (중복 가능)', tagConcern:'선택사항',
     priorityHeader:'🏥 병원 선택 시 가장 중요했던 부분 (최대 3개)', priorityMaxToast:'최대 3개까지 선택할 수 있어요',
     hesitationHeader:'💭 그동안 진료를 망설이게 했던 이유가 있다면'
@@ -377,7 +386,7 @@ ko: {
   visit:{ first_visit:'초진 (첫 방문)', regular_followup:'정기 재진', ortho_consult:'교정상담 방문', re_consult:'재상담 방문' },
   category:{ general:'일반진료', ortho:'교정전문' },
   treatment:{ cavity:'충치치료', root_canal:'신경치료', implant:'임플란트', crown:'보철·크라운', whitening_scaling:'스케일링·미백', wisdom_tooth:'사랑니 발치', gum_treatment:'잇몸치료', denture:'틀니', checkup:'정기검진', overall:'전반적 만족', metal_braces:'메탈교정', ceramic_braces:'세라믹교정', clear_aligner:'투명교정 (인비절라인 등)', lingual_braces:'설측교정 (안보이는교정)', partial_braces:'부분교정', pediatric_ortho:'소아교정', re_treatment:'재교정', ortho_consult_treat:'교정상담' },
-  role:{ doctor:'원장님', counselor:'상담실장님', staff:'진료실 스텝', desk:'데스크·예약' },
+  role:{ doctor:'원장님', counselor:'상담실장님', staff:'진료실 선생님', desk:'데스크·예약' },
   experienceItem:{ accurate_diagnosis:'정확한 진단', careful_procedure:'꼼꼼한 시술', pain_minimization:'통증 최소화', thorough_explanation:'충분한 설명', digital_cadcam:'최신 디지털 캐드캠 장비', oral_scan:'정밀 구강 스캔', simulation_3d:'3D 시뮬레이션 상담', digital_xray:'디지털 엑스레이·CT 촬영', gentle_chairside:'편안한 진료 태도', kind_consult:'친절한 상담', transparent_cost:'투명한 비용 안내', no_overselling:'과잉권유 없음', tailored_plan:'맞춤 플랜 제안', skilled_assist:'능숙한 어시스트', careful_care:'세심한 케어', comfortable_atmosphere:'편안한 분위기', hygiene:'청결한 위생관리', easy_booking:'편리한 예약', kind_response:'친절한 응대', short_wait:'짧은 대기시간' },
   improvementCategory:{ wait_booking:'대기·예약', cost_info:'비용·안내', facility:'시설·환경', communication:'설명·소통' },
   improvementItem:{ long_wait:'대기시간이 길었어요', hard_reschedule:'예약 변경이 어려웠어요', cost_info_lacking:'비용 안내가 아쉬웠어요', cost_burden:'진료비가 부담됐어요', parking_inconvenient:'주차가 불편했어요', waiting_area_small:'대기공간이 좁았어요', explanation_lacking:'설명이 조금 부족했어요', followup_lacking:'진료 후 안내가 아쉬웠어요' },
@@ -395,7 +404,7 @@ en: {
     smileStart:'Ready to start?', smileReady:"You're all set", smileProgress:(n,t)=>`${n}/${t} selected`,
     eyebrow0:'STEP 1 · METHOD', title0:'How would you like to write your review?', methodAI:'AI-generated ✨', methodManual:'Write it myself ✍️',
     eyebrow1:'STEP 2 · VISIT TYPE', title1:'What kind of visit was this?',
-    eyebrow2:'STEP 3 · TREATMENT AREA', title2:'Which area were you treated in?',
+    eyebrow2:'STEP 3 · TREATMENT AREA', title2:'Which areas were you treated in?', descCategory:'Select all that apply (multiple choice)',
     eyebrow3:'STEP 4 · TREATMENT', title3Suffix:'— which treatment did you receive?', title3Default:'Which treatment did you receive?',
     eyebrow4:'STEP 5 · EXPERIENCE', title4:'What did you like?', desc4:'Pick what stood out for each staff member (multiple choice)',
     eyebrow5:'STEP 6 · FEEDBACK', tag5:'optional', title5:'Anything that could be improved?', desc5:'Pick any that apply, or skip straight to the next step',
@@ -411,12 +420,12 @@ en: {
     homepageIconLabel:'Website', kakaoShareLabel:'Share on KakaoTalk', wechatShareLabel:'Share on WeChat',
     toastCopyKakao:'Copied · paste it into KakaoTalk to share', toastCopyWechat:'Copied · paste it into WeChat to share',
     btnBack:'Back',
-    callLabel:'Call to book an appointment', instagramLabel:'Follow on Instagram', blogLabel:'Follow the blog', youtubeLabel:'Subscribe on YouTube', eventTag:'📸 Event',
+    callLabel:'Call to book an appointment', kakaoChannelLabel:'Message us on KakaoTalk', kakaoChannelNote:'💬 If there was anything you especially liked, anything we could improve, or a staff member you\'d like to praise, feel free to share it with us on our KakaoTalk channel.', instagramLabel:'Follow on Instagram', blogLabel:'Follow the blog', youtubeLabel:'Subscribe on YouTube', eventTag:'📸 Event',
     referralLabel:'Recommend this clinic to a friend', toastReferralCopy:'Link copied · share it with someone',
     referralShareText:(name)=>`I visited ${name} and the care was thorough and great. Worth checking out 🙂`,
     guideNote:'✏️ Copy your review and paste it into Google or Naver Reviews. Adding 2–3 photos of the doctor or the clinic makes it even better!',
     thanksNote:'Thank you so much for taking the time to share your review 🙏 We truly value your feedback and will use it to keep offering more premium care and service.',
-    eyebrowMotive:'Reason for visiting', titleMotive:'What brought you in?', descMotive:'Select if any apply', tagMotive:'Optional',
+    eyebrowMotive:'Reason for visiting', titleMotive:'What brought you in?', descMotive:'Select all that apply (multiple choice)', tagMotive:'Optional',
     eyebrowConcern:'Concerns beforehand', titleConcern:'Was there anything that concerned you before treatment?', descConcern:'Select if any apply (multiple OK)', tagConcern:'Optional',
     priorityHeader:'🏥 What mattered most when choosing this clinic (up to 3)', priorityMaxToast:'You can select up to 3',
     hesitationHeader:'💭 If anything made you hesitate about treatment before'
@@ -428,7 +437,7 @@ en: {
   experienceItem:{ accurate_diagnosis:'Accurate diagnosis', careful_procedure:'Careful procedure', pain_minimization:'Minimal pain', thorough_explanation:'Thorough explanation', digital_cadcam:'Latest digital CAD/CAM equipment', oral_scan:'Precise intraoral scan', simulation_3d:'3D simulation consultation', digital_xray:'Digital X-ray / CT imaging', gentle_chairside:'Comfortable chairside manner', kind_consult:'Friendly consultation', transparent_cost:'Transparent pricing', no_overselling:'No pressure to upsell', tailored_plan:'Tailored treatment plan', skilled_assist:'Skilled assistance', careful_care:'Attentive care', comfortable_atmosphere:'Comfortable atmosphere', hygiene:'Clean & hygienic', easy_booking:'Easy booking', kind_response:'Friendly service', short_wait:'Short wait time' },
   improvementCategory:{ wait_booking:'Wait & booking', cost_info:'Cost & information', facility:'Facilities', communication:'Explanation & communication' },
   improvementItem:{ long_wait:'The wait was long', hard_reschedule:'Rescheduling was difficult', cost_info_lacking:'Cost info could be clearer', cost_burden:'The cost felt like a burden', parking_inconvenient:'Parking was inconvenient', waiting_area_small:'The waiting area was small', explanation_lacking:'Explanation could be more thorough', followup_lacking:'Follow-up guidance was lacking' },
-  motive:{ self_concern:"It's something I'd been thinking about for a while", family_referral:'Recommended by family/friends', other_clinic_referral:'Referred by another clinic', checkup_found:'Found during a regular checkup', online_research:'Found while researching online/SNS', time_available:'Finally had some free time' },
+  motive:{ self_concern:"Something I'd been meaning to take care of", family_referral:'Recommended by family/friends', other_clinic_referral:'Referred by another clinic', checkup_found:'Found during a regular checkup', online_research:'Found while researching online / on social media', time_available:'Finally had some free time' },
   concern:{
     general:{ cavity_pain:'Pain from a cavity', tooth_sensitive:'Tooth sensitivity', gum_bleeding:'Gum bleeding/swelling', chewing_discomfort:'Discomfort while chewing', worn_prosthetic:'Worn-out old dental work', tooth_color:'Tooth color/whitening concerns' },
     ortho:{ crooked_teeth:'Crooked teeth', protruding_teeth:'Protruding teeth/mouth', jaw_protrusion:'Underbite/protruding jaw', teeth_gap:'Gaps between teeth', gummy_smile:'Gummy smile', bite_mismatch:'Upper and lower front teeth not meeting' }
@@ -442,7 +451,7 @@ zh: {
     smileStart:'准备好了吗？', smileReady:'已完成', smileProgress:(n,t)=>`已选择 ${n}/${t}`,
     eyebrow0:'① 撰写方式', title0:'您想如何撰写评价？', methodAI:'AI 自动生成 ✨', methodManual:'自己输入 ✍️',
     eyebrow1:'② 就诊类型', title1:'这次是什么类型的就诊？',
-    eyebrow2:'③ 诊疗领域', title2:'您接受的是哪个领域的诊疗？',
+    eyebrow2:'③ 诊疗领域', title2:'您接受的是哪个领域的诊疗？', descCategory:'请选择所有符合的领域（可多选）',
     eyebrow3:'④ 具体治疗', title3Suffix:'中您接受了哪种治疗？', title3Default:'您接受了哪种治疗？',
     eyebrow4:'⑤ 体验选择', title4:'哪些方面让您满意？', desc4:'请按负责人分别选择满意之处（可多选）',
     eyebrow5:'⑥ 改进建议', tag5:'可选', title5:'有没有觉得不满意的地方？', desc5:'如果有请选择，没有的话可以直接进入下一步',
@@ -458,12 +467,12 @@ zh: {
     homepageIconLabel:'官网', kakaoShareLabel:'分享到 KakaoTalk', wechatShareLabel:'分享到微信',
     toastCopyKakao:'已复制 · 请在 KakaoTalk 中粘贴分享', toastCopyWechat:'已复制 · 请在微信中粘贴分享',
     btnBack:'上一步',
-    callLabel:'致电预约', instagramLabel:'关注 Instagram', blogLabel:'订阅博客', youtubeLabel:'订阅 YouTube', eventTag:'📸 活动',
+    callLabel:'致电预约', kakaoChannelLabel:'通过 KakaoTalk 咨询', kakaoChannelNote:'💬 如果就诊过程中有满意的地方、希望改进的地方，或想表扬的员工，欢迎通过 KakaoTalk 频道自由留言告诉我们。', instagramLabel:'关注 Instagram', blogLabel:'订阅博客', youtubeLabel:'订阅 YouTube', eventTag:'📸 活动',
     referralLabel:'推荐给朋友', toastReferralCopy:'链接已复制 · 快分享出去吧',
     referralShareText:(name)=>`我去了${name}，诊疗很细致，体验很好，推荐大家去看看 🙂`,
     guideNote:'✏️ 请复制您撰写的评价，粘贴到 Google 或 Naver 的评价页面。若能一起上传2~3张院长或医院的照片，效果会更好！',
     thanksNote:'衷心感谢您抽出宝贵时间留下评价 🙏 我们会认真倾听您的意见，以更优质的高端诊疗与服务回馈各位患者。',
-    eyebrowMotive:'就诊契机', titleMotive:'是什么让您来到这里？', descMotive:'如有符合的项目请选择', tagMotive:'可选',
+    eyebrowMotive:'就诊契机', titleMotive:'是什么让您来到这里？', descMotive:'请选择所有符合的项目（可多选）', tagMotive:'可选',
     eyebrowConcern:'治疗前在意的部分', titleConcern:'治疗前有让您在意的部分吗？', descConcern:'如有符合的项目请选择（可多选）', tagConcern:'可选',
     priorityHeader:'🏥 选择医院时最看重的部分（最多3个）', priorityMaxToast:'最多可选择3个',
     hesitationHeader:'💭 如果之前有让您犹豫治疗的原因'
@@ -489,7 +498,7 @@ ja: {
     smileStart:'始めましょうか？', smileReady:'準備完了です', smileProgress:(n,t)=>`${n}/${t} 選択済み`,
     eyebrow0:'① 作成方法', title0:'レビューをどのように作成しますか？', methodAI:'AI文章生成 ✨', methodManual:'自分で入力 ✍️',
     eyebrow1:'② 来院タイプ', title1:'今回の来院は？',
-    eyebrow2:'③ 診療分野', title2:'どの分野の診療を受けましたか？',
+    eyebrow2:'③ 診療分野', title2:'どの分野の診療を受けましたか？', descCategory:'当てはまる分野をすべて選んでください（複数選択可）',
     eyebrow3:'④ 詳細治療', title3Suffix:'のうち、どの治療を受けましたか？', title3Default:'どの治療を受けましたか？',
     eyebrow4:'⑤ 体験選択', title4:'どんな点が良かったですか？', desc4:'担当者ごとに良かった点を選んでください（複数選択可）',
     eyebrow5:'⑥ 改善点', tag5:'任意', title5:'気になった点はありましたか？', desc5:'あれば選んでください。なければそのまま次に進んでも大丈夫です',
@@ -505,14 +514,14 @@ ja: {
     homepageIconLabel:'ホームページ', kakaoShareLabel:'カカオトークで共有', wechatShareLabel:'WeChatで共有',
     toastCopyKakao:'コピーしました・カカオトークに貼り付けて共有してください', toastCopyWechat:'コピーしました・WeChatに貼り付けて共有してください',
     btnBack:'戻る',
-    callLabel:'電話で予約する', instagramLabel:'Instagramをフォロー', blogLabel:'ブログを購読', youtubeLabel:'YouTubeを購読', eventTag:'📸 イベント',
+    callLabel:'電話で予約する', kakaoChannelLabel:'カカオトークで問い合わせる', kakaoChannelNote:'💬 診療を受けられて満足された点、改善してほしい点、褒めたいスタッフがいらっしゃれば、カカオトークチャンネルで気軽にお知らせください。', instagramLabel:'Instagramをフォロー', blogLabel:'ブログを購読', youtubeLabel:'YouTubeを購読', eventTag:'📸 イベント',
     referralLabel:'友人にクリニックを紹介する', toastReferralCopy:'リンクをコピーしました・共有してみてください',
     referralShareText:(name)=>`${name}に通っているのですが、診療が丁寧でとても良かったです。一度訪れてみてください 🙂`,
     guideNote:'✏️ 作成したレビューをコピーして、GoogleまたはNaverのレビュー画面に貼り付けてください。院長先生や医院の写真を2〜3枚一緒に投稿していただくと、さらに効果的です！',
     thanksNote:'貴重なお時間を割いてレビューを残してくださり、心より感謝申し上げます 🙏 いただいたご意見に耳を傾け、今後さらにプレミアムな診療とサービスでお応えしてまいります。',
-    eyebrowMotive:'来院のきっかけ', titleMotive:'来院のきっかけはありましたか？', descMotive:'当てはまるものがあれば選んでください', tagMotive:'任意',
+    eyebrowMotive:'来院のきっかけ', titleMotive:'来院のきっかけはありましたか？', descMotive:'当てはまるものをすべて選んでください（複数選択可）', tagMotive:'任意',
     eyebrowConcern:'治療前に気になっていたこと', titleConcern:'治療前に気になっていたことはありましたか？', descConcern:'当てはまるものがあれば選んでください（複数可）', tagConcern:'任意',
-    priorityHeader:'🏥 病院を選ぶ際に重視した部分（最大3つ）', priorityMaxToast:'最大3つまで選択できます',
+    priorityHeader:'🏥 医院を選ぶ際に重視した部分（最大3つ）', priorityMaxToast:'最大3つまで選択できます',
     hesitationHeader:'💭 これまで治療をためらっていた理由があれば'
   },
   visit:{ first_visit:'初診（初めての来院）', regular_followup:'定期通院', ortho_consult:'矯正相談', re_consult:'再相談' },
@@ -522,13 +531,13 @@ ja: {
   experienceItem:{ accurate_diagnosis:'正確な診断', careful_procedure:'丁寧な施術', pain_minimization:'痛みが少ない', thorough_explanation:'十分な説明', digital_cadcam:'最新デジタルCAD/CAM機器', oral_scan:'精密な口腔内スキャン', simulation_3d:'3Dシミュレーション相談', digital_xray:'デジタルX線・CT撮影', gentle_chairside:'落ち着いた診療態度', kind_consult:'親切なカウンセリング', transparent_cost:'透明な費用案内', no_overselling:'過剰な勧誘なし', tailored_plan:'オーダーメイドの提案', skilled_assist:'熟練したアシスト', careful_care:'きめ細やかなケア', comfortable_atmosphere:'落ち着いた雰囲気', hygiene:'清潔な衛生管理', easy_booking:'予約のしやすさ', kind_response:'親切な対応', short_wait:'待ち時間が短い' },
   improvementCategory:{ wait_booking:'待ち時間・予約', cost_info:'費用・案内', facility:'施設・環境', communication:'説明・コミュニケーション' },
   improvementItem:{ long_wait:'待ち時間が長かった', hard_reschedule:'予約変更が難しかった', cost_info_lacking:'費用案内が不十分だった', cost_burden:'費用が負担に感じた', parking_inconvenient:'駐車場が不便だった', waiting_area_small:'待合スペースが狭かった', explanation_lacking:'説明がやや不足していた', followup_lacking:'診療後の案内が不十分だった' },
-  motive:{ self_concern:'以前から自分で気になっていた', family_referral:'家族・知人の勧めで', other_clinic_referral:'他の病院で診療を受けて勧められて', checkup_found:'定期検診で見つかって', online_research:'インターネット・SNSで調べて', time_available:'ちょうど時間に余裕ができて' },
+  motive:{ self_concern:'以前から自分で気になっていた', family_referral:'家族・知人の勧めで', other_clinic_referral:'他の医院で診療を受けて勧められて', checkup_found:'定期検診で見つかって', online_research:'インターネット・SNSで調べて', time_available:'ちょうど時間に余裕ができて' },
   concern:{
     general:{ cavity_pain:'虫歯による痛み', tooth_sensitive:'歯がしみる', gum_bleeding:'歯茎の出血・腫れ', chewing_discomfort:'噛むときの不快感', worn_prosthetic:'古い補綴物のすり減り', tooth_color:'歯の色・ホワイトニングの悩み' },
     ortho:{ crooked_teeth:'ガタガタの歯並び', protruding_teeth:'出っ歯・口元の突出', jaw_protrusion:'受け口', teeth_gap:'すきっ歯', gummy_smile:'笑うと歯茎が見えすぎる', bite_mismatch:'上下の前歯が噛み合わない' }
   },
-  priority:{ doctor_expertise:'院長の経歴・専門性', reasonable_cost:'適正な診療費', kind_explanation:'親切で丁寧な説明', location_access:'病院の立地・アクセス', clean_facility:'清潔な施設環境', short_wait:'短い待ち時間', modern_equipment:'最新の設備・システム', aftercare:'きめ細かなアフターケア' },
-  hesitationItem:{ cost_burden:'費用への負担', treatment_duration:'治療期間への負担', pain_fear:'痛みへの不安', time_shortage:'時間を作りにくいこと', vague_fear:'病院への漠然とした不安', others_experience:'周囲の体験談' }
+  priority:{ doctor_expertise:'院長の経歴・専門性', reasonable_cost:'適正な診療費', kind_explanation:'親切で丁寧な説明', location_access:'医院の立地・アクセス', clean_facility:'清潔な施設環境', short_wait:'短い待ち時間', modern_equipment:'最新の設備・システム', aftercare:'きめ細かなアフターケア' },
+  hesitationItem:{ cost_burden:'費用への負担', treatment_duration:'治療期間への負担', pain_fear:'痛みへの不安', time_shortage:'時間を作りにくいこと', vague_fear:'医院への漠然とした不安', others_experience:'周囲の体験談' }
 },
 es: {
   ui:{
@@ -536,7 +545,7 @@ es: {
     smileStart:'¿Empezamos?', smileReady:'Todo listo', smileProgress:(n,t)=>`${n}/${t} seleccionado(s)`,
     eyebrow0:'① MÉTODO', title0:'¿Cómo desea escribir su reseña?', methodAI:'Generar con IA ✨', methodManual:'Escribir yo mismo ✍️',
     eyebrow1:'② TIPO DE VISITA', title1:'¿Qué tipo de visita fue esta?',
-    eyebrow2:'③ ÁREA DE TRATAMIENTO', title2:'¿En qué área recibió tratamiento?',
+    eyebrow2:'③ ÁREA DE TRATAMIENTO', title2:'¿En qué áreas recibió tratamiento?', descCategory:'Seleccione todas las que correspondan (opción múltiple)',
     eyebrow3:'④ TRATAMIENTO', title3Suffix:': ¿qué tratamiento recibió?', title3Default:'¿Qué tratamiento recibió?',
     eyebrow4:'⑤ EXPERIENCIA', title4:'¿Qué fue lo que más le gustó?', desc4:'Elija lo que más destacó de cada persona (puede elegir varias opciones)',
     eyebrow5:'⑥ SUGERENCIAS', tag5:'opcional', title5:'¿Hubo algo que podría mejorar?', desc5:'Selecciónelo si lo hubo, o pase directamente al siguiente paso',
@@ -552,12 +561,12 @@ es: {
     homepageIconLabel:'Sitio web', kakaoShareLabel:'Compartir en KakaoTalk', wechatShareLabel:'Compartir en WeChat',
     toastCopyKakao:'Copiado · péguelo en KakaoTalk para compartir', toastCopyWechat:'Copiado · péguelo en WeChat para compartir',
     btnBack:'Atrás',
-    callLabel:'Llamar para reservar', instagramLabel:'Seguir en Instagram', blogLabel:'Seguir el blog', youtubeLabel:'Suscribirse en YouTube', eventTag:'📸 Promoción',
+    callLabel:'Llamar para reservar', kakaoChannelLabel:'Escríbanos por KakaoTalk', kakaoChannelNote:'💬 Si hubo algo que le gustó especialmente, algo que podríamos mejorar, o algún miembro del personal que le gustaría elogiar, cuéntenoslo con confianza por nuestro canal de KakaoTalk.', instagramLabel:'Seguir en Instagram', blogLabel:'Seguir el blog', youtubeLabel:'Suscribirse en YouTube', eventTag:'📸 Promoción',
     referralLabel:'Recomendar esta clínica a un amigo', toastReferralCopy:'Enlace copiado · compártalo',
     referralShareText:(name)=>`Visité ${name} y la atención fue muy completa y buena. Vale la pena conocerla 🙂`,
     guideNote:'✏️ Copie su reseña y péguela en Google o Naver Reviews. ¡Subir 2–3 fotos del doctor o de la clínica hace que sea aún mejor!',
     thanksNote:'Muchas gracias por tomarse el tiempo de dejar su reseña 🙏 Valoramos mucho su opinión y la usaremos para seguir ofreciendo una atención y un servicio de nivel premium.',
-    eyebrowMotive:'Motivo de la visita', titleMotive:'¿Qué le trajo a la clínica?', descMotive:'Seleccione si aplica', tagMotive:'Opcional',
+    eyebrowMotive:'Motivo de la visita', titleMotive:'¿Qué le trajo a la clínica?', descMotive:'Seleccione todas las que correspondan (opción múltiple)', tagMotive:'Opcional',
     eyebrowConcern:'Preocupaciones previas', titleConcern:'¿Había algo que le preocupara antes del tratamiento?', descConcern:'Seleccione si aplica (puede elegir varios)', tagConcern:'Opcional',
     priorityHeader:'🏥 Lo más importante al elegir esta clínica (hasta 3)', priorityMaxToast:'Puede seleccionar hasta 3',
     hesitationHeader:'💭 Si algo le hizo dudar sobre el tratamiento anteriormente'
@@ -582,41 +591,78 @@ es: {
 /* ============================================================ */
 
 const params = new URLSearchParams(window.location.search);
-const CLINIC_NAME = params.get('name');
-const GOOGLE_REVIEW_URL = params.get('google');
-const NAVER_REVIEW_URL = params.get('naver');
-const HOMEPAGE_URL = params.get('homepage');
+let CLINIC_NAME, GOOGLE_REVIEW_URL, NAVER_REVIEW_URL, HOMEPAGE_URL, CLINIC_ID, REGION, PHONE,
+    KAKAO_CHANNEL_URL, INSTAGRAM_URL, BLOG_URL, YOUTUBE_URL, EVENT_NOTE, DOCTOR_PHOTO,
+    DOCTOR_GREETING, LOGO_URL, BRAND_COLOR;
 
-// 온라인 브랜딩 확장 파라미터 (모두 선택값)
-const CLINIC_ID = params.get('cid');               // 관리자 알림/통계 매핑용 식별자 (없으면 병원명 사용)
-const REGION = params.get('region');                // 예: "강남 치과" — 리뷰 문구에 자연스럽게 1회만 반영
-const PHONE = params.get('phone');                  // 예: 0212345678 — 하단 "전화로 예약하기" 버튼
-const INSTAGRAM_URL = params.get('instagram');       // 인스타그램 팔로우 링크
-const BLOG_URL = params.get('blog');                 // 네이버 블로그 링크
-const YOUTUBE_URL = params.get('youtube');            // 유튜브 채널 링크
-const EVENT_NOTE = params.get('event');              // 포토리뷰/SNS 이벤트 안내문 (자유 텍스트, 원문 그대로 표시)
-const DOCTOR_PHOTO = params.get('doctorPhoto');       // 원장님 사진 URL
-const DOCTOR_GREETING = params.get('doctorGreeting'); // 원장님 한줄 인사말 (자유 텍스트, 원문 그대로 표시)
-const LOGO_URL = params.get('logo');                  // 병원 로고 이미지 URL
-const BRAND_COLOR = params.get('color');              // 브랜드 포인트 컬러 (hex, # 없이. 예: 0F5132)
+async function bootstrap(){
+  const shortCode = params.get('c');
 
-if(BRAND_COLOR){
-  document.documentElement.style.setProperty('--deep', `#${BRAND_COLOR}`);
-  document.documentElement.style.setProperty('--deep-light', `#${BRAND_COLOR}cc`);
+  if(shortCode){
+    // 짧은 링크 방식: 서버(api/get-link)에 저장된 병원 설정을 코드로 조회
+    try{
+      const res = await fetch(`/api/get-link?c=${encodeURIComponent(shortCode)}`);
+      if(!res.ok) throw new Error('not found');
+      const cfg = await res.json();
+      CLINIC_NAME = cfg.name || null;
+      GOOGLE_REVIEW_URL = cfg.google || null;
+      NAVER_REVIEW_URL = cfg.naver || null;
+      HOMEPAGE_URL = cfg.homepage || null;
+      CLINIC_ID = cfg.cid || null;
+      REGION = cfg.region || null;
+      PHONE = cfg.phone || null;
+      KAKAO_CHANNEL_URL = cfg.kakaoChannel || null;
+      INSTAGRAM_URL = cfg.instagram || null;
+      BLOG_URL = cfg.blog || null;
+      YOUTUBE_URL = cfg.youtube || null;
+      EVENT_NOTE = cfg.event || null;
+      DOCTOR_PHOTO = cfg.doctorPhoto || null;
+      DOCTOR_GREETING = cfg.doctorGreeting || null;
+      LOGO_URL = cfg.logo || null;
+      BRAND_COLOR = cfg.color || null;
+    }catch(e){
+      console.error('short link resolve failed:', e);
+      CLINIC_NAME = null; GOOGLE_REVIEW_URL = null;
+    }
+  } else {
+    // 기존 방식: 모든 값이 URL 파라미터에 직접 포함된 긴 링크 (하위 호환 — 예전에 발급된 링크도 그대로 동작)
+    CLINIC_NAME = params.get('name');
+    GOOGLE_REVIEW_URL = params.get('google');
+    NAVER_REVIEW_URL = params.get('naver');
+    HOMEPAGE_URL = params.get('homepage');
+    CLINIC_ID = params.get('cid');
+    REGION = params.get('region');
+    PHONE = params.get('phone');
+    KAKAO_CHANNEL_URL = params.get('kakaoChannel');
+    INSTAGRAM_URL = params.get('instagram');
+    BLOG_URL = params.get('blog');
+    YOUTUBE_URL = params.get('youtube');
+    EVENT_NOTE = params.get('event');
+    DOCTOR_PHOTO = params.get('doctorPhoto');
+    DOCTOR_GREETING = params.get('doctorGreeting');
+    LOGO_URL = params.get('logo');
+    BRAND_COLOR = params.get('color');
+  }
+
+  if(BRAND_COLOR){
+    document.documentElement.style.setProperty('--deep', `#${BRAND_COLOR}`);
+    document.documentElement.style.setProperty('--deep-light', `#${BRAND_COLOR}cc`);
+  }
+
+  if(!CLINIC_NAME || !GOOGLE_REVIEW_URL){
+    document.getElementById('setupNeeded').style.display = 'block';
+  } else {
+    document.getElementById('mainContent').style.display = 'block';
+    document.getElementById('bar').style.display = 'flex';
+    document.getElementById('clinicNameLabel').textContent = decodeURIComponent(CLINIC_NAME);
+    initApp();
+  }
 }
-
-if(!CLINIC_NAME || !GOOGLE_REVIEW_URL){
-  document.getElementById('setupNeeded').style.display = 'block';
-} else {
-  document.getElementById('mainContent').style.display = 'block';
-  document.getElementById('bar').style.display = 'flex';
-  document.getElementById('clinicNameLabel').textContent = decodeURIComponent(CLINIC_NAME);
-  initApp();
-}
+bootstrap();
 
 function initApp(){
   let LANG = null;
-  const state = { method:null, visit:[], category:null, treatment:[], motive:null, concern:[], experience:[], priority:[], hesitation:[], improvements:[], additionalNote:'' };
+  const state = { method:null, visit:[], category:[], treatment:[], motive:[], concern:[], experience:[], priority:[], hesitation:[], improvements:[], additionalNote:'' };
   let flow = [];
   let stepIndex = 0;
   let generatedText = "";
@@ -657,8 +703,8 @@ function initApp(){
     resultCard.classList.remove('active');
     ghostBtn.style.display = 'none';
     mainBtn.style.display = 'block';
-    state.method = null; state.visit = []; state.category = null; state.treatment = [];
-    state.motive = null; state.concern = []; state.priority = []; state.hesitation = [];
+    state.method = null; state.visit = []; state.category = []; state.treatment = [];
+    state.motive = []; state.concern = []; state.priority = []; state.hesitation = [];
     state.experience = []; state.improvements = []; state.additionalNote = '';
     goToStep('lang');
     updateBackButtonVisibility();
@@ -681,6 +727,7 @@ function initApp(){
     document.getElementById('txtDescMotive').textContent = t.ui.descMotive;
     document.getElementById('txtEyebrow2').textContent = t.ui.eyebrow2;
     document.getElementById('txtTitle2').textContent = t.ui.title2;
+    document.getElementById('txtDescCategory').textContent = t.ui.descCategory;
     document.getElementById('txtEyebrow3').textContent = t.ui.eyebrow3;
     document.getElementById('txtEyebrowConcern').innerHTML = `${t.ui.eyebrowConcern} <span class="step-optional-tag">${t.ui.tagConcern}</span>`;
     document.getElementById('txtTitleConcern').textContent = t.ui.titleConcern;
@@ -747,6 +794,16 @@ function initApp(){
       callBtn.href = `tel:${decodeURIComponent(PHONE)}`;
     }
 
+    if(KAKAO_CHANNEL_URL){
+      const kakaoBtn = document.getElementById('kakaoChannelBtn');
+      kakaoBtn.style.display = 'flex';
+      kakaoBtn.href = decodeURIComponent(KAKAO_CHANNEL_URL);
+      document.getElementById('txtKakaoChannelLabel').textContent = t.ui.kakaoChannelLabel;
+      const noteEl = document.getElementById('txtKakaoChannelNote');
+      noteEl.textContent = t.ui.kakaoChannelNote;
+      noteEl.style.display = 'block';
+    }
+
     if(INSTAGRAM_URL || BLOG_URL || YOUTUBE_URL){
       document.getElementById('snsRow').style.display = 'flex';
       if(INSTAGRAM_URL){
@@ -773,7 +830,7 @@ function initApp(){
 
     renderVisit(); renderCategory(); renderExperience(); renderImprovement();
     renderMotive(); renderPriority(); renderHesitation();
-    if(state.category){ renderTreatments(state.category); renderConcern(state.category); }
+    renderTreatments(state.category); renderConcern(state.category);
     refreshButton();
   }
 
@@ -795,34 +852,46 @@ function initApp(){
       const d = document.createElement('div');
       d.className='opt category'; d.dataset.group='category'; d.dataset.value=id;
       d.textContent = `${ICONS.category[id]} ${T().category[id]}`;
-      if(state.category === id) d.classList.add('selected');
+      if(state.category.includes(id)) d.classList.add('selected');
       box.appendChild(d);
     });
   }
-  function renderTreatments(categoryId){
+  function renderTreatments(categoryIds){
     const box = document.getElementById('treatmentOptions');
     box.innerHTML = '';
     const t = T();
-    document.getElementById('treatmentTitle').textContent = categoryId
-      ? `${t.category[categoryId]} ${t.ui.title3Suffix}` : t.ui.title3Default;
-    (TREATMENT_ORDER[categoryId] || []).forEach(id=>{
-      const d = document.createElement('div');
-      d.className='opt'; d.dataset.group='treatment'; d.dataset.value=id;
-      d.textContent = `${ICONS.treatment[id]} ${t.treatment[id]}`;
-      if(state.treatment.includes(id)) d.classList.add('selected');
-      box.appendChild(d);
+    const cats = Array.isArray(categoryIds) ? categoryIds : (categoryIds ? [categoryIds] : []);
+    document.getElementById('treatmentTitle').textContent = cats.length === 1
+      ? `${t.category[cats[0]]} ${t.ui.title3Suffix}` : t.ui.title3Default;
+    const seen = new Set();
+    cats.forEach(categoryId=>{
+      (TREATMENT_ORDER[categoryId] || []).forEach(id=>{
+        if(seen.has(id)) return;
+        seen.add(id);
+        const d = document.createElement('div');
+        d.className='opt'; d.dataset.group='treatment'; d.dataset.value=id;
+        d.textContent = `${ICONS.treatment[id]} ${t.treatment[id]}`;
+        if(state.treatment.includes(id)) d.classList.add('selected');
+        box.appendChild(d);
+      });
     });
   }
-  function renderConcern(categoryId){
+  function renderConcern(categoryIds){
     const box = document.getElementById('concernOptions');
     box.innerHTML = '';
     const t = T();
-    (CONCERN_ORDER[categoryId] || []).forEach(id=>{
-      const d = document.createElement('div');
-      d.className='opt'; d.dataset.group='concern'; d.dataset.value=id;
-      d.textContent = t.concern[categoryId][id];
-      if(state.concern.includes(id)) d.classList.add('selected');
-      box.appendChild(d);
+    const cats = Array.isArray(categoryIds) ? categoryIds : (categoryIds ? [categoryIds] : []);
+    const seen = new Set();
+    cats.forEach(categoryId=>{
+      (CONCERN_ORDER[categoryId] || []).forEach(id=>{
+        if(seen.has(id)) return;
+        seen.add(id);
+        const d = document.createElement('div');
+        d.className='opt'; d.dataset.group='concern'; d.dataset.value=id;
+        d.textContent = t.concern[categoryId][id];
+        if(state.concern.includes(id)) d.classList.add('selected');
+        box.appendChild(d);
+      });
     });
   }
   function renderMotive(){
@@ -833,7 +902,7 @@ function initApp(){
       const d = document.createElement('div');
       d.className='opt'; d.dataset.group='motive'; d.dataset.value=id;
       d.textContent = t.motive[id];
-      if(state.motive === id) d.classList.add('selected');
+      if(state.motive.includes(id)) d.classList.add('selected');
       box.appendChild(d);
     });
   }
@@ -945,13 +1014,13 @@ function initApp(){
     const name = currentStepName();
     if(name === '1') mainBtn.disabled = state.visit.length===0;
     else if(name === 'motive'){ mainBtn.disabled = false; mainBtn.textContent = t.ui.btnNext; }
-    else if(name === '2') mainBtn.disabled = !state.category;
+    else if(name === '2') mainBtn.disabled = state.category.length===0;
     else if(name === '3') mainBtn.disabled = state.treatment.length===0;
     else if(name === 'concern'){ mainBtn.disabled = false; mainBtn.textContent = t.ui.btnNext; }
     else if(name === '4'){ mainBtn.disabled = state.experience.length===0; mainBtn.textContent = t.ui.btnNext; }
     else if(name === '5'){ mainBtn.disabled = false; mainBtn.textContent = t.ui.btnMakeReview; }
     else mainBtn.textContent = t.ui.btnNext;
-    const done = [state.visit.length>0, state.category, state.treatment.length>0, state.experience.length>0].filter(Boolean).length;
+    const done = [state.visit.length>0, state.category.length>0, state.treatment.length>0, state.experience.length>0].filter(Boolean).length;
     setSmile(done/4, done===4 ? t.ui.smileReady : t.ui.smileProgress(done,4));
     updateBackButtonVisibility();
   }
@@ -1018,10 +1087,16 @@ function initApp(){
       else state.visit.push(value);
     }
     if(group === 'category'){
-      document.querySelectorAll('[data-group="category"]').forEach(o=>o.classList.remove('selected'));
-      opt.classList.add('selected'); state.category = value; state.treatment = []; state.concern = [];
-      renderTreatments(value);
-      renderConcern(value);
+      opt.classList.toggle('selected');
+      const idx = state.category.indexOf(value);
+      if(idx >= 0) state.category.splice(idx,1);
+      else state.category.push(value);
+      const validTreatmentIds = new Set(state.category.flatMap(c => TREATMENT_ORDER[c] || []));
+      const validConcernIds = new Set(state.category.flatMap(c => CONCERN_ORDER[c] || []));
+      state.treatment = state.treatment.filter(id => validTreatmentIds.has(id));
+      state.concern = state.concern.filter(id => validConcernIds.has(id));
+      renderTreatments(state.category);
+      renderConcern(state.category);
     }
     if(group === 'treatment'){
       opt.classList.toggle('selected');
@@ -1030,10 +1105,10 @@ function initApp(){
       else state.treatment.push(value);
     }
     if(group === 'motive'){
-      const wasSelected = opt.classList.contains('selected');
-      document.querySelectorAll('[data-group="motive"]').forEach(o=>o.classList.remove('selected'));
-      if(wasSelected){ state.motive = null; }
-      else { opt.classList.add('selected'); state.motive = value; }
+      opt.classList.toggle('selected');
+      const idx = state.motive.indexOf(value);
+      if(idx >= 0) state.motive.splice(idx,1);
+      else state.motive.push(value);
     }
     if(group === 'concern'){
       opt.classList.toggle('selected');
@@ -1086,8 +1161,11 @@ function initApp(){
     const improvementPayload = state.improvements.map(i => t.improvementItem[i.id]);
     const visitText = state.visit.map(v => t.visit[v]).join(', ');
     const treatmentText = state.treatment.map(tr => t.treatment[tr]).join(', ');
-    const motiveText = state.motive ? t.motive[state.motive] : '';
-    const concernText = state.category ? state.concern.map(c => t.concern[state.category][c]).join(', ') : '';
+    const motiveText = state.motive.map(m => t.motive[m]).join(', ');
+    const concernText = state.concern.map(id => {
+      const cat = CATEGORY_ORDER.find(c => (CONCERN_ORDER[c]||[]).includes(id));
+      return cat ? t.concern[cat][id] : '';
+    }).filter(Boolean).join(', ');
     const priorityText = state.priority.map(p => t.priority[p]).join(', ');
     const hesitationText = state.hesitation.map(h => t.hesitationItem[h]).join(', ');
 
@@ -1099,7 +1177,7 @@ function initApp(){
           clinicName: decodeURIComponent(CLINIC_NAME),
           language: LANG_FULL_NAME[LANG],
           visit: visitText,
-          category: t.category[state.category] || '',
+          category: state.category.map(c => t.category[c]).join(', '),
           treatment: treatmentText,
           motive: motiveText,
           concern: concernText,

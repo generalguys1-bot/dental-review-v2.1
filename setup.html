@@ -9,7 +9,7 @@
 <style>
   :root{
     --bg:#F3F6F4; --surface:#FFFFFF; --deep:#163832; --deep-light:#2C5D54;
-    --text:#1B2624; --muted:#5B6B67; --gold:#C89B3C; --gold-soft:#EADFC2;
+    --text:#1B2624; --muted:#5B6B67; --gold:#8F6A16; --gold-soft:#EADFC2;
     --border:#E1E8E5; --radius:18px;
   }
   *{box-sizing:border-box;}
@@ -72,7 +72,7 @@
 
   <div class="card">
     <label>치과 이름</label>
-    <input type="text" id="clinicName" placeholder="예: 스마일라인치과">
+    <input type="text" id="clinicName" placeholder="예: 밝은미소치과">
 
     <label style="margin-top:18px;">구글 리뷰 작성 링크</label>
     <input type="text" id="googleUrl" placeholder="https://search.google.com/local/writereview?placeid=...">
@@ -129,6 +129,10 @@
     <input type="text" id="phone" placeholder="예: 0212345678">
     <p class="help">입력하면 리뷰 작성 완료 화면에 "전화로 예약하기" 버튼이 표시돼요.</p>
 
+    <label style="margin-top:18px;">카카오톡 채널(플러스친구) 링크 <span style="font-weight:500;color:var(--muted);">(선택)</span></label>
+    <input type="text" id="kakaoChannel" placeholder="https://pf.kakao.com/_xxxxxx">
+    <p class="help">입력하면 전화 예약 버튼 바로 아래에 "카카오톡 채널 문의" 버튼과 함께, 만족한 점·개선사항·칭찬하고 싶은 직원을 편하게 남겨달라는 안내문이 표시돼요.</p>
+
     <div class="row2">
       <div>
         <label>인스타그램 링크 <span style="font-weight:500;color:var(--muted);">(선택)</span></label>
@@ -174,8 +178,16 @@
     </div>
     <div id="qrcode"></div>
     <p class="help" style="text-align:center;">이 QR 코드를 스캔하면 바로 리뷰 작성 페이지로 연결돼요</p>
+    <div id="printCardWrap" style="display:none; margin-top:22px; padding-top:20px; border-top:1px dashed var(--border); text-align:center;">
+      <p class="help" style="margin-bottom:12px;">치과에 비치할 인쇄용 안내 카드도 함께 만들어드려요</p>
+      <img id="printCardPreview" style="max-width:100%; border-radius:14px; border:1px solid var(--border); margin-bottom:12px;">
+      <br>
+      <a id="printCardDownload" class="qr-download" download="리뷰안내카드.png">🖼️ 인쇄용 안내 카드 다운로드</a>
+    </div>
   </div>
 </div>
+
+<canvas id="hiddenCanvas" style="display:none;"></canvas>
 
 <div class="toast" id="toast">복사되었어요</div>
 
@@ -191,46 +203,200 @@ function showToast(msg){
   setTimeout(()=>toast.classList.remove('show'), 1500);
 }
 
-generateBtn.addEventListener('click', ()=>{
-  const name = document.getElementById('clinicName').value.trim();
-  const google = document.getElementById('googleUrl').value.trim();
-  const naver = document.getElementById('naverUrl').value.trim();
-  const homepage = document.getElementById('homepageUrl').value.trim();
-  const logo = document.getElementById('logoUrl').value.trim();
-  const brandColor = document.getElementById('brandColor').value.trim().replace(/^#/, '');
-  const doctorPhoto = document.getElementById('doctorPhoto').value.trim();
-  const doctorGreeting = document.getElementById('doctorGreeting').value.trim();
-  const region = document.getElementById('region').value.trim();
-  const phone = document.getElementById('phone').value.trim();
-  const instagram = document.getElementById('instagramUrl').value.trim();
-  const blog = document.getElementById('blogUrl').value.trim();
-  const youtube = document.getElementById('youtubeUrl').value.trim();
-  const eventNote = document.getElementById('eventNote').value.trim();
-  const clinicId = document.getElementById('clinicId').value.trim();
-  if(!name || !google){
+function buildLongUrl(base, fields){
+  let url = `${base}?name=${encodeURIComponent(fields.name)}&google=${encodeURIComponent(fields.google)}`;
+  const map = {
+    naver:'naver', homepage:'homepage', logo:'logo', color:'color',
+    doctorPhoto:'doctorPhoto', doctorGreeting:'doctorGreeting', region:'region',
+    phone:'phone', kakaoChannel:'kakaoChannel', instagram:'instagram', blog:'blog',
+    youtube:'youtube', event:'event', cid:'cid'
+  };
+  Object.keys(map).forEach(key=>{
+    if(fields[key]) url += `&${map[key]}=${encodeURIComponent(fields[key])}`;
+  });
+  return url;
+}
+
+// 캔버스에 여러 줄 텍스트를 중앙정렬로 그려주는 헬퍼 (한글은 글자 단위로 줄바꿈)
+function wrapAndDrawText(ctx, text, centerX, startY, maxWidth, lineHeight){
+  const chars = Array.from(text);
+  let line = '';
+  const lines = [];
+  chars.forEach(ch=>{
+    const test = line + ch;
+    if(ctx.measureText(test).width > maxWidth && line !== ''){
+      lines.push(line);
+      line = ch;
+    } else {
+      line = test;
+    }
+  });
+  if(line) lines.push(line);
+  lines.forEach((l,i)=>{
+    ctx.fillText(l.trim(), centerX, startY + i * lineHeight);
+  });
+  return lines.length;
+}
+
+function roundRectPath(ctx, x, y, w, h, r){
+  ctx.beginPath();
+  ctx.moveTo(x+r, y);
+  ctx.arcTo(x+w, y, x+w, y+h, r);
+  ctx.arcTo(x+w, y+h, x, y+h, r);
+  ctx.arcTo(x, y+h, x, y, r);
+  ctx.arcTo(x, y, x+w, y, r);
+  ctx.closePath();
+}
+
+// QR 이미지를 안전하게 불러오기 (CORS 문제 시 fetch→blob 경유로 폴백)
+async function loadImageSafely(url){
+  try{
+    const res = await fetch(url);
+    const blob = await res.blob();
+    const objUrl = URL.createObjectURL(blob);
+    const img = await new Promise((resolve, reject)=>{
+      const im = new Image();
+      im.onload = ()=>resolve(im);
+      im.onerror = reject;
+      im.src = objUrl;
+    });
+    return img;
+  }catch(e){
+    return new Promise((resolve, reject)=>{
+      const im = new Image();
+      im.crossOrigin = 'anonymous';
+      im.onload = ()=>resolve(im);
+      im.onerror = reject;
+      im.src = url;
+    });
+  }
+}
+
+// 치과에 비치하기 좋은 세로형 안내 카드 이미지를 합성한다 (병원명 + QR + 안내문구)
+async function composePrintCard(name, qrImgUrl, brandColorHex){
+  const W = 900, H = 1260;
+  const canvas = document.getElementById('hiddenCanvas');
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+  const accent = brandColorHex ? `#${brandColorHex}` : '#163832';
+
+  // 배경
+  ctx.fillStyle = '#F3F6F4';
+  ctx.fillRect(0, 0, W, H);
+
+  // 상단 컬러 밴드
+  const bandHeight = 320;
+  ctx.fillStyle = accent;
+  ctx.fillRect(0, 0, W, bandHeight);
+
+  // 병원 이름 (상단 밴드 안, 흰 텍스트, 줄바꿈 지원)
+  ctx.fillStyle = '#FFFFFF';
+  ctx.font = "bold 58px 'Apple SD Gothic Neo','Malgun Gothic',sans-serif";
+  ctx.textAlign = 'center';
+  const nameLines = wrapAndDrawText(ctx, name, W/2, 150, W - 140, 70);
+  // 줄 수에 따라 살짝 수직 보정 (2줄 이상이면 위로 올려 균형 맞춤)
+  if(nameLines > 1){
+    ctx.clearRect(0, 0, W, bandHeight);
+    ctx.fillStyle = accent;
+    ctx.fillRect(0, 0, W, bandHeight);
+    ctx.fillStyle = '#FFFFFF';
+    wrapAndDrawText(ctx, name, W/2, 120, W - 140, 70);
+  }
+  ctx.font = "600 30px 'Apple SD Gothic Neo','Malgun Gothic',sans-serif";
+  ctx.fillStyle = 'rgba(255,255,255,0.88)';
+  ctx.fillText('환자분들의 소중한 리뷰를 기다립니다', W/2, bandHeight - 46);
+
+  // QR 코드 흰색 패널
+  const qrSize = 460;
+  const qrX = (W - qrSize) / 2;
+  const qrY = bandHeight + 70;
+  const panelPad = 28;
+  ctx.shadowColor = 'rgba(22,56,50,0.12)';
+  ctx.shadowBlur = 30;
+  ctx.shadowOffsetY = 10;
+  ctx.fillStyle = '#FFFFFF';
+  roundRectPath(ctx, qrX - panelPad, qrY - panelPad, qrSize + panelPad*2, qrSize + panelPad*2, 28);
+  ctx.fill();
+  ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
+
+  try{
+    const qrImg = await loadImageSafely(qrImgUrl);
+    ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
+  }catch(e){
+    console.error('QR 이미지를 카드에 불러오지 못했어요:', e);
+    ctx.fillStyle = accent;
+    ctx.font = "20px sans-serif";
+    ctx.fillText('QR 이미지를 불러오지 못했어요', W/2, qrY + qrSize/2);
+  }
+
+  // 안내 문구
+  ctx.fillStyle = '#163832';
+  ctx.font = "bold 42px 'Apple SD Gothic Neo','Malgun Gothic',sans-serif";
+  ctx.fillText('📱 QR코드를 스캔해주세요', W/2, qrY + qrSize + 90);
+
+  ctx.fillStyle = '#5B6B67';
+  ctx.font = "28px 'Apple SD Gothic Neo','Malgun Gothic',sans-serif";
+  ctx.fillText('휴대폰 카메라로 비추기만 하면 바로 연결돼요', W/2, qrY + qrSize + 138);
+
+  // 하단 포인트 라인
+  ctx.fillStyle = accent;
+  ctx.fillRect(W/2 - 60, H - 60, 120, 6);
+
+  return canvas.toDataURL('image/png');
+}
+
+generateBtn.addEventListener('click', async ()=>{
+  const fields = {
+    name: document.getElementById('clinicName').value.trim(),
+    google: document.getElementById('googleUrl').value.trim(),
+    naver: document.getElementById('naverUrl').value.trim(),
+    homepage: document.getElementById('homepageUrl').value.trim(),
+    logo: document.getElementById('logoUrl').value.trim(),
+    color: document.getElementById('brandColor').value.trim().replace(/^#/, ''),
+    doctorPhoto: document.getElementById('doctorPhoto').value.trim(),
+    doctorGreeting: document.getElementById('doctorGreeting').value.trim(),
+    region: document.getElementById('region').value.trim(),
+    phone: document.getElementById('phone').value.trim(),
+    kakaoChannel: document.getElementById('kakaoChannel').value.trim(),
+    instagram: document.getElementById('instagramUrl').value.trim(),
+    blog: document.getElementById('blogUrl').value.trim(),
+    youtube: document.getElementById('youtubeUrl').value.trim(),
+    event: document.getElementById('eventNote').value.trim(),
+    cid: document.getElementById('clinicId').value.trim()
+  };
+  if(!fields.name || !fields.google){
     showToast('치과 이름과 구글 리뷰 링크는 필수예요');
     return;
   }
+
   const base = window.location.href.replace(/setup\.html.*$/, 'index.html');
-  let url = `${base}?name=${encodeURIComponent(name)}&google=${encodeURIComponent(google)}`;
-  if(naver) url += `&naver=${encodeURIComponent(naver)}`;
-  if(homepage) url += `&homepage=${encodeURIComponent(homepage)}`;
-  if(logo) url += `&logo=${encodeURIComponent(logo)}`;
-  if(brandColor) url += `&color=${encodeURIComponent(brandColor)}`;
-  if(doctorPhoto) url += `&doctorPhoto=${encodeURIComponent(doctorPhoto)}`;
-  if(doctorGreeting) url += `&doctorGreeting=${encodeURIComponent(doctorGreeting)}`;
-  if(region) url += `&region=${encodeURIComponent(region)}`;
-  if(phone) url += `&phone=${encodeURIComponent(phone)}`;
-  if(instagram) url += `&instagram=${encodeURIComponent(instagram)}`;
-  if(blog) url += `&blog=${encodeURIComponent(blog)}`;
-  if(youtube) url += `&youtube=${encodeURIComponent(youtube)}`;
-  if(eventNote) url += `&event=${encodeURIComponent(eventNote)}`;
-  if(clinicId) url += `&cid=${encodeURIComponent(clinicId)}`;
-  finalUrlInput.value = url;
+  generateBtn.disabled = true;
+  generateBtn.textContent = '링크 생성 중...';
+
+  let finalUrl = buildLongUrl(base, fields);
+  try{
+    const res = await fetch('/api/create-link', {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json' },
+      body: JSON.stringify(fields)
+    });
+    if(res.ok){
+      const data = await res.json();
+      if(data.slug) finalUrl = `${base}?c=${encodeURIComponent(data.slug)}`;
+    } else {
+      console.warn('짧은 링크 생성 실패 — 전체 링크로 대체합니다.');
+    }
+  }catch(e){
+    console.warn('짧은 링크 서버 호출 실패 — 전체 링크로 대체합니다.', e);
+  }
+
+  finalUrlInput.value = finalUrl;
   resultCard.classList.add('active');
+  generateBtn.disabled = false;
+  generateBtn.textContent = '링크 · QR 코드 생성';
 
   document.getElementById('qrcode').innerHTML = '';
-  const qrImgUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=8&data=${encodeURIComponent(url)}`;
+  const qrImgUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=8&data=${encodeURIComponent(finalUrl)}`;
   const img = document.createElement('img');
   img.src = qrImgUrl;
   img.width = 220;
@@ -240,10 +406,23 @@ generateBtn.addEventListener('click', ()=>{
 
   const downloadLink = document.createElement('a');
   downloadLink.href = qrImgUrl;
-  downloadLink.download = `${name}_리뷰QR.png`;
+  downloadLink.download = `${fields.name}_리뷰QR.png`;
   downloadLink.className = 'qr-download';
   downloadLink.textContent = '⬇ QR 이미지 다운로드';
   document.getElementById('qrcode').appendChild(downloadLink);
+
+  // 인쇄용 안내 카드 이미지 합성 (실패해도 위 기본 QR 다운로드는 그대로 동작)
+  try{
+    const cardQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=460x460&margin=6&data=${encodeURIComponent(finalUrl)}`;
+    const dataUrl = await composePrintCard(fields.name, cardQrUrl, fields.color);
+    document.getElementById('printCardPreview').src = dataUrl;
+    const printDownload = document.getElementById('printCardDownload');
+    printDownload.href = dataUrl;
+    printDownload.download = `${fields.name}_리뷰안내카드.png`;
+    document.getElementById('printCardWrap').style.display = 'block';
+  }catch(e){
+    console.error('인쇄용 카드 생성 실패:', e);
+  }
 });
 
 document.getElementById('copyBtn').addEventListener('click', ()=>{
