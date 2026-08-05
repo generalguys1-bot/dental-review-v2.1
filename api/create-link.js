@@ -34,8 +34,8 @@ function getClientIp(req) {
   return req.socket?.remoteAddress || 'unknown';
 }
 
-const REDIS_URL = process.env.UPSTASH_REDIS_REST_URL;
-const REDIS_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
+const REDIS_URL = process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL || process.env.REDIS_REST_URL;
+const REDIS_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN || process.env.REDIS_REST_TOKEN;
 
 async function redis(command) {
   const res = await fetch(REDIS_URL, {
@@ -67,6 +67,16 @@ function randomSuffix(len = 4) {
 }
 
 export default async function handler(req, res) {
+  if (req.method === 'GET') {
+    // 브라우저에서 이 주소를 직접 열어보면 Redis 연결 여부를 바로 확인할 수 있음 (진단용, 실제 값은 노출하지 않음)
+    return res.status(200).json({
+      ok: true,
+      message: 'create-link 함수는 정상적으로 배포되어 있어요. 아래 값이 모두 true여야 짧은 링크가 만들어져요.',
+      redisUrlConfigured: Boolean(REDIS_URL),
+      redisTokenConfigured: Boolean(REDIS_TOKEN)
+    });
+  }
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -85,7 +95,7 @@ export default async function handler(req, res) {
 
   const {
     name, google, naver, homepage, logo, color, doctorPhoto, doctorGreeting,
-    region, phone, kakaoChannel, instagram, blog, youtube, event, cid
+    region, phone, kakaoChannel, instagram, blog, youtube, event, cid, showPrintCard
   } = req.body || {};
 
   if (!name || !google) {
@@ -94,7 +104,7 @@ export default async function handler(req, res) {
 
   const config = {
     name, google, naver, homepage, logo, color, doctorPhoto, doctorGreeting,
-    region, phone, kakaoChannel, instagram, blog, youtube, event, cid
+    region, phone, kakaoChannel, instagram, blog, youtube, event, cid, showPrintCard
   };
   // 빈 값 정리
   Object.keys(config).forEach(k => { if (!config[k]) delete config[k]; });

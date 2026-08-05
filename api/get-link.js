@@ -24,8 +24,8 @@ function getClientIp(req) {
   return req.socket?.remoteAddress || 'unknown';
 }
 
-const REDIS_URL = process.env.UPSTASH_REDIS_REST_URL;
-const REDIS_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
+const REDIS_URL = process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL || process.env.REDIS_REST_URL;
+const REDIS_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN || process.env.REDIS_REST_TOKEN;
 
 async function redisGet(key) {
   const res = await fetch(`${REDIS_URL}/get/${encodeURIComponent(key)}`, {
