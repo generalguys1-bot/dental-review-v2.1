@@ -106,6 +106,16 @@
   .sns-row{ display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap; }
   .event-banner{ background:linear-gradient(135deg,var(--gold-soft),#fff); border:1px solid var(--gold-soft); border-radius:12px; padding:13px 15px; margin-bottom:16px; font-size:15px; line-height:1.6; color:var(--deep); }
   .event-banner-tag{ display:inline-block; font-size:13px; font-weight:800; color:#fff; background:var(--gold); padding:2px 8px; border-radius:999px; margin-bottom:6px; letter-spacing:.02em; }
+  .print-card-section{ margin-top:26px; padding-top:20px; border-top:1px dashed var(--border); text-align:center; }
+  .print-card-hint{ font-size:14px; color:var(--muted); line-height:1.6; margin:0 0 14px; padding:0 4px; }
+  .print-card-dense-note{ font-size:12.5px; color:var(--gold); line-height:1.6; margin:0 0 12px; padding:0 4px; display:none; }
+  .print-card-box img{ max-width:100%; border-radius:16px; border:1px solid var(--border); margin-bottom:12px; }
+  .print-card-loading{ font-size:14px; color:var(--muted); padding:18px 0; display:none; }
+  .print-card-error{ display:none; }
+  .print-card-error p{ font-size:14px; color:var(--muted); line-height:1.6; margin:0 0 10px; }
+  .print-card-retry-btn{ display:inline-block; font-size:13.5px; font-weight:700; color:var(--deep-light); background:var(--bg); border:1.5px solid var(--border); border-radius:999px; padding:9px 18px; cursor:pointer; font-family:inherit; }
+  .print-card-retry-btn:active{ transform:scale(.97); }
+  .print-card-download{ display:inline-block; font-size:13.5px; font-weight:700; color:var(--deep-light); text-decoration:none; }
 </style>
 </head>
 <body>
@@ -126,10 +136,10 @@
       <img id="doctorPhotoImg" src="" alt="">
       <p id="doctorGreetingText"></p>
     </div>
-    <h1 id="txtHeading"></h1>
-    <p class="sub" id="txtSubtitle"></p>
+    <h1 id="txtHeading" style="display:none;"></h1>
+    <p class="sub" id="txtSubtitle" style="display:none;"></p>
 
-    <div class="smile-wrap">
+    <div class="smile-wrap" style="display:none;">
       <svg width="140" height="76" viewBox="0 0 140 76">
         <path class="smile-track" d="M10,20 Q70,76 130,20"/>
         <path class="smile-fill" id="smileFill" d="M10,20 Q70,76 130,20" stroke-dasharray="128" stroke-dashoffset="128"/>
@@ -141,6 +151,7 @@
     <div class="step active" data-step="lang">
       <p class="step-eyebrow">🌐 Language / 언어 / 语言 / 言語 / Idioma</p>
       <p class="step-title">Select your language</p>
+      <p class="step-desc">리뷰 작성을 위한 언어를 선택해주세요 · Select the language for writing your review · 请选择用于撰写评价的语言 · レビュー作成のための言語を選択してください · Seleccione el idioma para escribir su reseña</p>
       <div class="options single-col" id="langOptions"></div>
       <a href="https://translate.google.com/" target="_blank" rel="noopener" class="translate-link">
         🗣️ Google Translate
@@ -282,8 +293,25 @@
     </div>
 
     <p class="privacy-note" id="txtPrivacyNote"></p>
+
+    <div class="print-card-section" id="printCardSection" style="display:none;">
+      <p class="print-card-hint" id="txtPrintCardHint"></p>
+      <p class="print-card-dense-note" id="txtPrintCardDenseNote"></p>
+      <div class="print-card-box">
+        <p class="print-card-loading" id="printCardLoading"></p>
+        <img id="printCardImg" alt="" style="display:none;">
+        <br id="printCardImgBreak" style="display:none;">
+        <a href="#" id="printCardDownloadBtn" class="print-card-download" download="review_guide_card.png" style="display:none;"></a>
+        <div class="print-card-error" id="printCardError">
+          <p id="txtPrintCardErrorHint"></p>
+          <button type="button" class="print-card-retry-btn" id="printCardRetryBtn"></button>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
+
+<canvas id="hiddenCanvas" style="display:none;"></canvas>
 
 <div class="toast" id="toast"></div>
 
@@ -355,7 +383,7 @@ ko: {
   ui:{
     heading:'진료, 어떠셨나요?', subtitle:'잠깐만 알려주시면 리뷰를 만들어드려요',
     smileStart:'시작해볼까요?', smileReady:'준비됐어요', smileProgress:(n,t)=>`${n}/${t} 선택완료`,
-    eyebrow0:'① 작성방식', title0:'리뷰를 어떻게 작성할까요?', methodAI:'AI 문구 생성 ✨', methodManual:'직접 입력 ✍️',
+    eyebrow0:'① 작성방식', title0:'리뷰를 어떻게 작성할까요?', methodAI:'AI로 쉽고 빠르게 작성 ✨', methodManual:'직접 입력하기 ✍️',
     eyebrow1:'② 방문유형', title1:'이번 방문은?',
     eyebrow2:'③ 진료분야', title2:'어느 분야로 진료받으셨나요?', descCategory:'해당되는 분야를 모두 선택해주세요 (복수 선택 가능)',
     eyebrow3:'④ 세부 치료', title3Suffix:'중 어떤 치료를 받으셨나요?', title3Default:'어떤 치료를 받으셨나요?',
@@ -376,12 +404,20 @@ ko: {
     callLabel:'전화로 예약하기', kakaoChannelLabel:'카카오톡 채널 문의', kakaoChannelNote:'💬 진료받으시면서 만족하셨던 점, 개선했으면 하는 점, 칭찬하고 싶은 직원이 있다면 카카오톡 채널로 자유롭게 편하게 말씀해주세요.', instagramLabel:'인스타그램 팔로우', blogLabel:'블로그 구독', youtubeLabel:'유튜브 구독', eventTag:'📸 이벤트',
     referralLabel:'지인에게 병원 추천하기', toastReferralCopy:'링크가 복사되었어요 · 공유해보세요',
     referralShareText:(name)=>`제가 다녀온 ${name}, 진료가 꼼꼼하고 좋았어요. 한번 방문해보세요 🙂`,
+    shareInfoHomepage:'🏠 홈페이지', shareInfoNaverMap:'📍 네이버지도', shareInfoGoogle:'🔍 구글 링크', shareInfoPhone:'📞 예약 전화', shareInfoKakao:'💬 카카오톡 채널',
     guideNote:'✏️ 작성하신 리뷰는 복사한 뒤 구글 또는 네이버 리뷰 화면에 붙여넣어 등록해주세요. 원장님 또는 치과 사진을 2~3장 함께 올려주시면 더욱 좋아요!',
     thanksNote:'소중한 시간 내어 남겨주신 리뷰, 진심으로 감사드립니다 🙏 환자분의 의견에 귀 기울여 앞으로 더 프리미엄 진료와 서비스로 보답하겠습니다.',
     eyebrowMotive:'방문 계기', titleMotive:'병원을 찾게 된 계기가 있으신가요?', descMotive:'해당되는 항목을 모두 선택해주세요 (복수 선택 가능)', tagMotive:'선택사항',
     eyebrowConcern:'신경쓰였던 부분', titleConcern:'치료 전 신경 쓰이셨던 부분이 있었나요?', descConcern:'해당되는 항목이 있으면 골라주세요 (중복 가능)', tagConcern:'선택사항',
     priorityHeader:'🏥 병원 선택 시 가장 중요했던 부분 (최대 3개)', priorityMaxToast:'최대 3개까지 선택할 수 있어요',
-    hesitationHeader:'💭 그동안 진료를 망설이게 했던 이유가 있다면'
+    hesitationHeader:'💭 그동안 진료를 망설이게 했던 이유가 있다면',
+    printCardHint:'🖨️ 이 QR 안내카드는 치과에서도 대기실이나 데스크에 그대로 인쇄해 사용하실 수 있어요.',
+    printCardMessage:'잠깐만 알려주시면, 환자분의 소중한 의견을 참고하여 프리미엄 진료와 더 나은 경험을 위해 노력하겠습니다.',
+    printCardScanLabel:'📱 QR코드를 스캔해주세요', printCardScanSub:'휴대폰 카메라로 비추기만 하면 바로 연결돼요',
+    printCardDownloadLabel:'⬇ 안내카드 이미지 다운로드', printCardLoadingText:'안내카드를 만들고 있어요...',
+    printCardErrorHint:'안내카드를 불러오지 못했어요.', printCardRetryLabel:'다시 시도',
+    printCardDenseNote:'⚠️ 링크가 길어 QR코드가 촘촘해요. 인쇄하실 땐 조금 크게 출력해주세요.',
+    printCardFileSuffix:'_QR안내카드.png'
   },
   visit:{ first_visit:'초진 (첫 방문)', regular_followup:'정기 재진', ortho_consult:'교정상담 방문', re_consult:'재상담 방문' },
   category:{ general:'일반진료', ortho:'교정전문' },
@@ -402,7 +438,7 @@ en: {
   ui:{
     heading:'How was your visit?', subtitle:"Answer a few quick questions and we'll write your review",
     smileStart:'Ready to start?', smileReady:"You're all set", smileProgress:(n,t)=>`${n}/${t} selected`,
-    eyebrow0:'STEP 1 · METHOD', title0:'How would you like to write your review?', methodAI:'AI-generated ✨', methodManual:'Write it myself ✍️',
+    eyebrow0:'STEP 1 · METHOD', title0:'How would you like to write your review?', methodAI:'Write easily with AI ✨', methodManual:'Write it myself ✍️',
     eyebrow1:'STEP 2 · VISIT TYPE', title1:'What kind of visit was this?',
     eyebrow2:'STEP 3 · TREATMENT AREA', title2:'Which areas were you treated in?', descCategory:'Select all that apply (multiple choice)',
     eyebrow3:'STEP 4 · TREATMENT', title3Suffix:'— which treatment did you receive?', title3Default:'Which treatment did you receive?',
@@ -423,12 +459,20 @@ en: {
     callLabel:'Call to book an appointment', kakaoChannelLabel:'Message us on KakaoTalk', kakaoChannelNote:'💬 If there was anything you especially liked, anything we could improve, or a staff member you\'d like to praise, feel free to share it with us on our KakaoTalk channel.', instagramLabel:'Follow on Instagram', blogLabel:'Follow the blog', youtubeLabel:'Subscribe on YouTube', eventTag:'📸 Event',
     referralLabel:'Recommend this clinic to a friend', toastReferralCopy:'Link copied · share it with someone',
     referralShareText:(name)=>`I visited ${name} and the care was thorough and great. Worth checking out 🙂`,
+    shareInfoHomepage:'🏠 Website', shareInfoNaverMap:'📍 Naver Map', shareInfoGoogle:'🔍 Google Link', shareInfoPhone:'📞 Phone', shareInfoKakao:'💬 KakaoTalk Channel',
     guideNote:'✏️ Copy your review and paste it into Google or Naver Reviews. Adding 2–3 photos of the doctor or the clinic makes it even better!',
     thanksNote:'Thank you so much for taking the time to share your review 🙏 We truly value your feedback and will use it to keep offering more premium care and service.',
     eyebrowMotive:'Reason for visiting', titleMotive:'What brought you in?', descMotive:'Select all that apply (multiple choice)', tagMotive:'Optional',
     eyebrowConcern:'Concerns beforehand', titleConcern:'Was there anything that concerned you before treatment?', descConcern:'Select if any apply (multiple OK)', tagConcern:'Optional',
     priorityHeader:'🏥 What mattered most when choosing this clinic (up to 3)', priorityMaxToast:'You can select up to 3',
-    hesitationHeader:'💭 If anything made you hesitate about treatment before'
+    hesitationHeader:'💭 If anything made you hesitate about treatment before',
+    printCardHint:'🖨️ Clinics are welcome to print this QR guide card and display it in the waiting room or at the front desk.',
+    printCardMessage:"Just a moment of your time helps a lot — we'll use your feedback to keep offering more premium care and a better experience.",
+    printCardScanLabel:'📱 Please scan the QR code', printCardScanSub:'Just point your phone camera at it to connect instantly',
+    printCardDownloadLabel:'⬇ Download guide card image', printCardLoadingText:'Creating your guide card...',
+    printCardErrorHint:"We couldn't load the guide card.", printCardRetryLabel:'Try again',
+    printCardDenseNote:'⚠️ The link is long, so the QR code is quite dense. Please print it a bit larger.',
+    printCardFileSuffix:'_qr-card.png'
   },
   visit:{ first_visit:'First visit', regular_followup:'Regular follow-up', ortho_consult:'Orthodontic consultation', re_consult:'Follow-up consultation' },
   category:{ general:'General dentistry', ortho:'Orthodontics' },
@@ -449,7 +493,7 @@ zh: {
   ui:{
     heading:'您的就诊体验如何？', subtitle:'只需简单几步，我们就能帮您写好评价',
     smileStart:'准备好了吗？', smileReady:'已完成', smileProgress:(n,t)=>`已选择 ${n}/${t}`,
-    eyebrow0:'① 撰写方式', title0:'您想如何撰写评价？', methodAI:'AI 自动生成 ✨', methodManual:'自己输入 ✍️',
+    eyebrow0:'① 撰写方式', title0:'您想如何撰写评价？', methodAI:'用 AI 轻松快速生成 ✨', methodManual:'自己输入 ✍️',
     eyebrow1:'② 就诊类型', title1:'这次是什么类型的就诊？',
     eyebrow2:'③ 诊疗领域', title2:'您接受的是哪个领域的诊疗？', descCategory:'请选择所有符合的领域（可多选）',
     eyebrow3:'④ 具体治疗', title3Suffix:'中您接受了哪种治疗？', title3Default:'您接受了哪种治疗？',
@@ -470,12 +514,20 @@ zh: {
     callLabel:'致电预约', kakaoChannelLabel:'通过 KakaoTalk 咨询', kakaoChannelNote:'💬 如果就诊过程中有满意的地方、希望改进的地方，或想表扬的员工，欢迎通过 KakaoTalk 频道自由留言告诉我们。', instagramLabel:'关注 Instagram', blogLabel:'订阅博客', youtubeLabel:'订阅 YouTube', eventTag:'📸 活动',
     referralLabel:'推荐给朋友', toastReferralCopy:'链接已复制 · 快分享出去吧',
     referralShareText:(name)=>`我去了${name}，诊疗很细致，体验很好，推荐大家去看看 🙂`,
+    shareInfoHomepage:'🏠 官网', shareInfoNaverMap:'📍 Naver 地图', shareInfoGoogle:'🔍 谷歌链接', shareInfoPhone:'📞 预约电话', shareInfoKakao:'💬 KakaoTalk 频道',
     guideNote:'✏️ 请复制您撰写的评价，粘贴到 Google 或 Naver 的评价页面。若能一起上传2~3张院长或医院的照片，效果会更好！',
     thanksNote:'衷心感谢您抽出宝贵时间留下评价 🙏 我们会认真倾听您的意见，以更优质的高端诊疗与服务回馈各位患者。',
     eyebrowMotive:'就诊契机', titleMotive:'是什么让您来到这里？', descMotive:'请选择所有符合的项目（可多选）', tagMotive:'可选',
     eyebrowConcern:'治疗前在意的部分', titleConcern:'治疗前有让您在意的部分吗？', descConcern:'如有符合的项目请选择（可多选）', tagConcern:'可选',
     priorityHeader:'🏥 选择医院时最看重的部分（最多3个）', priorityMaxToast:'最多可选择3个',
-    hesitationHeader:'💭 如果之前有让您犹豫治疗的原因'
+    hesitationHeader:'💭 如果之前有让您犹豫治疗的原因',
+    printCardHint:'🖨️ 诊所也可以将此二维码引导卡打印出来，摆放在候诊区或前台使用。',
+    printCardMessage:'请您抽出片刻时间告诉我们，我们会参考您宝贵的意见，为您提供更优质的高端诊疗与体验。',
+    printCardScanLabel:'📱 请扫描二维码', printCardScanSub:'只需用手机摄像头对准即可立即连接',
+    printCardDownloadLabel:'⬇ 下载引导卡图片', printCardLoadingText:'正在生成引导卡...',
+    printCardErrorHint:'引导卡加载失败。', printCardRetryLabel:'重试',
+    printCardDenseNote:'⚠️ 链接较长，二维码会比较密集。打印时请适当放大。',
+    printCardFileSuffix:'_qr-card.png'
   },
   visit:{ first_visit:'首次就诊', regular_followup:'定期复诊', ortho_consult:'正畸咨询', re_consult:'复诊咨询' },
   category:{ general:'普通诊疗', ortho:'正畸专科' },
@@ -496,7 +548,7 @@ ja: {
   ui:{
     heading:'診療はいかがでしたか？', subtitle:'簡単な質問にお答えいただくだけで、レビューを作成します',
     smileStart:'始めましょうか？', smileReady:'準備完了です', smileProgress:(n,t)=>`${n}/${t} 選択済み`,
-    eyebrow0:'① 作成方法', title0:'レビューをどのように作成しますか？', methodAI:'AI文章生成 ✨', methodManual:'自分で入力 ✍️',
+    eyebrow0:'① 作成方法', title0:'レビューをどのように作成しますか？', methodAI:'AIで簡単・スピーディーに作成 ✨', methodManual:'自分で入力 ✍️',
     eyebrow1:'② 来院タイプ', title1:'今回の来院は？',
     eyebrow2:'③ 診療分野', title2:'どの分野の診療を受けましたか？', descCategory:'当てはまる分野をすべて選んでください（複数選択可）',
     eyebrow3:'④ 詳細治療', title3Suffix:'のうち、どの治療を受けましたか？', title3Default:'どの治療を受けましたか？',
@@ -517,12 +569,20 @@ ja: {
     callLabel:'電話で予約する', kakaoChannelLabel:'カカオトークで問い合わせる', kakaoChannelNote:'💬 診療を受けられて満足された点、改善してほしい点、褒めたいスタッフがいらっしゃれば、カカオトークチャンネルで気軽にお知らせください。', instagramLabel:'Instagramをフォロー', blogLabel:'ブログを購読', youtubeLabel:'YouTubeを購読', eventTag:'📸 イベント',
     referralLabel:'友人にクリニックを紹介する', toastReferralCopy:'リンクをコピーしました・共有してみてください',
     referralShareText:(name)=>`${name}に通っているのですが、診療が丁寧でとても良かったです。一度訪れてみてください 🙂`,
+    shareInfoHomepage:'🏠 ホームページ', shareInfoNaverMap:'📍 Naverマップ', shareInfoGoogle:'🔍 Googleリンク', shareInfoPhone:'📞 予約電話', shareInfoKakao:'💬 カカオトークチャンネル',
     guideNote:'✏️ 作成したレビューをコピーして、GoogleまたはNaverのレビュー画面に貼り付けてください。院長先生や医院の写真を2〜3枚一緒に投稿していただくと、さらに効果的です！',
     thanksNote:'貴重なお時間を割いてレビューを残してくださり、心より感謝申し上げます 🙏 いただいたご意見に耳を傾け、今後さらにプレミアムな診療とサービスでお応えしてまいります。',
     eyebrowMotive:'来院のきっかけ', titleMotive:'来院のきっかけはありましたか？', descMotive:'当てはまるものをすべて選んでください（複数選択可）', tagMotive:'任意',
     eyebrowConcern:'治療前に気になっていたこと', titleConcern:'治療前に気になっていたことはありましたか？', descConcern:'当てはまるものがあれば選んでください（複数可）', tagConcern:'任意',
     priorityHeader:'🏥 医院を選ぶ際に重視した部分（最大3つ）', priorityMaxToast:'最大3つまで選択できます',
-    hesitationHeader:'💭 これまで治療をためらっていた理由があれば'
+    hesitationHeader:'💭 これまで治療をためらっていた理由があれば',
+    printCardHint:'🖨️ このQR案内カードは、医院の待合室や受付にそのまま印刷してご利用いただけます。',
+    printCardMessage:'少しだけお時間をいただければ、貴重なご意見を参考にして、より上質な診療とより良い体験のために努めてまいります。',
+    printCardScanLabel:'📱 QRコードをスキャンしてください', printCardScanSub:'スマートフォンのカメラをかざすだけで、すぐにつながります',
+    printCardDownloadLabel:'⬇ 案内カード画像をダウンロード', printCardLoadingText:'案内カードを作成しています...',
+    printCardErrorHint:'案内カードを読み込めませんでした。', printCardRetryLabel:'再試行',
+    printCardDenseNote:'⚠️ リンクが長いため、QRコードが少し細かくなっています。印刷時は少し大きめに出力してください。',
+    printCardFileSuffix:'_qr-card.png'
   },
   visit:{ first_visit:'初診（初めての来院）', regular_followup:'定期通院', ortho_consult:'矯正相談', re_consult:'再相談' },
   category:{ general:'一般診療', ortho:'矯正専門' },
@@ -543,7 +603,7 @@ es: {
   ui:{
     heading:'¿Qué tal estuvo su visita?', subtitle:'Responda unas breves preguntas y crearemos su reseña',
     smileStart:'¿Empezamos?', smileReady:'Todo listo', smileProgress:(n,t)=>`${n}/${t} seleccionado(s)`,
-    eyebrow0:'① MÉTODO', title0:'¿Cómo desea escribir su reseña?', methodAI:'Generar con IA ✨', methodManual:'Escribir yo mismo ✍️',
+    eyebrow0:'① MÉTODO', title0:'¿Cómo desea escribir su reseña?', methodAI:'Escribir fácil y rápido con IA ✨', methodManual:'Escribir yo mismo ✍️',
     eyebrow1:'② TIPO DE VISITA', title1:'¿Qué tipo de visita fue esta?',
     eyebrow2:'③ ÁREA DE TRATAMIENTO', title2:'¿En qué áreas recibió tratamiento?', descCategory:'Seleccione todas las que correspondan (opción múltiple)',
     eyebrow3:'④ TRATAMIENTO', title3Suffix:': ¿qué tratamiento recibió?', title3Default:'¿Qué tratamiento recibió?',
@@ -564,12 +624,20 @@ es: {
     callLabel:'Llamar para reservar', kakaoChannelLabel:'Escríbanos por KakaoTalk', kakaoChannelNote:'💬 Si hubo algo que le gustó especialmente, algo que podríamos mejorar, o algún miembro del personal que le gustaría elogiar, cuéntenoslo con confianza por nuestro canal de KakaoTalk.', instagramLabel:'Seguir en Instagram', blogLabel:'Seguir el blog', youtubeLabel:'Suscribirse en YouTube', eventTag:'📸 Promoción',
     referralLabel:'Recomendar esta clínica a un amigo', toastReferralCopy:'Enlace copiado · compártalo',
     referralShareText:(name)=>`Visité ${name} y la atención fue muy completa y buena. Vale la pena conocerla 🙂`,
+    shareInfoHomepage:'🏠 Sitio web', shareInfoNaverMap:'📍 Mapa de Naver', shareInfoGoogle:'🔍 Enlace de Google', shareInfoPhone:'📞 Teléfono', shareInfoKakao:'💬 Canal de KakaoTalk',
     guideNote:'✏️ Copie su reseña y péguela en Google o Naver Reviews. ¡Subir 2–3 fotos del doctor o de la clínica hace que sea aún mejor!',
     thanksNote:'Muchas gracias por tomarse el tiempo de dejar su reseña 🙏 Valoramos mucho su opinión y la usaremos para seguir ofreciendo una atención y un servicio de nivel premium.',
     eyebrowMotive:'Motivo de la visita', titleMotive:'¿Qué le trajo a la clínica?', descMotive:'Seleccione todas las que correspondan (opción múltiple)', tagMotive:'Opcional',
     eyebrowConcern:'Preocupaciones previas', titleConcern:'¿Había algo que le preocupara antes del tratamiento?', descConcern:'Seleccione si aplica (puede elegir varios)', tagConcern:'Opcional',
     priorityHeader:'🏥 Lo más importante al elegir esta clínica (hasta 3)', priorityMaxToast:'Puede seleccionar hasta 3',
-    hesitationHeader:'💭 Si algo le hizo dudar sobre el tratamiento anteriormente'
+    hesitationHeader:'💭 Si algo le hizo dudar sobre el tratamiento anteriormente',
+    printCardHint:'🖨️ La clínica también puede imprimir esta tarjeta con código QR y colocarla en la sala de espera o en la recepción.',
+    printCardMessage:'Solo tomará un momento: usaremos sus comentarios para seguir ofreciendo una atención y una experiencia de nivel premium.',
+    printCardScanLabel:'📱 Escanee el código QR', printCardScanSub:'Solo apunte la cámara de su teléfono para conectarse al instante',
+    printCardDownloadLabel:'⬇ Descargar imagen de la tarjeta', printCardLoadingText:'Creando la tarjeta guía...',
+    printCardErrorHint:'No se pudo cargar la tarjeta guía.', printCardRetryLabel:'Reintentar',
+    printCardDenseNote:'⚠️ El enlace es largo, por lo que el código QR es bastante denso. Al imprimir, hágalo un poco más grande.',
+    printCardFileSuffix:'_qr-card.png'
   },
   visit:{ first_visit:'Primera visita', regular_followup:'Control periódico', ortho_consult:'Consulta de ortodoncia', re_consult:'Consulta de seguimiento' },
   category:{ general:'Odontología general', ortho:'Ortodoncia' },
@@ -588,12 +656,185 @@ es: {
 }
 };
 
-/* ============================================================ */
+/* ============================================================
+   인쇄용 QR 안내카드 합성 (setup.html의 카드와 동일한 디자인을
+   환자용 리뷰 페이지 하단에도 노출해, 치과에서 이 페이지만으로도
+   안내카드를 바로 저장/인쇄할 수 있게 한다)
+   ============================================================ */
+
+function roundRectPath(ctx, x, y, w, h, r){
+  ctx.beginPath();
+  ctx.moveTo(x+r, y);
+  ctx.arcTo(x+w, y, x+w, y+h, r);
+  ctx.arcTo(x+w, y+h, x, y+h, r);
+  ctx.arcTo(x, y+h, x, y, r);
+  ctx.arcTo(x, y, x+w, y, r);
+  ctx.closePath();
+}
+
+// 텍스트를 주어진 폭에 맞춰 줄바꿈만 계산 (그리지 않음) — 언어별 문장 길이에 따라
+// 실제로 몇 줄이 나오는지 미리 알아야 캔버스 높이를 동적으로 계산할 수 있다
+function measureWrappedLines(ctx, text, maxWidth){
+  const chars = Array.from(text);
+  let line = '';
+  const lines = [];
+  chars.forEach(ch=>{
+    const test = line + ch;
+    if(ctx.measureText(test).width > maxWidth && line !== ''){
+      lines.push(line);
+      line = ch;
+    } else {
+      line = test;
+    }
+  });
+  if(line) lines.push(line);
+  return lines.map(l=>l.trim());
+}
+
+function drawWrappedLines(ctx, lines, centerX, startY, lineHeight){
+  lines.forEach((l,i)=>{ ctx.fillText(l, centerX, startY + i * lineHeight); });
+}
+
+// 기존 호출부와의 호환을 위한 헬퍼: 측정 + 그리기를 한 번에 하고 줄 수를 반환
+function wrapAndDrawText(ctx, text, centerX, startY, maxWidth, lineHeight){
+  const lines = measureWrappedLines(ctx, text, maxWidth);
+  drawWrappedLines(ctx, lines, centerX, startY, lineHeight);
+  return lines.length;
+}
+
+async function loadImageSafely(url){
+  try{
+    const res = await fetch(url);
+    const blob = await res.blob();
+    const objUrl = URL.createObjectURL(blob);
+    const img = await new Promise((resolve, reject)=>{
+      const im = new Image();
+      im.onload = ()=>resolve(im);
+      im.onerror = reject;
+      im.src = objUrl;
+    });
+    return img;
+  }catch(e){
+    return new Promise((resolve, reject)=>{
+      const im = new Image();
+      im.crossOrigin = 'anonymous';
+      im.onload = ()=>resolve(im);
+      im.onerror = reject;
+      im.src = url;
+    });
+  }
+}
+
+const PRINT_CARD_FONT_FAMILY = "'Apple SD Gothic Neo','Malgun Gothic','Noto Sans SC','Noto Sans JP',sans-serif";
+
+// 인쇄용 QR 안내카드를 캔버스에 합성한다.
+// qrImg: 이미 로드된 Image 객체 (언어 전환마다 다시 받아오지 않도록 호출부에서 캐싱해 전달)
+// 캔버스 높이(H)는 고정값이 아니라, 언어별 문구가 실제로 몇 줄을 차지하는지 먼저 측정해서 동적으로 계산한다
+// (스페인어 등 문장이 긴 언어에서 텍스트가 카드 하단 포인트 라인과 겹치는 것을 방지)
+function composePrintCardImage(name, qrImg, brandColorHex, t, qrSize){
+  const W = 900;
+  qrSize = qrSize || 460;
+  const canvas = document.getElementById('hiddenCanvas');
+  const ctx = canvas.getContext('2d');
+  const accent = brandColorHex ? `#${brandColorHex}` : '#163832';
+
+  // --- 1) 실제 그리기 전, 각 텍스트 블록이 몇 줄이 될지 미리 측정 ---
+  ctx.font = "bold 58px " + PRINT_CARD_FONT_FAMILY;
+  const nameLines = measureWrappedLines(ctx, name, W - 140);
+  ctx.font = "600 28px " + PRINT_CARD_FONT_FAMILY;
+  const scanSubLines = measureWrappedLines(ctx, t.ui.printCardScanSub, W - 160);
+  ctx.font = "bold 40px " + PRINT_CARD_FONT_FAMILY;
+  const scanLabelLines = measureWrappedLines(ctx, t.ui.printCardScanLabel, W - 140);
+  ctx.font = "bold 36px " + PRINT_CARD_FONT_FAMILY;
+  const headingLines = measureWrappedLines(ctx, t.ui.heading, W - 140);
+  ctx.font = "26px " + PRINT_CARD_FONT_FAMILY;
+  const messageLines = measureWrappedLines(ctx, t.ui.printCardMessage, W - 160);
+
+  // --- 2) 측정된 줄 수를 바탕으로 각 구간의 Y 좌표를 동적으로 계산 ---
+  const NAME_LINE_HEIGHT = 70, SUB_LINE_HEIGHT = 34, LABEL_LINE_HEIGHT = 50,
+        HEADING_LINE_HEIGHT = 46, MESSAGE_LINE_HEIGHT = 38;
+
+  const bandBaseHeight = 320;
+  // 병원 이름이 2줄 이상이면 상단 밴드 자체를 늘려 이름과 부제가 겹치지 않게 한다
+  const bandHeight = nameLines.length > 1
+    ? bandBaseHeight + (nameLines.length - 1) * NAME_LINE_HEIGHT
+    : bandBaseHeight;
+  const nameStartY = nameLines.length > 1 ? 120 : 150;
+
+  const qrX = (W - qrSize) / 2;
+  const qrY = bandHeight + 70;
+  const panelPad = 28;
+
+  const scanLabelStartY = qrY + qrSize + 90;
+  const feedbackDividerY = scanLabelStartY + (scanLabelLines.length - 1) * LABEL_LINE_HEIGHT + 108;
+  const headingStartY = feedbackDividerY + 56;
+  const messageStartY = headingStartY + (headingLines.length - 1) * HEADING_LINE_HEIGHT + 48;
+  const messageBottomY = messageStartY + (messageLines.length - 1) * MESSAGE_LINE_HEIGHT;
+
+  const H = Math.round(messageBottomY + 130); // 하단 포인트 라인 + 여백
+
+  canvas.width = W; canvas.height = H;
+  // width/height를 다시 지정하면 캔버스가 초기화되므로 폰트 등 컨텍스트 설정도 다시 적용해야 한다
+
+  ctx.fillStyle = '#F3F6F4';
+  ctx.fillRect(0, 0, W, H);
+
+  ctx.fillStyle = accent;
+  ctx.fillRect(0, 0, W, bandHeight);
+
+  ctx.fillStyle = '#FFFFFF';
+  ctx.font = "bold 58px " + PRINT_CARD_FONT_FAMILY;
+  ctx.textAlign = 'center';
+  drawWrappedLines(ctx, nameLines, W/2, nameStartY, NAME_LINE_HEIGHT);
+
+  ctx.font = "600 28px " + PRINT_CARD_FONT_FAMILY;
+  ctx.fillStyle = 'rgba(255,255,255,0.88)';
+  drawWrappedLines(ctx, scanSubLines, W/2, bandHeight - 46, SUB_LINE_HEIGHT);
+
+  ctx.shadowColor = 'rgba(22,56,50,0.12)';
+  ctx.shadowBlur = 30;
+  ctx.shadowOffsetY = 10;
+  ctx.fillStyle = '#FFFFFF';
+  roundRectPath(ctx, qrX - panelPad, qrY - panelPad, qrSize + panelPad*2, qrSize + panelPad*2, 28);
+  ctx.fill();
+  ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
+
+  if(qrImg){
+    ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
+  }
+
+  ctx.fillStyle = '#163832';
+  ctx.font = "bold 40px " + PRINT_CARD_FONT_FAMILY;
+  drawWrappedLines(ctx, scanLabelLines, W/2, scanLabelStartY, LABEL_LINE_HEIGHT);
+
+  ctx.strokeStyle = 'rgba(22,56,50,0.15)';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(W/2 - 130, feedbackDividerY);
+  ctx.lineTo(W/2 + 130, feedbackDividerY);
+  ctx.stroke();
+
+  ctx.fillStyle = accent;
+  ctx.font = "bold 36px " + PRINT_CARD_FONT_FAMILY;
+  drawWrappedLines(ctx, headingLines, W/2, headingStartY, HEADING_LINE_HEIGHT);
+
+  ctx.fillStyle = '#3E4C48';
+  ctx.font = "26px " + PRINT_CARD_FONT_FAMILY;
+  drawWrappedLines(ctx, messageLines, W/2, messageStartY, MESSAGE_LINE_HEIGHT);
+
+  ctx.fillStyle = accent;
+  ctx.fillRect(W/2 - 60, H - 60, 120, 6);
+
+  return canvas.toDataURL('image/png');
+}
 
 const params = new URLSearchParams(window.location.search);
 let CLINIC_NAME, GOOGLE_REVIEW_URL, NAVER_REVIEW_URL, HOMEPAGE_URL, CLINIC_ID, REGION, PHONE,
     KAKAO_CHANNEL_URL, INSTAGRAM_URL, BLOG_URL, YOUTUBE_URL, EVENT_NOTE, DOCTOR_PHOTO,
-    DOCTOR_GREETING, LOGO_URL, BRAND_COLOR;
+    DOCTOR_GREETING, LOGO_URL, BRAND_COLOR, SHOW_PRINT_CARD;
+// 짧은 링크 발급이 실패해 원본 긴 URL을 그대로 쓰는 경우를 표시 — 이 경우 QR 데이터가 길어져
+// 코드가 촘촘해지므로, 환자 페이지의 안내카드에서 인쇄 시 유의사항을 함께 보여준다
+let USING_LONG_URL_FALLBACK = false;
 
 async function bootstrap(){
   const shortCode = params.get('c');
@@ -620,6 +861,7 @@ async function bootstrap(){
       DOCTOR_GREETING = cfg.doctorGreeting || null;
       LOGO_URL = cfg.logo || null;
       BRAND_COLOR = cfg.color || null;
+      SHOW_PRINT_CARD = cfg.showPrintCard !== '0';
     }catch(e){
       console.error('short link resolve failed:', e);
       CLINIC_NAME = null; GOOGLE_REVIEW_URL = null;
@@ -642,6 +884,10 @@ async function bootstrap(){
     DOCTOR_GREETING = params.get('doctorGreeting');
     LOGO_URL = params.get('logo');
     BRAND_COLOR = params.get('color');
+    SHOW_PRINT_CARD = params.get('showPrintCard') !== '0';
+    // 짧은 링크(c=코드) 없이 이 페이지에 접속했다는 것은 짧은 링크 발급이 실패해서
+    // setup.html이 긴 URL로 대체 발급했을 가능성이 높다는 뜻 (setup.html 참고)
+    if(CLINIC_NAME && window.location.href.length > 220) USING_LONG_URL_FALLBACK = true;
   }
 
   if(BRAND_COLOR){
@@ -828,11 +1074,93 @@ function initApp(){
       document.getElementById('txtEventNote').textContent = decodeURIComponent(EVENT_NOTE);
     }
 
+    document.getElementById('txtPrintCardHint').textContent = t.ui.printCardHint;
+    const denseNoteEl = document.getElementById('txtPrintCardDenseNote');
+    denseNoteEl.textContent = t.ui.printCardDenseNote;
+    denseNoteEl.style.display = USING_LONG_URL_FALLBACK ? 'block' : 'none';
+    document.getElementById('txtPrintCardErrorHint').textContent = t.ui.printCardErrorHint;
+    const retryBtn = document.getElementById('printCardRetryBtn');
+    retryBtn.textContent = t.ui.printCardRetryLabel;
+    document.getElementById('printCardLoading').textContent = t.ui.printCardLoadingText;
+
+    const printCardSection = document.getElementById('printCardSection');
+    if(SHOW_PRINT_CARD && CLINIC_NAME){
+      // 치과에서 원치 않으면(setup.html 설정) 아예 만들지 않는다 — 불필요한 QR API 호출도 줄어든다
+      printCardSection.dataset.ready = '1';
+      renderPrintCard(t);
+    } else {
+      printCardSection.dataset.ready = '0';
+      printCardSection.style.display = 'none';
+    }
+
     renderVisit(); renderCategory(); renderExperience(); renderImprovement();
     renderMotive(); renderPriority(); renderHesitation();
     renderTreatments(state.category); renderConcern(state.category);
     refreshButton();
   }
+
+  // 환자 페이지 하단에도 동일한 QR 안내카드를 만들어 치과에서 별도로 활용할 수 있게 한다.
+  // QR에 담기는 데이터(현재 페이지 URL)는 언어를 바꿔도 동일하므로, QR 이미지 자체는
+  // 최초 1회만 불러와 캐싱해두고 언어 전환 시에는 텍스트만 다시 그린다.
+  let printCardRenderToken = 0;
+  let cachedQrImagePromise = null;
+  function getQrImage(size){
+    if(!cachedQrImagePromise){
+      const qrDataUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&margin=6&data=${encodeURIComponent(window.location.href)}`;
+      cachedQrImagePromise = loadImageSafely(qrDataUrl);
+    }
+    return cachedQrImagePromise;
+  }
+
+  async function renderPrintCard(t){
+    if(!CLINIC_NAME) return;
+    const myToken = ++printCardRenderToken;
+    const section = document.getElementById('printCardSection');
+    const img = document.getElementById('printCardImg');
+    const imgBreak = document.getElementById('printCardImgBreak');
+    const downloadBtn = document.getElementById('printCardDownloadBtn');
+    const loadingEl = document.getElementById('printCardLoading');
+    const errorEl = document.getElementById('printCardError');
+
+    section.style.display = 'block';
+    errorEl.style.display = 'none';
+    // 이미 한 번 만들어진 적이 있으면(언어 전환) 빈 화면 대신 기존 이미지를 유지한 채로 갱신한다
+    if(img.style.display !== 'block'){
+      loadingEl.style.display = 'block';
+    }
+
+    // 링크가 길어(짧은 링크 발급 실패) QR이 촘촘할 것으로 예상되면 모듈을 더 큼직하게 인식할 수 있도록 QR 자체 해상도를 높인다
+    const qrSize = USING_LONG_URL_FALLBACK ? 620 : 460;
+
+    try{
+      const qrImg = await getQrImage(qrSize);
+      const dataUrl = composePrintCardImage(decodeURIComponent(CLINIC_NAME), qrImg, BRAND_COLOR, t, qrSize);
+      if(myToken !== printCardRenderToken) return; // 언어가 그 사이 바뀌었으면 이전 결과는 버림
+      loadingEl.style.display = 'none';
+      img.src = dataUrl;
+      img.alt = t.ui.printCardScanLabel;
+      img.style.display = 'block';
+      imgBreak.style.display = 'block';
+      const suffix = t.ui.printCardFileSuffix || '_qr-card.png';
+      downloadBtn.href = dataUrl;
+      downloadBtn.download = `${decodeURIComponent(CLINIC_NAME)}${suffix}`;
+      downloadBtn.textContent = t.ui.printCardDownloadLabel;
+      downloadBtn.style.display = 'inline-block';
+    }catch(e){
+      console.error('안내카드 생성 실패:', e);
+      if(myToken !== printCardRenderToken) return;
+      loadingEl.style.display = 'none';
+      img.style.display = 'none';
+      imgBreak.style.display = 'none';
+      downloadBtn.style.display = 'none';
+      errorEl.style.display = 'block';
+    }
+  }
+
+  document.getElementById('printCardRetryBtn').addEventListener('click', ()=>{
+    cachedQrImagePromise = null; // 실패한 캐시(있다면)를 비우고 다시 시도
+    if(LANG) renderPrintCard(T());
+  });
 
   function renderVisit(){
     const box = document.getElementById('visitOptions');
@@ -991,6 +1319,16 @@ function initApp(){
   function goToStep(name){
     document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
     document.querySelector(`.step[data-step="${name}"]`).classList.add('active');
+    const isLangStep = name === 'lang';
+    document.getElementById('txtHeading').style.display = isLangStep ? 'none' : '';
+    document.getElementById('txtSubtitle').style.display = isLangStep ? 'none' : '';
+    document.querySelector('.smile-wrap').style.display = isLangStep ? 'none' : '';
+    // 안내카드는 리뷰 작성 흐름 내내 붙어있지 않고, 언어 선택 직후 첫 화면(작성방식 선택)에서만 노출한다.
+    // 병원 데스크 직원이 환자 화면을 굳이 끝까지 진행하지 않아도 안내카드를 바로 내려받을 수 있게 하기 위함이다.
+    const printCardSection = document.getElementById('printCardSection');
+    if(printCardSection.dataset.ready === '1'){
+      printCardSection.style.display = (name === '0') ? 'block' : 'none';
+    }
   }
   function currentStepName(){ return flow[stepIndex]; }
 
@@ -1234,34 +1572,54 @@ function initApp(){
     setTimeout(()=>{ window.open(decodeURIComponent(NAVER_REVIEW_URL), '_blank'); }, 500);
   });
 
+  // 카카오톡 공유 등에 함께 담을 병원 정보 블록 조립 (설정된 항목만 포함)
+  function buildClinicInfoText(t){
+    const lines = [];
+    if(HOMEPAGE_URL) lines.push(`${t.ui.shareInfoHomepage} ${decodeURIComponent(HOMEPAGE_URL)}`);
+    if(NAVER_REVIEW_URL) lines.push(`${t.ui.shareInfoNaverMap} ${decodeURIComponent(NAVER_REVIEW_URL)}`);
+    if(GOOGLE_REVIEW_URL) lines.push(`${t.ui.shareInfoGoogle} ${decodeURIComponent(GOOGLE_REVIEW_URL)}`);
+    if(PHONE) lines.push(`${t.ui.shareInfoPhone} ${decodeURIComponent(PHONE)}`);
+    if(KAKAO_CHANNEL_URL) lines.push(`${t.ui.shareInfoKakao} ${decodeURIComponent(KAKAO_CHANNEL_URL)}`);
+    return lines.join('\n');
+  }
+
   document.getElementById('kakaoShareBtn').addEventListener('click', ()=>{
+    const t = T();
     const finalText = state.method === 'manual' ? document.getElementById('manualText').value.trim() : generatedText;
+    const infoBlock = buildClinicInfoText(t);
+    const shareText = infoBlock ? `${finalText}\n\n${infoBlock}` : finalText;
     if(navigator.share){
-      navigator.share({ text: finalText }).catch(()=>{});
+      navigator.share({ text: shareText }).catch(()=>{});
     } else {
-      copyText(finalText).then(()=>{ showToast(T().ui.toastCopyKakao); }).catch(()=>{ showToast(T().ui.toastCopyFail); });
+      copyText(shareText).then(()=>{ showToast(t.ui.toastCopyKakao); }).catch(()=>{ showToast(t.ui.toastCopyFail); });
     }
   });
   document.getElementById('wechatShareBtn').addEventListener('click', ()=>{
+    const t = T();
     const finalText = state.method === 'manual' ? document.getElementById('manualText').value.trim() : generatedText;
+    const infoBlock = buildClinicInfoText(t);
+    const shareText = infoBlock ? `${finalText}\n\n${infoBlock}` : finalText;
     if(navigator.share){
-      navigator.share({ text: finalText }).catch(()=>{
-        copyText(finalText).then(()=>{ showToast(T().ui.toastCopyWechat); }).catch(()=>{ showToast(T().ui.toastCopyFail); });
+      navigator.share({ text: shareText }).catch(()=>{
+        copyText(shareText).then(()=>{ showToast(t.ui.toastCopyWechat); }).catch(()=>{ showToast(t.ui.toastCopyFail); });
       });
     } else {
-      copyText(finalText).then(()=>{ showToast(T().ui.toastCopyWechat); }).catch(()=>{ showToast(T().ui.toastCopyFail); });
+      copyText(shareText).then(()=>{ showToast(t.ui.toastCopyWechat); }).catch(()=>{ showToast(t.ui.toastCopyFail); });
     }
   });
 
   document.getElementById('referralBtn').addEventListener('click', ()=>{
     const t = T();
     const clinicName = decodeURIComponent(CLINIC_NAME);
-    const shareText = t.ui.referralShareText(clinicName);
-    const pageUrl = window.location.href;
+    const infoBlock = buildClinicInfoText(t);
+    const shareText = infoBlock
+      ? `${t.ui.referralShareText(clinicName)}\n\n🏥 ${clinicName}\n${infoBlock}`
+      : t.ui.referralShareText(clinicName);
+    const shareUrl = HOMEPAGE_URL ? decodeURIComponent(HOMEPAGE_URL) : window.location.href;
     if(navigator.share){
-      navigator.share({ title: clinicName, text: shareText, url: pageUrl }).catch(()=>{});
+      navigator.share({ title: clinicName, text: shareText, url: shareUrl }).catch(()=>{});
     } else {
-      copyText(`${shareText} ${pageUrl}`).then(()=>{ showToast(t.ui.toastReferralCopy); }).catch(()=>{ showToast(t.ui.toastCopyFail); });
+      copyText(`${shareText}\n${shareUrl}`).then(()=>{ showToast(t.ui.toastReferralCopy); }).catch(()=>{ showToast(t.ui.toastCopyFail); });
     }
   });
 
