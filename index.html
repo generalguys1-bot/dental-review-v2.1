@@ -416,6 +416,7 @@ ko: {
     eyebrow3:'④ 세부 치료', title3Suffix:'중 어떤 치료를 받으셨나요?', title3Default:'어떤 치료를 받으셨나요?',
     eyebrow4:'⑤ 경험선택', title4:'어떤 점이 좋으셨나요?', desc4:'담당자별로 좋았던 점을 골라주세요 (중복 가능)',
     eyebrow5:'⑥ 개선사항', tag5:'선택사항', title5:'아쉬웠던 점이 있으셨나요?', desc5:'있으시면 골라주세요. 없으시면 바로 다음으로 넘어가도 돼요',
+    eyebrow5Blanche:'⑥ 선택 기준', title5Blanche:'병원을 선택하실 때 어떤 점을 중요하게 보셨나요?', desc5Blanche:'해당되는 항목이 있으면 골라주세요. 없으시면 바로 다음으로 넘어가도 돼요',
     noteLabel:'더 남기고 싶은 말 (선택)', notePlaceholder:'예) 대기 공간에 물이 있으면 좋을 것 같아요',
     manualEyebrow:'✍️ 직접 입력', manualTitle:'리뷰 내용을 적어주세요', manualPlaceholder:'예) 상담부터 시술까지 친절하게 설명해주셔서 편안하게 진료받았어요.',
     loadingText:'리뷰를 작성하고 있어요...',
@@ -471,6 +472,7 @@ en: {
     eyebrow3:'STEP 4 · TREATMENT', title3Suffix:'— which treatment did you receive?', title3Default:'Which treatment did you receive?',
     eyebrow4:'STEP 5 · EXPERIENCE', title4:'What did you like?', desc4:'Pick what stood out for each staff member (multiple choice)',
     eyebrow5:'STEP 6 · FEEDBACK', tag5:'optional', title5:'Anything that could be improved?', desc5:'Pick any that apply, or skip straight to the next step',
+    eyebrow5Blanche:'STEP 6 · WHAT MATTERED', title5Blanche:'What mattered most when choosing this clinic?', desc5Blanche:'Pick any that apply, or skip straight to the next step',
     noteLabel:'Anything else to add? (optional)', notePlaceholder:'e.g. It would be nice to have water in the waiting area',
     manualEyebrow:'✍️ Write it myself', manualTitle:'Write your review', manualPlaceholder:'e.g. The staff explained everything clearly and I felt comfortable throughout the treatment.',
     loadingText:'Writing your review...',
@@ -526,6 +528,7 @@ zh: {
     eyebrow3:'④ 具体治疗', title3Suffix:'中您接受了哪种治疗？', title3Default:'您接受了哪种治疗？',
     eyebrow4:'⑤ 体验选择', title4:'哪些方面让您满意？', desc4:'请按负责人分别选择满意之处（可多选）',
     eyebrow5:'⑥ 改进建议', tag5:'可选', title5:'有没有觉得不满意的地方？', desc5:'如果有请选择，没有的话可以直接进入下一步',
+    eyebrow5Blanche:'⑥ 选择考量', title5Blanche:'选择这家医院时，您比较看重哪些方面？', desc5Blanche:'如有符合的请选择，没有的话可以直接进入下一步',
     noteLabel:'还想补充的话（可选）', notePlaceholder:'例如：候诊区如果有饮水机就更好了',
     manualEyebrow:'✍️ 自己输入', manualTitle:'请输入评价内容', manualPlaceholder:'例如：从咨询到治疗，医护人员都耐心讲解，让我很安心。',
     loadingText:'正在为您生成评价...',
@@ -581,6 +584,7 @@ ja: {
     eyebrow3:'④ 詳細治療', title3Suffix:'のうち、どの治療を受けましたか？', title3Default:'どの治療を受けましたか？',
     eyebrow4:'⑤ 体験選択', title4:'どんな点が良かったですか？', desc4:'担当者ごとに良かった点を選んでください（複数選択可）',
     eyebrow5:'⑥ 改善点', tag5:'任意', title5:'気になった点はありましたか？', desc5:'あれば選んでください。なければそのまま次に進んでも大丈夫です',
+    eyebrow5Blanche:'⑥ 選んだ理由', title5Blanche:'この病院を選ぶ際、何を重視されましたか？', desc5Blanche:'当てはまるものがあれば選んでください。なければそのまま次に進んでも大丈夫です',
     noteLabel:'その他ご意見（任意）', notePlaceholder:'例）待合スペースにお水があるとうれしいです',
     manualEyebrow:'✍️ 自分で入力', manualTitle:'レビュー内容を入力してください', manualPlaceholder:'例）カウンセリングから施術まで丁寧に説明していただき、安心して診療を受けられました。',
     loadingText:'レビューを作成しています...',
@@ -636,6 +640,7 @@ es: {
     eyebrow3:'④ TRATAMIENTO', title3Suffix:': ¿qué tratamiento recibió?', title3Default:'¿Qué tratamiento recibió?',
     eyebrow4:'⑤ EXPERIENCIA', title4:'¿Qué fue lo que más le gustó?', desc4:'Elija lo que más destacó de cada persona (puede elegir varias opciones)',
     eyebrow5:'⑥ SUGERENCIAS', tag5:'opcional', title5:'¿Hubo algo que podría mejorar?', desc5:'Selecciónelo si lo hubo, o pase directamente al siguiente paso',
+    eyebrow5Blanche:'⑥ CRITERIOS DE ELECCIÓN', title5Blanche:'¿Qué fue lo más importante al elegir esta clínica?', desc5Blanche:'Selecciónelo si aplica, o pase directamente al siguiente paso',
     noteLabel:'¿Algo más que agregar? (opcional)', notePlaceholder:'Ej: estaría bien tener agua en la sala de espera',
     manualEyebrow:'✍️ Escribir yo mismo', manualTitle:'Escriba su reseña', manualPlaceholder:'Ej: El personal me explicó todo con claridad y me sentí cómodo/a durante todo el tratamiento.',
     loadingText:'Redactando su reseña...',
@@ -1017,9 +1022,9 @@ function initApp(){
     document.getElementById('txtEyebrow4').textContent = t.ui.eyebrow4;
     document.getElementById('txtTitle4').textContent = t.ui.title4;
     document.getElementById('txtDesc4').textContent = t.ui.desc4;
-    document.getElementById('txtEyebrow5').innerHTML = `${t.ui.eyebrow5} <span class="step-optional-tag">${t.ui.tag5}</span>`;
-    document.getElementById('txtTitle5').textContent = t.ui.title5;
-    document.getElementById('txtDesc5').textContent = t.ui.desc5;
+    document.getElementById('txtEyebrow5').innerHTML = `${BLANCHE_MODE ? t.ui.eyebrow5Blanche : t.ui.eyebrow5} <span class="step-optional-tag">${t.ui.tag5}</span>`;
+    document.getElementById('txtTitle5').textContent = BLANCHE_MODE ? t.ui.title5Blanche : t.ui.title5;
+    document.getElementById('txtDesc5').textContent = BLANCHE_MODE ? t.ui.desc5Blanche : t.ui.desc5;
     document.getElementById('txtPriorityHeader').textContent = t.ui.priorityHeader;
     document.getElementById('txtHesitationHeader').textContent = t.ui.hesitationHeader;
     document.getElementById('txtNoteLabel').textContent = t.ui.noteLabel;
