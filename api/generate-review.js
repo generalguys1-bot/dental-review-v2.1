@@ -50,7 +50,7 @@ export default async function handler(req, res) {
     clinicName, language, visit, category, treatment,
     experience, improvements, additionalNote, region,
     motive, concern, priority, hesitation,
-    tone, previousText, translateTo
+    tone, previousText
   } = req.body || {};
 
   const targetLanguage = language || 'Korean';
@@ -58,7 +58,6 @@ export default async function handler(req, res) {
   // 톤 재작성 모드: 이미 만들어진 리뷰의 사실관계는 그대로 두고 톤(길이/격식/친근함)만 다시 씀
   const TONE_INSTRUCTIONS = {
     shorter: 'Make it noticeably shorter and more concise (about 2-3 sentences), keeping only the key points.',
-    longer: 'Make it noticeably longer and more detailed (about 5-7 sentences), naturally elaborating on the same experiences already mentioned — do not invent new facts, staff members, or treatments that were not in the original.',
     polite: 'Make the tone more polite, warm, and formal, while staying natural and not stiff.',
     casual: 'Make the tone more casual, friendly, and conversational, like talking to a friend — still respectful.'
   };
@@ -83,25 +82,6 @@ Revise it as follows: ${instruction}
 - Do not add any new facts, names, or claims that weren't already in the original review
 - Keep it written like a genuine, understated first-person patient review — never like an advertisement
 - No emojis, no markdown, no quotation marks, no star ratings — output only the review body text
-
-[Medical advertising compliance guardrails — must still follow]
-- Never use absolute or guaranteed claims about medical outcomes
-- Never generate any personally identifying information (real name, birth date, phone number, etc.)`;
-  } else if (previousText && translateTo) {
-    prompt = `You are translating a real dental patient's Google review into another language for the same patient to post themselves.
-
-IMPORTANT: Output ONLY the translated review, written naturally as if the patient originally wrote it in ${translateTo}. Do not include the original text, notes, explanations, or commentary — output only the translated review body text.
-
-Original review:
-"""
-${previousText}
-"""
-
-Requirements:
-- Translate naturally and idiomatically into ${translateTo}, not literally word-for-word
-- Preserve the meaning, facts, tone, and level of detail of the original — do not add or remove any facts
-- Keep it written like a genuine, first-person patient review, in a way that reads naturally to a native speaker of ${translateTo}
-- No emojis, no markdown, no quotation marks, no star ratings — output only the translated review body text
 
 [Medical advertising compliance guardrails — must still follow]
 - Never use absolute or guaranteed claims about medical outcomes
@@ -193,7 +173,6 @@ Requirements:
       body: JSON.stringify({
         model: 'claude-sonnet-5',
         max_tokens: 1000,
-        thinking: { type: 'disabled' }, // 단순 텍스트 생성이라 thinking 불필요 + max_tokens를 리뷰 본문에 온전히 사용
         messages: [{ role: 'user', content: prompt }]
       })
     });
