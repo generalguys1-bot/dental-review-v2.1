@@ -85,13 +85,6 @@
   .tone-chip{ font-size:12.5px; font-weight:700; color:var(--deep-light); background:var(--bg); border:1.5px solid var(--border); border-radius:999px; padding:6px 12px; cursor:pointer; font-family:inherit; transition:.15s ease; }
   .tone-chip:active{ transform:scale(.95); }
   .tone-chip.loading{ opacity:.55; pointer-events:none; }
-  .tone-chip.active{ background:var(--deep); border-color:var(--deep); color:#fff; }
-  .result-edit-textarea{ min-height:120px; margin:0 0 10px; font-size:15.5px; line-height:1.7; }
-  .edit-row{ display:flex; justify-content:flex-end; margin:-6px 0 12px; }
-  .edit-link-btn{ font-size:12.5px; font-weight:700; color:var(--muted); background:none; border:none; cursor:pointer; font-family:inherit; padding:4px 2px; text-decoration:underline; text-underline-offset:2px; }
-  .edit-link-btn:active{ opacity:.6; }
-  .edit-link-btn.saving{ color:var(--deep-light); }
-  .translate-chips{ display:flex; flex-wrap:wrap; gap:6px; }
   .posted-confirm{ text-align:center; margin:4px 0 4px; padding:12px; background:var(--bg); border-radius:12px; }
   .posted-confirm p{ margin:0 0 8px; font-size:13px; color:var(--muted); }
   .posted-confirm-btn{ display:inline-block; font-size:13.5px; font-weight:700; color:#fff; background:var(--deep-light); border:none; border-radius:999px; padding:9px 18px; cursor:pointer; font-family:inherit; }
@@ -281,20 +274,11 @@
     <div class="result-card" id="resultCard">
       <div class="result-badge" id="txtResultBadge"></div>
       <p class="result-text" id="resultText"></p>
-      <textarea class="result-edit-textarea" id="resultTextEdit" style="display:none;"></textarea>
-      <div class="edit-row" id="editRow">
-        <button type="button" class="edit-link-btn" id="editReviewBtn"></button>
-      </div>
       <div class="tone-row" id="toneRow" style="display:none;">
         <span class="tone-label" id="txtToneLabel"></span>
         <button type="button" class="tone-chip" data-tone="shorter" id="toneShorterBtn"></button>
-        <button type="button" class="tone-chip" data-tone="longer" id="toneLongerBtn"></button>
         <button type="button" class="tone-chip" data-tone="polite" id="tonePoliteBtn"></button>
         <button type="button" class="tone-chip" data-tone="casual" id="toneCasualBtn"></button>
-      </div>
-      <div class="tone-row" id="translateRow" style="display:none;">
-        <span class="tone-label" id="txtTranslateLabel"></span>
-        <div id="translateChips" class="translate-chips"></div>
       </div>
       <p class="platform-label" id="txtPlatformLabel"></p>
       <div class="platform-actions">
@@ -434,8 +418,7 @@ const ICONS = {
     cavity:'🪥', root_canal:'🔩', implant:'🦷', crown:'👑', whitening_scaling:'✨',
     wisdom_tooth:'😬', gum_treatment:'🩹', denture:'🦷', checkup:'🔍', overall:'💙',
     metal_braces:'⚙️', ceramic_braces:'🤍', clear_aligner:'👻', lingual_braces:'🙊',
-    partial_braces:'🔹', pediatric_ortho:'🧒', re_treatment:'🔁', ortho_consult_treat:'💬',
-    blanche_special:'⭐'
+    partial_braces:'🔹', pediatric_ortho:'🧒', re_treatment:'🔁', ortho_consult_treat:'💬'
   },
   role: { doctor:'🩺', counselor:'💬', staff:'🧑\u200d⚕️', desk:'🗓️' },
   improvementCategory: { wait_booking:'⏰', cost_info:'💳', facility:'🅿️', communication:'💬' }
@@ -452,7 +435,6 @@ ko: {
     eyebrow3:'④ 세부 치료', title3Suffix:'중 어떤 치료를 받으셨나요?', title3Default:'어떤 치료를 받으셨나요?',
     eyebrow4:'⑤ 경험선택', title4:'어떤 점이 좋으셨나요?', desc4:'담당자별로 좋았던 점을 골라주세요 (중복 가능)',
     eyebrow5:'⑥ 개선사항', tag5:'선택사항', title5:'아쉬웠던 점이 있으셨나요?', desc5:'있으시면 골라주세요. 없으시면 바로 다음으로 넘어가도 돼요',
-    eyebrow5Blanche:'⑥ 선택 기준', title5Blanche:'병원을 선택하실 때 어떤 점을 중요하게 보셨나요?', desc5Blanche:'해당되는 항목이 있으면 골라주세요. 없으시면 바로 다음으로 넘어가도 돼요',
     noteLabel:'더 남기고 싶은 말 (선택)', notePlaceholder:'예) 대기 공간에 물이 있으면 좋을 것 같아요',
     manualEyebrow:'✍️ 직접 입력', manualTitle:'리뷰 내용을 적어주세요', manualPlaceholder:'예) 상담부터 시술까지 친절하게 설명해주셔서 편안하게 진료받았어요.',
     loadingText:'리뷰를 작성하고 있어요...',
@@ -469,9 +451,7 @@ ko: {
     referralLabel:'지인에게 병원 추천하기', toastReferralCopy:'링크가 복사되었어요 · 공유해보세요',
     referralShareText:(name)=>`제가 다녀온 ${name}, 진료가 꼼꼼하고 좋았어요. 한번 방문해보세요 🙂`,
     shareInfoHomepage:'🏠 홈페이지', shareInfoNaverMap:'📍 네이버지도', shareInfoGoogle:'🔍 구글 링크', shareInfoPhone:'📞 예약 전화', shareInfoKakao:'💬 카카오톡 채널',
-    toneLabel:'톤 조절', toneShorter:'✂️ 더 짧게', toneLonger:'➕ 더 길게', tonePolite:'🙇 더 정중하게', toneCasual:'😊 더 편하게', toastToneUpdated:'리뷰 톤이 조정되었어요',
-    editReviewBtn:'✏️ 직접 수정하기', editReviewSaveBtn:'✅ 수정 완료', toastEditSaved:'수정한 내용으로 저장됐어요',
-    translateLabel:'🌐 다른 언어로 보기', toastTranslated:(name)=>`${name}로 번역됐어요`, toastTranslateFail:'번역에 실패했어요. 다시 시도해주세요',
+    toneLabel:'톤 조절', toneShorter:'✂️ 더 짧게', tonePolite:'🙇 더 정중하게', toneCasual:'😊 더 편하게', toastToneUpdated:'리뷰 톤이 조정되었어요',
     postedConfirmQuestion:'리뷰를 올리셨나요?', postedConfirmBtn:'✅ 네, 올렸어요', toastPostedThanks:'확인 감사해요! 소중한 리뷰 정말 감사합니다 🙏',
     guideNote:'✏️ 작성하신 리뷰는 복사한 뒤 구글 또는 네이버 리뷰 화면에 붙여넣어 등록해주세요. 원장님 또는 치과 사진을 2~3장 함께 올려주시면 더욱 좋아요!',
     thanksNote:'소중한 시간 내어 남겨주신 리뷰, 진심으로 감사드립니다 🙏 환자분의 의견에 귀 기울여 앞으로 더 프리미엄 진료와 서비스로 보답하겠습니다.',
@@ -489,7 +469,7 @@ ko: {
   },
   visit:{ first_visit:'초진 (첫 방문)', regular_followup:'정기 재진', ortho_consult:'교정상담 방문', re_consult:'재상담 방문' },
   category:{ general:'일반진료', ortho:'교정전문' },
-  treatment:{ cavity:'충치치료', root_canal:'신경치료', implant:'임플란트', crown:'보철·크라운', whitening_scaling:'스케일링·미백', wisdom_tooth:'사랑니 발치', gum_treatment:'잇몸치료', denture:'틀니', checkup:'정기검진', overall:'전반적 만족', metal_braces:'메탈교정', ceramic_braces:'세라믹교정', clear_aligner:'투명교정 (인비절라인 등)', lingual_braces:'설측교정 (안보이는교정)', partial_braces:'부분교정', pediatric_ortho:'소아교정', re_treatment:'재교정', ortho_consult_treat:'교정상담', blanche_special:'-블랑쉬-' },
+  treatment:{ cavity:'충치치료', root_canal:'신경치료', implant:'임플란트', crown:'보철·크라운', whitening_scaling:'스케일링·미백', wisdom_tooth:'사랑니 발치', gum_treatment:'잇몸치료', denture:'틀니', checkup:'정기검진', overall:'전반적 만족', metal_braces:'메탈교정', ceramic_braces:'세라믹교정', clear_aligner:'투명교정 (인비절라인 등)', lingual_braces:'설측교정 (안보이는교정)', partial_braces:'부분교정', pediatric_ortho:'소아교정', re_treatment:'재교정', ortho_consult_treat:'교정상담' },
   role:{ doctor:'원장님', counselor:'상담실장님', staff:'진료실 선생님', desk:'데스크·예약' },
   experienceItem:{ accurate_diagnosis:'정확한 진단', careful_procedure:'꼼꼼한 시술', pain_minimization:'통증 최소화', thorough_explanation:'충분한 설명', digital_cadcam:'최신 디지털 캐드캠 장비', oral_scan:'정밀 구강 스캔', simulation_3d:'3D 시뮬레이션 상담', digital_xray:'디지털 엑스레이·CT 촬영', gentle_chairside:'편안한 진료 태도', kind_consult:'친절한 상담', transparent_cost:'투명한 비용 안내', no_overselling:'과잉권유 없음', tailored_plan:'맞춤 플랜 제안', skilled_assist:'능숙한 어시스트', careful_care:'세심한 케어', comfortable_atmosphere:'편안한 분위기', hygiene:'청결한 위생관리', easy_booking:'편리한 예약', kind_response:'친절한 응대', short_wait:'짧은 대기시간' },
   improvementCategory:{ wait_booking:'대기·예약', cost_info:'비용·안내', facility:'시설·환경', communication:'설명·소통' },
@@ -512,7 +492,6 @@ en: {
     eyebrow3:'STEP 4 · TREATMENT', title3Suffix:'— which treatment did you receive?', title3Default:'Which treatment did you receive?',
     eyebrow4:'STEP 5 · EXPERIENCE', title4:'What did you like?', desc4:'Pick what stood out for each staff member (multiple choice)',
     eyebrow5:'STEP 6 · FEEDBACK', tag5:'optional', title5:'Anything that could be improved?', desc5:'Pick any that apply, or skip straight to the next step',
-    eyebrow5Blanche:'STEP 6 · WHAT MATTERED', title5Blanche:'What mattered most when choosing this clinic?', desc5Blanche:'Pick any that apply, or skip straight to the next step',
     noteLabel:'Anything else to add? (optional)', notePlaceholder:'e.g. It would be nice to have water in the waiting area',
     manualEyebrow:'✍️ Write it myself', manualTitle:'Write your review', manualPlaceholder:'e.g. The staff explained everything clearly and I felt comfortable throughout the treatment.',
     loadingText:'Writing your review...',
@@ -529,9 +508,7 @@ en: {
     referralLabel:'Recommend this clinic to a friend', toastReferralCopy:'Link copied · share it with someone',
     referralShareText:(name)=>`I visited ${name} and the care was thorough and great. Worth checking out 🙂`,
     shareInfoHomepage:'🏠 Website', shareInfoNaverMap:'📍 Naver Map', shareInfoGoogle:'🔍 Google Link', shareInfoPhone:'📞 Phone', shareInfoKakao:'💬 KakaoTalk Channel',
-    toneLabel:'Adjust tone', toneShorter:'✂️ Shorter', toneLonger:'➕ Longer', tonePolite:'🙇 More polite', toneCasual:'😊 More casual', toastToneUpdated:'Review tone updated',
-    editReviewBtn:'✏️ Edit manually', editReviewSaveBtn:'✅ Save changes', toastEditSaved:'Your changes were saved',
-    translateLabel:'🌐 View in another language', toastTranslated:(name)=>`Translated to ${name}`, toastTranslateFail:'Translation failed. Please try again',
+    toneLabel:'Adjust tone', toneShorter:'✂️ Shorter', tonePolite:'🙇 More polite', toneCasual:'😊 More casual', toastToneUpdated:'Review tone updated',
     postedConfirmQuestion:'Did you post your review?', postedConfirmBtn:'✅ Yes, I posted it', toastPostedThanks:'Thanks for letting us know — we really appreciate your review 🙏',
     guideNote:'✏️ Copy your review and paste it into Google or Naver Reviews. Adding 2–3 photos of the doctor or the clinic makes it even better!',
     thanksNote:'Thank you so much for taking the time to share your review 🙏 We truly value your feedback and will use it to keep offering more premium care and service.',
@@ -549,7 +526,7 @@ en: {
   },
   visit:{ first_visit:'First visit', regular_followup:'Regular follow-up', ortho_consult:'Orthodontic consultation', re_consult:'Follow-up consultation' },
   category:{ general:'General dentistry', ortho:'Orthodontics' },
-  treatment:{ cavity:'Cavity treatment', root_canal:'Root canal', implant:'Implant', crown:'Crown / Prosthetics', whitening_scaling:'Scaling / Whitening', wisdom_tooth:'Wisdom tooth extraction', gum_treatment:'Gum treatment', denture:'Dentures', checkup:'Regular checkup', overall:'Overall satisfaction', metal_braces:'Metal braces', ceramic_braces:'Ceramic braces', clear_aligner:'Clear aligners (Invisalign, etc.)', lingual_braces:'Lingual braces (hidden)', partial_braces:'Partial braces', pediatric_ortho:'Pediatric orthodontics', re_treatment:'Re-treatment', ortho_consult_treat:'Orthodontic consultation', blanche_special:'-Blanche-' },
+  treatment:{ cavity:'Cavity treatment', root_canal:'Root canal', implant:'Implant', crown:'Crown / Prosthetics', whitening_scaling:'Scaling / Whitening', wisdom_tooth:'Wisdom tooth extraction', gum_treatment:'Gum treatment', denture:'Dentures', checkup:'Regular checkup', overall:'Overall satisfaction', metal_braces:'Metal braces', ceramic_braces:'Ceramic braces', clear_aligner:'Clear aligners (Invisalign, etc.)', lingual_braces:'Lingual braces (hidden)', partial_braces:'Partial braces', pediatric_ortho:'Pediatric orthodontics', re_treatment:'Re-treatment', ortho_consult_treat:'Orthodontic consultation' },
   role:{ doctor:'Dentist', counselor:'Treatment Coordinator', staff:'Clinical Staff', desk:'Front Desk' },
   experienceItem:{ accurate_diagnosis:'Accurate diagnosis', careful_procedure:'Careful procedure', pain_minimization:'Minimal pain', thorough_explanation:'Thorough explanation', digital_cadcam:'Latest digital CAD/CAM equipment', oral_scan:'Precise intraoral scan', simulation_3d:'3D simulation consultation', digital_xray:'Digital X-ray / CT imaging', gentle_chairside:'Comfortable chairside manner', kind_consult:'Friendly consultation', transparent_cost:'Transparent pricing', no_overselling:'No pressure to upsell', tailored_plan:'Tailored treatment plan', skilled_assist:'Skilled assistance', careful_care:'Attentive care', comfortable_atmosphere:'Comfortable atmosphere', hygiene:'Clean & hygienic', easy_booking:'Easy booking', kind_response:'Friendly service', short_wait:'Short wait time' },
   improvementCategory:{ wait_booking:'Wait & booking', cost_info:'Cost & information', facility:'Facilities', communication:'Explanation & communication' },
@@ -572,7 +549,6 @@ zh: {
     eyebrow3:'④ 具体治疗', title3Suffix:'中您接受了哪种治疗？', title3Default:'您接受了哪种治疗？',
     eyebrow4:'⑤ 体验选择', title4:'哪些方面让您满意？', desc4:'请按负责人分别选择满意之处（可多选）',
     eyebrow5:'⑥ 改进建议', tag5:'可选', title5:'有没有觉得不满意的地方？', desc5:'如果有请选择，没有的话可以直接进入下一步',
-    eyebrow5Blanche:'⑥ 选择考量', title5Blanche:'选择这家医院时，您比较看重哪些方面？', desc5Blanche:'如有符合的请选择，没有的话可以直接进入下一步',
     noteLabel:'还想补充的话（可选）', notePlaceholder:'例如：候诊区如果有饮水机就更好了',
     manualEyebrow:'✍️ 自己输入', manualTitle:'请输入评价内容', manualPlaceholder:'例如：从咨询到治疗，医护人员都耐心讲解，让我很安心。',
     loadingText:'正在为您生成评价...',
@@ -589,9 +565,7 @@ zh: {
     referralLabel:'推荐给朋友', toastReferralCopy:'链接已复制 · 快分享出去吧',
     referralShareText:(name)=>`我去了${name}，诊疗很细致，体验很好，推荐大家去看看 🙂`,
     shareInfoHomepage:'🏠 官网', shareInfoNaverMap:'📍 Naver 地图', shareInfoGoogle:'🔍 谷歌链接', shareInfoPhone:'📞 预约电话', shareInfoKakao:'💬 KakaoTalk 频道',
-    toneLabel:'调整语气', toneShorter:'✂️ 更简洁', toneLonger:'➕ 更详细', tonePolite:'🙇 更礼貌', toneCasual:'😊 更随意', toastToneUpdated:'评价语气已调整',
-    editReviewBtn:'✏️ 手动修改', editReviewSaveBtn:'✅ 保存修改', toastEditSaved:'已保存您的修改',
-    translateLabel:'🌐 切换其他语言', toastTranslated:(name)=>`已翻译为${name}`, toastTranslateFail:'翻译失败，请重试',
+    toneLabel:'调整语气', toneShorter:'✂️ 更简洁', tonePolite:'🙇 更礼貌', toneCasual:'😊 更随意', toastToneUpdated:'评价语气已调整',
     postedConfirmQuestion:'您已经发布评价了吗？', postedConfirmBtn:'✅ 是的，已发布', toastPostedThanks:'感谢确认！非常感谢您宝贵的评价 🙏',
     guideNote:'✏️ 请复制您撰写的评价，粘贴到 Google 或 Naver 的评价页面。若能一起上传2~3张院长或医院的照片，效果会更好！',
     thanksNote:'衷心感谢您抽出宝贵时间留下评价 🙏 我们会认真倾听您的意见，以更优质的高端诊疗与服务回馈各位患者。',
@@ -609,7 +583,7 @@ zh: {
   },
   visit:{ first_visit:'首次就诊', regular_followup:'定期复诊', ortho_consult:'正畸咨询', re_consult:'复诊咨询' },
   category:{ general:'普通诊疗', ortho:'正畸专科' },
-  treatment:{ cavity:'龋齿治疗', root_canal:'根管治疗', implant:'种植牙', crown:'补牙·牙冠', whitening_scaling:'洁牙·美白', wisdom_tooth:'智齿拔除', gum_treatment:'牙龈治疗', denture:'义齿', checkup:'定期检查', overall:'整体满意', metal_braces:'金属矫正', ceramic_braces:'陶瓷矫正', clear_aligner:'隐形矫正（隐适美等）', lingual_braces:'舌侧矫正（隐形）', partial_braces:'局部矫正', pediatric_ortho:'儿童矫正', re_treatment:'二次矫正', ortho_consult_treat:'正畸咨询', blanche_special:'-Blanche-' },
+  treatment:{ cavity:'龋齿治疗', root_canal:'根管治疗', implant:'种植牙', crown:'补牙·牙冠', whitening_scaling:'洁牙·美白', wisdom_tooth:'智齿拔除', gum_treatment:'牙龈治疗', denture:'义齿', checkup:'定期检查', overall:'整体满意', metal_braces:'金属矫正', ceramic_braces:'陶瓷矫正', clear_aligner:'隐形矫正（隐适美等）', lingual_braces:'舌侧矫正（隐形）', partial_braces:'局部矫正', pediatric_ortho:'儿童矫正', re_treatment:'二次矫正', ortho_consult_treat:'正畸咨询' },
   role:{ doctor:'院长', counselor:'咨询师', staff:'诊疗室员工', desk:'前台·预约' },
   experienceItem:{ accurate_diagnosis:'诊断准确', careful_procedure:'操作细致', pain_minimization:'疼痛感极小', thorough_explanation:'讲解充分', digital_cadcam:'最新数字化CAD/CAM设备', oral_scan:'精确口腔扫描', simulation_3d:'3D模拟方案咨询', digital_xray:'数字化X光/CT拍摄', gentle_chairside:'诊疗态度舒适', kind_consult:'咨询亲切', transparent_cost:'费用透明', no_overselling:'不过度推销', tailored_plan:'个性化方案', skilled_assist:'助理操作娴熟', careful_care:'照护细心', comfortable_atmosphere:'氛围舒适', hygiene:'环境卫生清洁', easy_booking:'预约方便', kind_response:'服务亲切', short_wait:'等待时间短' },
   improvementCategory:{ wait_booking:'等待·预约', cost_info:'费用·说明', facility:'设施·环境', communication:'讲解·沟通' },
@@ -632,7 +606,6 @@ ja: {
     eyebrow3:'④ 詳細治療', title3Suffix:'のうち、どの治療を受けましたか？', title3Default:'どの治療を受けましたか？',
     eyebrow4:'⑤ 体験選択', title4:'どんな点が良かったですか？', desc4:'担当者ごとに良かった点を選んでください（複数選択可）',
     eyebrow5:'⑥ 改善点', tag5:'任意', title5:'気になった点はありましたか？', desc5:'あれば選んでください。なければそのまま次に進んでも大丈夫です',
-    eyebrow5Blanche:'⑥ 選んだ理由', title5Blanche:'この病院を選ぶ際、何を重視されましたか？', desc5Blanche:'当てはまるものがあれば選んでください。なければそのまま次に進んでも大丈夫です',
     noteLabel:'その他ご意見（任意）', notePlaceholder:'例）待合スペースにお水があるとうれしいです',
     manualEyebrow:'✍️ 自分で入力', manualTitle:'レビュー内容を入力してください', manualPlaceholder:'例）カウンセリングから施術まで丁寧に説明していただき、安心して診療を受けられました。',
     loadingText:'レビューを作成しています...',
@@ -649,9 +622,7 @@ ja: {
     referralLabel:'友人にクリニックを紹介する', toastReferralCopy:'リンクをコピーしました・共有してみてください',
     referralShareText:(name)=>`${name}に通っているのですが、診療が丁寧でとても良かったです。一度訪れてみてください 🙂`,
     shareInfoHomepage:'🏠 ホームページ', shareInfoNaverMap:'📍 Naverマップ', shareInfoGoogle:'🔍 Googleリンク', shareInfoPhone:'📞 予約電話', shareInfoKakao:'💬 カカオトークチャンネル',
-    toneLabel:'トーン調整', toneShorter:'✂️ 短く', toneLonger:'➕ 長く', tonePolite:'🙇 より丁寧に', toneCasual:'😊 気軽に', toastToneUpdated:'レビューのトーンを調整しました',
-    editReviewBtn:'✏️ 直接編集', editReviewSaveBtn:'✅ 編集を保存', toastEditSaved:'編集内容を保存しました',
-    translateLabel:'🌐 他の言語で見る', toastTranslated:(name)=>`${name}に翻訳しました`, toastTranslateFail:'翻訳に失敗しました。もう一度お試しください',
+    toneLabel:'トーン調整', toneShorter:'✂️ 短く', tonePolite:'🙇 より丁寧に', toneCasual:'😊 気軽に', toastToneUpdated:'レビューのトーンを調整しました',
     postedConfirmQuestion:'レビューを投稿されましたか？', postedConfirmBtn:'✅ はい、投稿しました', toastPostedThanks:'ご確認ありがとうございます！大切なレビューに心より感謝します 🙏',
     guideNote:'✏️ 作成したレビューをコピーして、GoogleまたはNaverのレビュー画面に貼り付けてください。院長先生や医院の写真を2〜3枚一緒に投稿していただくと、さらに効果的です！',
     thanksNote:'貴重なお時間を割いてレビューを残してくださり、心より感謝申し上げます 🙏 いただいたご意見に耳を傾け、今後さらにプレミアムな診療とサービスでお応えしてまいります。',
@@ -669,7 +640,7 @@ ja: {
   },
   visit:{ first_visit:'初診（初めての来院）', regular_followup:'定期通院', ortho_consult:'矯正相談', re_consult:'再相談' },
   category:{ general:'一般診療', ortho:'矯正専門' },
-  treatment:{ cavity:'虫歯治療', root_canal:'神経治療', implant:'インプラント', crown:'補綴・クラウン', whitening_scaling:'スケーリング・ホワイトニング', wisdom_tooth:'親知らず抜歯', gum_treatment:'歯周病治療', denture:'入れ歯', checkup:'定期検診', overall:'全体的な満足', metal_braces:'メタル矯正', ceramic_braces:'セラミック矯正', clear_aligner:'マウスピース矯正（インビザラインなど）', lingual_braces:'舌側矯正（見えない矯正）', partial_braces:'部分矯正', pediatric_ortho:'小児矯正', re_treatment:'再矯正', ortho_consult_treat:'矯正相談', blanche_special:'-Blanche-' },
+  treatment:{ cavity:'虫歯治療', root_canal:'神経治療', implant:'インプラント', crown:'補綴・クラウン', whitening_scaling:'スケーリング・ホワイトニング', wisdom_tooth:'親知らず抜歯', gum_treatment:'歯周病治療', denture:'入れ歯', checkup:'定期検診', overall:'全体的な満足', metal_braces:'メタル矯正', ceramic_braces:'セラミック矯正', clear_aligner:'マウスピース矯正（インビザラインなど）', lingual_braces:'舌側矯正（見えない矯正）', partial_braces:'部分矯正', pediatric_ortho:'小児矯正', re_treatment:'再矯正', ortho_consult_treat:'矯正相談' },
   role:{ doctor:'院長', counselor:'カウンセラー', staff:'診療室スタッフ', desk:'受付・予約' },
   experienceItem:{ accurate_diagnosis:'正確な診断', careful_procedure:'丁寧な施術', pain_minimization:'痛みが少ない', thorough_explanation:'十分な説明', digital_cadcam:'最新デジタルCAD/CAM機器', oral_scan:'精密な口腔内スキャン', simulation_3d:'3Dシミュレーション相談', digital_xray:'デジタルX線・CT撮影', gentle_chairside:'落ち着いた診療態度', kind_consult:'親切なカウンセリング', transparent_cost:'透明な費用案内', no_overselling:'過剰な勧誘なし', tailored_plan:'オーダーメイドの提案', skilled_assist:'熟練したアシスト', careful_care:'きめ細やかなケア', comfortable_atmosphere:'落ち着いた雰囲気', hygiene:'清潔な衛生管理', easy_booking:'予約のしやすさ', kind_response:'親切な対応', short_wait:'待ち時間が短い' },
   improvementCategory:{ wait_booking:'待ち時間・予約', cost_info:'費用・案内', facility:'施設・環境', communication:'説明・コミュニケーション' },
@@ -692,7 +663,6 @@ es: {
     eyebrow3:'④ TRATAMIENTO', title3Suffix:': ¿qué tratamiento recibió?', title3Default:'¿Qué tratamiento recibió?',
     eyebrow4:'⑤ EXPERIENCIA', title4:'¿Qué fue lo que más le gustó?', desc4:'Elija lo que más destacó de cada persona (puede elegir varias opciones)',
     eyebrow5:'⑥ SUGERENCIAS', tag5:'opcional', title5:'¿Hubo algo que podría mejorar?', desc5:'Selecciónelo si lo hubo, o pase directamente al siguiente paso',
-    eyebrow5Blanche:'⑥ CRITERIOS DE ELECCIÓN', title5Blanche:'¿Qué fue lo más importante al elegir esta clínica?', desc5Blanche:'Selecciónelo si aplica, o pase directamente al siguiente paso',
     noteLabel:'¿Algo más que agregar? (opcional)', notePlaceholder:'Ej: estaría bien tener agua en la sala de espera',
     manualEyebrow:'✍️ Escribir yo mismo', manualTitle:'Escriba su reseña', manualPlaceholder:'Ej: El personal me explicó todo con claridad y me sentí cómodo/a durante todo el tratamiento.',
     loadingText:'Redactando su reseña...',
@@ -709,9 +679,7 @@ es: {
     referralLabel:'Recomendar esta clínica a un amigo', toastReferralCopy:'Enlace copiado · compártalo',
     referralShareText:(name)=>`Visité ${name} y la atención fue muy completa y buena. Vale la pena conocerla 🙂`,
     shareInfoHomepage:'🏠 Sitio web', shareInfoNaverMap:'📍 Mapa de Naver', shareInfoGoogle:'🔍 Enlace de Google', shareInfoPhone:'📞 Teléfono', shareInfoKakao:'💬 Canal de KakaoTalk',
-    toneLabel:'Ajustar el tono', toneShorter:'✂️ Más breve', toneLonger:'➕ Más extensa', tonePolite:'🙇 Más cortés', toneCasual:'😊 Más casual', toastToneUpdated:'Se actualizó el tono de la reseña',
-    editReviewBtn:'✏️ Editar manualmente', editReviewSaveBtn:'✅ Guardar cambios', toastEditSaved:'Se guardaron los cambios',
-    translateLabel:'🌐 Ver en otro idioma', toastTranslated:(name)=>`Traducido al ${name}`, toastTranslateFail:'Error al traducir. Inténtelo de nuevo',
+    toneLabel:'Ajustar el tono', toneShorter:'✂️ Más breve', tonePolite:'🙇 Más cortés', toneCasual:'😊 Más casual', toastToneUpdated:'Se actualizó el tono de la reseña',
     postedConfirmQuestion:'¿Ya publicaste tu reseña?', postedConfirmBtn:'✅ Sí, la publiqué', toastPostedThanks:'¡Gracias por confirmarlo! Agradecemos mucho tu reseña 🙏',
     guideNote:'✏️ Copie su reseña y péguela en Google o Naver Reviews. ¡Subir 2–3 fotos del doctor o de la clínica hace que sea aún mejor!',
     thanksNote:'Muchas gracias por tomarse el tiempo de dejar su reseña 🙏 Valoramos mucho su opinión y la usaremos para seguir ofreciendo una atención y un servicio de nivel premium.',
@@ -729,7 +697,7 @@ es: {
   },
   visit:{ first_visit:'Primera visita', regular_followup:'Control periódico', ortho_consult:'Consulta de ortodoncia', re_consult:'Consulta de seguimiento' },
   category:{ general:'Odontología general', ortho:'Ortodoncia' },
-  treatment:{ cavity:'Tratamiento de caries', root_canal:'Endodoncia', implant:'Implante', crown:'Prótesis / Corona', whitening_scaling:'Limpieza / Blanqueamiento', wisdom_tooth:'Extracción de muela del juicio', gum_treatment:'Tratamiento de encías', denture:'Dentadura postiza', checkup:'Chequeo regular', overall:'Satisfacción general', metal_braces:'Brackets metálicos', ceramic_braces:'Brackets cerámicos', clear_aligner:'Alineadores transparentes (Invisalign, etc.)', lingual_braces:'Ortodoncia lingual (invisible)', partial_braces:'Ortodoncia parcial', pediatric_ortho:'Ortodoncia infantil', re_treatment:'Retratamiento', ortho_consult_treat:'Consulta de ortodoncia', blanche_special:'-Blanche-' },
+  treatment:{ cavity:'Tratamiento de caries', root_canal:'Endodoncia', implant:'Implante', crown:'Prótesis / Corona', whitening_scaling:'Limpieza / Blanqueamiento', wisdom_tooth:'Extracción de muela del juicio', gum_treatment:'Tratamiento de encías', denture:'Dentadura postiza', checkup:'Chequeo regular', overall:'Satisfacción general', metal_braces:'Brackets metálicos', ceramic_braces:'Brackets cerámicos', clear_aligner:'Alineadores transparentes (Invisalign, etc.)', lingual_braces:'Ortodoncia lingual (invisible)', partial_braces:'Ortodoncia parcial', pediatric_ortho:'Ortodoncia infantil', re_treatment:'Retratamiento', ortho_consult_treat:'Consulta de ortodoncia' },
   role:{ doctor:'Dentista', counselor:'Coordinador/a de tratamiento', staff:'Personal clínico', desk:'Recepción' },
   experienceItem:{ accurate_diagnosis:'Diagnóstico preciso', careful_procedure:'Procedimiento cuidadoso', pain_minimization:'Dolor mínimo', thorough_explanation:'Explicación detallada', digital_cadcam:'Equipo CAD/CAM digital de última generación', oral_scan:'Escaneo intraoral preciso', simulation_3d:'Consulta con simulación 3D', digital_xray:'Radiografía digital / TC', gentle_chairside:'Trato cómodo durante la consulta', kind_consult:'Consulta amable', transparent_cost:'Precios transparentes', no_overselling:'Sin presión para vender más', tailored_plan:'Plan personalizado', skilled_assist:'Asistencia experta', careful_care:'Cuidado atento', comfortable_atmosphere:'Ambiente agradable', hygiene:'Limpieza e higiene', easy_booking:'Fácil de reservar', kind_response:'Atención amable', short_wait:'Poco tiempo de espera' },
   improvementCategory:{ wait_booking:'Espera y reservas', cost_info:'Costos e información', facility:'Instalaciones', communication:'Explicación y comunicación' },
@@ -920,9 +888,6 @@ const params = new URLSearchParams(window.location.search);
 let CLINIC_NAME, GOOGLE_REVIEW_URL, NAVER_REVIEW_URL, HOMEPAGE_URL, CLINIC_ID, REGION, PHONE,
     KAKAO_CHANNEL_URL, INSTAGRAM_URL, BLOG_URL, YOUTUBE_URL, EVENT_NOTE, DOCTOR_PHOTO,
     DOCTOR_GREETING, LOGO_URL, BRAND_COLOR, SHOW_PRINT_CARD;
-// 블랑쉬치과의원 전용 커스터마이징 — 이 병원 링크(name 파라미터)에서만 true가 되며,
-// 다른 병원 링크나 관리자 전체 설정에는 전혀 영향을 주지 않는다.
-let BLANCHE_MODE = false;
 // 짧은 링크 발급이 실패해 원본 긴 URL을 그대로 쓰는 경우를 표시 — 이 경우 QR 데이터가 길어져
 // 코드가 촘촘해지므로, 환자 페이지의 안내카드에서 인쇄 시 유의사항을 함께 보여준다
 let USING_LONG_URL_FALLBACK = false;
@@ -986,12 +951,6 @@ async function bootstrap(){
     document.documentElement.style.setProperty('--deep-light', `#${BRAND_COLOR}cc`);
   }
 
-  BLANCHE_MODE = !!CLINIC_NAME && decodeURIComponent(CLINIC_NAME) === '블랑쉬치과의원';
-  if(BLANCHE_MODE && !TREATMENT_ORDER.general.includes('blanche_special')){
-    // 블랑쉬치과 링크에서만 일반진료 항목 마지막에 "-블랑쉬-"를 추가한다 (다른 병원 링크는 영향 없음)
-    TREATMENT_ORDER.general.push('blanche_special');
-  }
-
   if(!CLINIC_NAME || !GOOGLE_REVIEW_URL){
     document.getElementById('setupNeeded').style.display = 'block';
   } else {
@@ -1009,13 +968,6 @@ function initApp(){
   let flow = [];
   let stepIndex = 0;
   let generatedText = "";
-  let reviewLang = null;        // 현재 리뷰 본문이 작성된 언어 코드 (번역 후 UI 언어와 달라질 수 있음)
-  let isEditingReview = false;  // 사용자가 리뷰를 직접 수정 중인지 여부
-  // 아래 두 변수는 원래 renderPrintCard 근처에 있었으나, 브라우저 언어 자동감지로
-  // applyLanguage() → renderPrintCard()가 스크립트 로드 초반에 곧바로 호출될 수 있어
-  // (TDZ 오류로 전체 스크립트가 멈추는 것을 막기 위해) 최상단으로 이동함
-  let printCardRenderToken = 0;
-  let cachedQrImagePromise = null;
 
   const smileFill = document.getElementById('smileFill');
   const smileLabel = document.getElementById('smileLabel');
@@ -1108,9 +1060,9 @@ function initApp(){
     document.getElementById('txtEyebrow4').textContent = t.ui.eyebrow4;
     document.getElementById('txtTitle4').textContent = t.ui.title4;
     document.getElementById('txtDesc4').textContent = t.ui.desc4;
-    document.getElementById('txtEyebrow5').innerHTML = `${BLANCHE_MODE ? t.ui.eyebrow5Blanche : t.ui.eyebrow5} <span class="step-optional-tag">${t.ui.tag5}</span>`;
-    document.getElementById('txtTitle5').textContent = BLANCHE_MODE ? t.ui.title5Blanche : t.ui.title5;
-    document.getElementById('txtDesc5').textContent = BLANCHE_MODE ? t.ui.desc5Blanche : t.ui.desc5;
+    document.getElementById('txtEyebrow5').innerHTML = `${t.ui.eyebrow5} <span class="step-optional-tag">${t.ui.tag5}</span>`;
+    document.getElementById('txtTitle5').textContent = t.ui.title5;
+    document.getElementById('txtDesc5').textContent = t.ui.desc5;
     document.getElementById('txtPriorityHeader').textContent = t.ui.priorityHeader;
     document.getElementById('txtHesitationHeader').textContent = t.ui.hesitationHeader;
     document.getElementById('txtNoteLabel').textContent = t.ui.noteLabel;
@@ -1123,12 +1075,8 @@ function initApp(){
     document.getElementById('txtPlatformLabel').textContent = t.ui.platformLabel;
     document.getElementById('txtToneLabel').textContent = t.ui.toneLabel;
     document.getElementById('toneShorterBtn').textContent = t.ui.toneShorter;
-    document.getElementById('toneLongerBtn').textContent = t.ui.toneLonger;
     document.getElementById('tonePoliteBtn').textContent = t.ui.tonePolite;
     document.getElementById('toneCasualBtn').textContent = t.ui.toneCasual;
-    document.getElementById('editReviewBtn').textContent = isEditingReview ? t.ui.editReviewSaveBtn : t.ui.editReviewBtn;
-    document.getElementById('txtTranslateLabel').textContent = t.ui.translateLabel;
-    renderTranslateChips();
     document.getElementById('txtPostedConfirmQuestion').textContent = t.ui.postedConfirmQuestion;
     document.getElementById('postedConfirmBtn').textContent = t.ui.postedConfirmBtn;
     document.getElementById('googleBtn').textContent = t.ui.googleBtnLabel;
@@ -1239,6 +1187,8 @@ function initApp(){
   // 환자 페이지 하단에도 동일한 QR 안내카드를 만들어 치과에서 별도로 활용할 수 있게 한다.
   // QR에 담기는 데이터(현재 페이지 URL)는 언어를 바꿔도 동일하므로, QR 이미지 자체는
   // 최초 1회만 불러와 캐싱해두고 언어 전환 시에는 텍스트만 다시 그린다.
+  let printCardRenderToken = 0;
+  let cachedQrImagePromise = null;
   function getQrImage(size){
     if(!cachedQrImagePromise){
       const qrDataUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&margin=6&data=${encodeURIComponent(window.location.href)}`;
@@ -1421,9 +1371,6 @@ function initApp(){
     const box = document.getElementById('improvementGroups');
     box.innerHTML = '';
     const t = T();
-    // 블랑쉬치과 링크에서는 개선사항(아쉬운점) 항목 목록만 비운다.
-    // 단계 자체와 병원 선택 중요도/망설임 이유/추가 의견 입력란은 그대로 유지된다.
-    if(BLANCHE_MODE) return;
     IMPROVEMENT_CATEGORY_ORDER.forEach(cat=>{
       const wrap = document.createElement('div');
       wrap.className = 'role-group';
@@ -1677,15 +1624,10 @@ function initApp(){
 
   function showResult(){
     const t = T();
-    reviewLang = LANG; // 방금 생성된 리뷰는 현재 UI 언어로 작성됨
-    exitEditMode(false);
     resultText.textContent = generatedText;
     resultCard.classList.add('active');
     mainBtn.style.display = 'none';
     document.getElementById('toneRow').style.display = state.method === 'ai' ? 'flex' : 'none';
-    document.getElementById('editRow').style.display = state.method === 'ai' ? 'flex' : 'none';
-    document.getElementById('translateRow').style.display = state.method === 'ai' ? 'flex' : 'none';
-    renderTranslateChips();
     const postedConfirmEl = document.getElementById('postedConfirm');
     postedConfirmEl.style.display = 'none';
     postedConfirmEl.classList.remove('confirmed');
@@ -1706,56 +1648,20 @@ function initApp(){
     updateBackButtonVisibility();
   });
 
-  // 직접 수정하기: AI가 만든 리뷰 문구를 사용자가 원하는 대로 바로 고칠 수 있게 함
-  function setEditingRowsDisabled(disabled){
-    ['toneRow','translateRow'].forEach(id=>{
-      const el = document.getElementById(id);
-      el.style.opacity = disabled ? '.45' : '1';
-      el.style.pointerEvents = disabled ? 'none' : 'auto';
-    });
-  }
-  function enterEditMode(){
-    isEditingReview = true;
-    const editEl = document.getElementById('resultTextEdit');
-    editEl.value = generatedText;
-    resultText.style.display = 'none';
-    editEl.style.display = 'block';
-    editEl.focus();
-    document.getElementById('editReviewBtn').textContent = T().ui.editReviewSaveBtn;
-    setEditingRowsDisabled(true);
-  }
-  function exitEditMode(save){
-    const editEl = document.getElementById('resultTextEdit');
-    if(save){
-      const edited = editEl.value.trim();
-      if(edited){ generatedText = edited; showToast(T().ui.toastEditSaved); }
-    }
-    isEditingReview = false;
-    resultText.textContent = generatedText;
-    resultText.style.display = 'block';
-    editEl.style.display = 'none';
-    document.getElementById('editReviewBtn').textContent = T().ui.editReviewBtn;
-    setEditingRowsDisabled(false);
-  }
-  document.getElementById('editReviewBtn').addEventListener('click', ()=>{
-    if(isEditingReview) exitEditMode(true);
-    else enterEditMode();
-  });
-
-  // 톤/분량 조절 칩: 이미 만들어진 리뷰를 같은 사실관계로 톤·분량만 바꿔 다시 작성
-  document.querySelectorAll('.tone-row .tone-chip').forEach(btn=>{
+  // 톤 조절 칩: 이미 만들어진 리뷰를 같은 사실관계로 톤만 바꿔 다시 작성
+  document.querySelectorAll('.tone-chip').forEach(btn=>{
     btn.addEventListener('click', ()=>regenerateTone(btn.dataset.tone));
   });
 
   async function regenerateTone(tone){
     const t = T();
-    document.querySelectorAll('.tone-row .tone-chip').forEach(b=>b.classList.add('loading'));
+    document.querySelectorAll('.tone-chip').forEach(b=>b.classList.add('loading'));
     try{
       const res = await fetch('/api/generate-review', {
         method:'POST',
         headers:{ 'Content-Type':'application/json' },
         body: JSON.stringify({
-          language: LANG_FULL_NAME[reviewLang || LANG],
+          language: LANG_FULL_NAME[LANG],
           tone,
           previousText: generatedText
         })
@@ -1771,54 +1677,7 @@ function initApp(){
     }catch(err){
       showToast(t.ui.toastCopyFail);
     }
-    document.querySelectorAll('.tone-row .tone-chip').forEach(b=>b.classList.remove('loading'));
-  }
-
-  // 언어 변환 칩: 이미 작성된 리뷰를 다른 언어로 번역 (사실관계는 그대로 유지)
-  function renderTranslateChips(){
-    const box = document.getElementById('translateChips');
-    box.innerHTML = '';
-    LANG_META.forEach(l=>{
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'tone-chip';
-      btn.dataset.lang = l.code;
-      btn.textContent = `${l.flag} ${l.name}`;
-      if(l.code === reviewLang) btn.classList.add('active');
-      btn.addEventListener('click', ()=>{
-        if(l.code === reviewLang) return;
-        translateReview(l.code);
-      });
-      box.appendChild(btn);
-    });
-  }
-
-  async function translateReview(targetLangCode){
-    const t = T();
-    document.querySelectorAll('#translateChips .tone-chip').forEach(b=>b.classList.add('loading'));
-    try{
-      const res = await fetch('/api/generate-review', {
-        method:'POST',
-        headers:{ 'Content-Type':'application/json' },
-        body: JSON.stringify({
-          translateTo: LANG_FULL_NAME[targetLangCode],
-          previousText: generatedText
-        })
-      });
-      const data = await res.json();
-      if(data.text){
-        generatedText = data.text;
-        reviewLang = targetLangCode;
-        resultText.textContent = generatedText;
-        renderTranslateChips();
-        showToast(t.ui.toastTranslated(LANG_META.find(l=>l.code===targetLangCode).name));
-      } else {
-        showToast(t.ui.toastTranslateFail);
-      }
-    }catch(err){
-      showToast(t.ui.toastTranslateFail);
-    }
-    document.querySelectorAll('#translateChips .tone-chip').forEach(b=>b.classList.remove('loading'));
+    document.querySelectorAll('.tone-chip').forEach(b=>b.classList.remove('loading'));
   }
 
   // "리뷰를 올리셨나요?" 게시 확인: 리뷰가 실제로 플랫폼에 게시됐는지 파악하기 위한 안내(개인정보 없음)
