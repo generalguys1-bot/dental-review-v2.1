@@ -80,6 +80,23 @@
   .platform-btn{ width:100%; padding:13px; border:1.5px solid var(--border); background:#FBFCFB; border-radius:12px; font-size:15.5px; font-weight:700; cursor:pointer; font-family:inherit; color:var(--text); }
   .platform-btn.google{ border-color:var(--deep); color:var(--deep); }
   .platform-btn.naver{ border-color:#03C75A; color:#03A94D; display:none; }
+  .tone-row{ display:flex; align-items:center; flex-wrap:wrap; gap:6px; margin:0 0 14px; }
+  .tone-label{ font-size:12px; color:var(--muted); margin-right:2px; }
+  .tone-chip{ font-size:12.5px; font-weight:700; color:var(--deep-light); background:var(--bg); border:1.5px solid var(--border); border-radius:999px; padding:6px 12px; cursor:pointer; font-family:inherit; transition:.15s ease; }
+  .tone-chip:active{ transform:scale(.95); }
+  .tone-chip.loading{ opacity:.55; pointer-events:none; }
+  .tone-chip.active{ background:var(--deep); border-color:var(--deep); color:#fff; }
+  .result-edit-textarea{ min-height:120px; margin:0 0 10px; font-size:15.5px; line-height:1.7; }
+  .edit-row{ display:flex; justify-content:flex-end; margin:-6px 0 12px; }
+  .edit-link-btn{ font-size:12.5px; font-weight:700; color:var(--muted); background:none; border:none; cursor:pointer; font-family:inherit; padding:4px 2px; text-decoration:underline; text-underline-offset:2px; }
+  .edit-link-btn:active{ opacity:.6; }
+  .edit-link-btn.saving{ color:var(--deep-light); }
+  .translate-chips{ display:flex; flex-wrap:wrap; gap:6px; }
+  .posted-confirm{ text-align:center; margin:4px 0 4px; padding:12px; background:var(--bg); border-radius:12px; }
+  .posted-confirm p{ margin:0 0 8px; font-size:13px; color:var(--muted); }
+  .posted-confirm-btn{ display:inline-block; font-size:13.5px; font-weight:700; color:#fff; background:var(--deep-light); border:none; border-radius:999px; padding:9px 18px; cursor:pointer; font-family:inherit; }
+  .posted-confirm-btn:active{ transform:scale(.96); }
+  .posted-confirm.confirmed p{ color:var(--deep-light); font-weight:600; }
   .loading{ display:none; align-items:center; gap:9px; padding:22px 4px; color:var(--muted); font-size:15px; font-weight:600; }
   .loading.active{ display:flex; }
   .spinner{ width:17px; height:17px; border:2.5px solid var(--border); border-top-color:var(--gold); border-radius:50%; animation:spin .8s linear infinite; flex-shrink:0; }
@@ -264,10 +281,29 @@
     <div class="result-card" id="resultCard">
       <div class="result-badge" id="txtResultBadge"></div>
       <p class="result-text" id="resultText"></p>
+      <textarea class="result-edit-textarea" id="resultTextEdit" style="display:none;"></textarea>
+      <div class="edit-row" id="editRow">
+        <button type="button" class="edit-link-btn" id="editReviewBtn"></button>
+      </div>
+      <div class="tone-row" id="toneRow" style="display:none;">
+        <span class="tone-label" id="txtToneLabel"></span>
+        <button type="button" class="tone-chip" data-tone="shorter" id="toneShorterBtn"></button>
+        <button type="button" class="tone-chip" data-tone="longer" id="toneLongerBtn"></button>
+        <button type="button" class="tone-chip" data-tone="polite" id="tonePoliteBtn"></button>
+        <button type="button" class="tone-chip" data-tone="casual" id="toneCasualBtn"></button>
+      </div>
+      <div class="tone-row" id="translateRow" style="display:none;">
+        <span class="tone-label" id="txtTranslateLabel"></span>
+        <div id="translateChips" class="translate-chips"></div>
+      </div>
       <p class="platform-label" id="txtPlatformLabel"></p>
       <div class="platform-actions">
         <button class="platform-btn google" id="googleBtn"></button>
         <button class="platform-btn naver" id="naverBtn"></button>
+      </div>
+      <div class="posted-confirm" id="postedConfirm" style="display:none;">
+        <p id="txtPostedConfirmQuestion"></p>
+        <button type="button" class="posted-confirm-btn" id="postedConfirmBtn"></button>
       </div>
 
       <div class="footer-section">
@@ -433,6 +469,10 @@ ko: {
     referralLabel:'지인에게 병원 추천하기', toastReferralCopy:'링크가 복사되었어요 · 공유해보세요',
     referralShareText:(name)=>`제가 다녀온 ${name}, 진료가 꼼꼼하고 좋았어요. 한번 방문해보세요 🙂`,
     shareInfoHomepage:'🏠 홈페이지', shareInfoNaverMap:'📍 네이버지도', shareInfoGoogle:'🔍 구글 링크', shareInfoPhone:'📞 예약 전화', shareInfoKakao:'💬 카카오톡 채널',
+    toneLabel:'톤 조절', toneShorter:'✂️ 더 짧게', toneLonger:'➕ 더 길게', tonePolite:'🙇 더 정중하게', toneCasual:'😊 더 편하게', toastToneUpdated:'리뷰 톤이 조정되었어요',
+    editReviewBtn:'✏️ 직접 수정하기', editReviewSaveBtn:'✅ 수정 완료', toastEditSaved:'수정한 내용으로 저장됐어요',
+    translateLabel:'🌐 다른 언어로 보기', toastTranslated:(name)=>`${name}로 번역됐어요`, toastTranslateFail:'번역에 실패했어요. 다시 시도해주세요',
+    postedConfirmQuestion:'리뷰를 올리셨나요?', postedConfirmBtn:'✅ 네, 올렸어요', toastPostedThanks:'확인 감사해요! 소중한 리뷰 정말 감사합니다 🙏',
     guideNote:'✏️ 작성하신 리뷰는 복사한 뒤 구글 또는 네이버 리뷰 화면에 붙여넣어 등록해주세요. 원장님 또는 치과 사진을 2~3장 함께 올려주시면 더욱 좋아요!',
     thanksNote:'소중한 시간 내어 남겨주신 리뷰, 진심으로 감사드립니다 🙏 환자분의 의견에 귀 기울여 앞으로 더 프리미엄 진료와 서비스로 보답하겠습니다.',
     eyebrowMotive:'방문 계기', titleMotive:'병원을 찾게 된 계기가 있으신가요?', descMotive:'해당되는 항목을 모두 선택해주세요 (복수 선택 가능)', tagMotive:'선택사항',
@@ -489,6 +529,10 @@ en: {
     referralLabel:'Recommend this clinic to a friend', toastReferralCopy:'Link copied · share it with someone',
     referralShareText:(name)=>`I visited ${name} and the care was thorough and great. Worth checking out 🙂`,
     shareInfoHomepage:'🏠 Website', shareInfoNaverMap:'📍 Naver Map', shareInfoGoogle:'🔍 Google Link', shareInfoPhone:'📞 Phone', shareInfoKakao:'💬 KakaoTalk Channel',
+    toneLabel:'Adjust tone', toneShorter:'✂️ Shorter', toneLonger:'➕ Longer', tonePolite:'🙇 More polite', toneCasual:'😊 More casual', toastToneUpdated:'Review tone updated',
+    editReviewBtn:'✏️ Edit manually', editReviewSaveBtn:'✅ Save changes', toastEditSaved:'Your changes were saved',
+    translateLabel:'🌐 View in another language', toastTranslated:(name)=>`Translated to ${name}`, toastTranslateFail:'Translation failed. Please try again',
+    postedConfirmQuestion:'Did you post your review?', postedConfirmBtn:'✅ Yes, I posted it', toastPostedThanks:'Thanks for letting us know — we really appreciate your review 🙏',
     guideNote:'✏️ Copy your review and paste it into Google or Naver Reviews. Adding 2–3 photos of the doctor or the clinic makes it even better!',
     thanksNote:'Thank you so much for taking the time to share your review 🙏 We truly value your feedback and will use it to keep offering more premium care and service.',
     eyebrowMotive:'Reason for visiting', titleMotive:'What brought you in?', descMotive:'Select all that apply (multiple choice)', tagMotive:'Optional',
@@ -545,6 +589,10 @@ zh: {
     referralLabel:'推荐给朋友', toastReferralCopy:'链接已复制 · 快分享出去吧',
     referralShareText:(name)=>`我去了${name}，诊疗很细致，体验很好，推荐大家去看看 🙂`,
     shareInfoHomepage:'🏠 官网', shareInfoNaverMap:'📍 Naver 地图', shareInfoGoogle:'🔍 谷歌链接', shareInfoPhone:'📞 预约电话', shareInfoKakao:'💬 KakaoTalk 频道',
+    toneLabel:'调整语气', toneShorter:'✂️ 更简洁', toneLonger:'➕ 更详细', tonePolite:'🙇 更礼貌', toneCasual:'😊 更随意', toastToneUpdated:'评价语气已调整',
+    editReviewBtn:'✏️ 手动修改', editReviewSaveBtn:'✅ 保存修改', toastEditSaved:'已保存您的修改',
+    translateLabel:'🌐 切换其他语言', toastTranslated:(name)=>`已翻译为${name}`, toastTranslateFail:'翻译失败，请重试',
+    postedConfirmQuestion:'您已经发布评价了吗？', postedConfirmBtn:'✅ 是的，已发布', toastPostedThanks:'感谢确认！非常感谢您宝贵的评价 🙏',
     guideNote:'✏️ 请复制您撰写的评价，粘贴到 Google 或 Naver 的评价页面。若能一起上传2~3张院长或医院的照片，效果会更好！',
     thanksNote:'衷心感谢您抽出宝贵时间留下评价 🙏 我们会认真倾听您的意见，以更优质的高端诊疗与服务回馈各位患者。',
     eyebrowMotive:'就诊契机', titleMotive:'是什么让您来到这里？', descMotive:'请选择所有符合的项目（可多选）', tagMotive:'可选',
@@ -601,6 +649,10 @@ ja: {
     referralLabel:'友人にクリニックを紹介する', toastReferralCopy:'リンクをコピーしました・共有してみてください',
     referralShareText:(name)=>`${name}に通っているのですが、診療が丁寧でとても良かったです。一度訪れてみてください 🙂`,
     shareInfoHomepage:'🏠 ホームページ', shareInfoNaverMap:'📍 Naverマップ', shareInfoGoogle:'🔍 Googleリンク', shareInfoPhone:'📞 予約電話', shareInfoKakao:'💬 カカオトークチャンネル',
+    toneLabel:'トーン調整', toneShorter:'✂️ 短く', toneLonger:'➕ 長く', tonePolite:'🙇 より丁寧に', toneCasual:'😊 気軽に', toastToneUpdated:'レビューのトーンを調整しました',
+    editReviewBtn:'✏️ 直接編集', editReviewSaveBtn:'✅ 編集を保存', toastEditSaved:'編集内容を保存しました',
+    translateLabel:'🌐 他の言語で見る', toastTranslated:(name)=>`${name}に翻訳しました`, toastTranslateFail:'翻訳に失敗しました。もう一度お試しください',
+    postedConfirmQuestion:'レビューを投稿されましたか？', postedConfirmBtn:'✅ はい、投稿しました', toastPostedThanks:'ご確認ありがとうございます！大切なレビューに心より感謝します 🙏',
     guideNote:'✏️ 作成したレビューをコピーして、GoogleまたはNaverのレビュー画面に貼り付けてください。院長先生や医院の写真を2〜3枚一緒に投稿していただくと、さらに効果的です！',
     thanksNote:'貴重なお時間を割いてレビューを残してくださり、心より感謝申し上げます 🙏 いただいたご意見に耳を傾け、今後さらにプレミアムな診療とサービスでお応えしてまいります。',
     eyebrowMotive:'来院のきっかけ', titleMotive:'来院のきっかけはありましたか？', descMotive:'当てはまるものをすべて選んでください（複数選択可）', tagMotive:'任意',
@@ -657,6 +709,10 @@ es: {
     referralLabel:'Recomendar esta clínica a un amigo', toastReferralCopy:'Enlace copiado · compártalo',
     referralShareText:(name)=>`Visité ${name} y la atención fue muy completa y buena. Vale la pena conocerla 🙂`,
     shareInfoHomepage:'🏠 Sitio web', shareInfoNaverMap:'📍 Mapa de Naver', shareInfoGoogle:'🔍 Enlace de Google', shareInfoPhone:'📞 Teléfono', shareInfoKakao:'💬 Canal de KakaoTalk',
+    toneLabel:'Ajustar el tono', toneShorter:'✂️ Más breve', toneLonger:'➕ Más extensa', tonePolite:'🙇 Más cortés', toneCasual:'😊 Más casual', toastToneUpdated:'Se actualizó el tono de la reseña',
+    editReviewBtn:'✏️ Editar manualmente', editReviewSaveBtn:'✅ Guardar cambios', toastEditSaved:'Se guardaron los cambios',
+    translateLabel:'🌐 Ver en otro idioma', toastTranslated:(name)=>`Traducido al ${name}`, toastTranslateFail:'Error al traducir. Inténtelo de nuevo',
+    postedConfirmQuestion:'¿Ya publicaste tu reseña?', postedConfirmBtn:'✅ Sí, la publiqué', toastPostedThanks:'¡Gracias por confirmarlo! Agradecemos mucho tu reseña 🙏',
     guideNote:'✏️ Copie su reseña y péguela en Google o Naver Reviews. ¡Subir 2–3 fotos del doctor o de la clínica hace que sea aún mejor!',
     thanksNote:'Muchas gracias por tomarse el tiempo de dejar su reseña 🙏 Valoramos mucho su opinión y la usaremos para seguir ofreciendo una atención y un servicio de nivel premium.',
     eyebrowMotive:'Motivo de la visita', titleMotive:'¿Qué le trajo a la clínica?', descMotive:'Seleccione todas las que correspondan (opción múltiple)', tagMotive:'Opcional',
@@ -953,6 +1009,13 @@ function initApp(){
   let flow = [];
   let stepIndex = 0;
   let generatedText = "";
+  let reviewLang = null;        // 현재 리뷰 본문이 작성된 언어 코드 (번역 후 UI 언어와 달라질 수 있음)
+  let isEditingReview = false;  // 사용자가 리뷰를 직접 수정 중인지 여부
+  // 아래 두 변수는 원래 renderPrintCard 근처에 있었으나, 브라우저 언어 자동감지로
+  // applyLanguage() → renderPrintCard()가 스크립트 로드 초반에 곧바로 호출될 수 있어
+  // (TDZ 오류로 전체 스크립트가 멈추는 것을 막기 위해) 최상단으로 이동함
+  let printCardRenderToken = 0;
+  let cachedQrImagePromise = null;
 
   const smileFill = document.getElementById('smileFill');
   const smileLabel = document.getElementById('smileLabel');
@@ -985,6 +1048,29 @@ function initApp(){
     goToStep('0');
     updateBackButtonVisibility();
   });
+
+  // 기기/브라우저 언어를 자동감지해 지원되는 언어면 언어선택 화면을 건너뛰고 바로 시작
+  // (QR을 스캔한 환자 휴대폰의 언어 설정을 그대로 활용 — 상단 🌐 버튼으로 언제든 변경 가능)
+  function detectBrowserLang(){
+    const supported = LANG_META.map(l=>l.code);
+    const candidates = (navigator.languages && navigator.languages.length)
+      ? navigator.languages : [navigator.language || navigator.userLanguage];
+    for(const raw of candidates){
+      if(!raw) continue;
+      const code = raw.toLowerCase().split('-')[0];
+      if(supported.includes(code)) return code;
+    }
+    return null;
+  }
+  const autoLang = detectBrowserLang();
+  if(autoLang){
+    LANG = autoLang;
+    langSwitchBtn.style.display = 'block';
+    langSwitchBtn.textContent = `🌐 ${T().ui.changeLanguage}`;
+    applyLanguage();
+    goToStep('0');
+    updateBackButtonVisibility();
+  }
 
   langSwitchBtn.addEventListener('click', ()=>{
     resultCard.classList.remove('active');
@@ -1035,6 +1121,16 @@ function initApp(){
     document.getElementById('txtLoading').textContent = t.ui.loadingText;
     document.getElementById('txtResultBadge').textContent = t.ui.resultBadge;
     document.getElementById('txtPlatformLabel').textContent = t.ui.platformLabel;
+    document.getElementById('txtToneLabel').textContent = t.ui.toneLabel;
+    document.getElementById('toneShorterBtn').textContent = t.ui.toneShorter;
+    document.getElementById('toneLongerBtn').textContent = t.ui.toneLonger;
+    document.getElementById('tonePoliteBtn').textContent = t.ui.tonePolite;
+    document.getElementById('toneCasualBtn').textContent = t.ui.toneCasual;
+    document.getElementById('editReviewBtn').textContent = isEditingReview ? t.ui.editReviewSaveBtn : t.ui.editReviewBtn;
+    document.getElementById('txtTranslateLabel').textContent = t.ui.translateLabel;
+    renderTranslateChips();
+    document.getElementById('txtPostedConfirmQuestion').textContent = t.ui.postedConfirmQuestion;
+    document.getElementById('postedConfirmBtn').textContent = t.ui.postedConfirmBtn;
     document.getElementById('googleBtn').textContent = t.ui.googleBtnLabel;
     document.getElementById('naverBtn').textContent = t.ui.naverBtnLabel;
     document.getElementById('txtPrivacyNote').textContent = t.ui.privacyNote;
@@ -1143,8 +1239,6 @@ function initApp(){
   // 환자 페이지 하단에도 동일한 QR 안내카드를 만들어 치과에서 별도로 활용할 수 있게 한다.
   // QR에 담기는 데이터(현재 페이지 URL)는 언어를 바꿔도 동일하므로, QR 이미지 자체는
   // 최초 1회만 불러와 캐싱해두고 언어 전환 시에는 텍스트만 다시 그린다.
-  let printCardRenderToken = 0;
-  let cachedQrImagePromise = null;
   function getQrImage(size){
     if(!cachedQrImagePromise){
       const qrDataUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&margin=6&data=${encodeURIComponent(window.location.href)}`;
@@ -1394,15 +1488,14 @@ function initApp(){
       return;
     }
     const name = currentStepName();
-    const isLastFlowStep = name === flow[flow.length-1];
     if(name === '1') mainBtn.disabled = state.visit.length===0;
-    else if(name === 'motive') mainBtn.disabled = false;
+    else if(name === 'motive'){ mainBtn.disabled = false; mainBtn.textContent = t.ui.btnNext; }
     else if(name === '2') mainBtn.disabled = state.category.length===0;
     else if(name === '3') mainBtn.disabled = state.treatment.length===0;
-    else if(name === 'concern') mainBtn.disabled = false;
-    else if(name === '4') mainBtn.disabled = state.experience.length===0;
-    else if(name === '5') mainBtn.disabled = false;
-    mainBtn.textContent = isLastFlowStep ? t.ui.btnMakeReview : t.ui.btnNext;
+    else if(name === 'concern'){ mainBtn.disabled = false; mainBtn.textContent = t.ui.btnNext; }
+    else if(name === '4'){ mainBtn.disabled = state.experience.length===0; mainBtn.textContent = t.ui.btnNext; }
+    else if(name === '5'){ mainBtn.disabled = false; mainBtn.textContent = t.ui.btnMakeReview; }
+    else mainBtn.textContent = t.ui.btnNext;
     const done = [state.visit.length>0, state.category.length>0, state.treatment.length>0, state.experience.length>0].filter(Boolean).length;
     setSmile(done/4, done===4 ? t.ui.smileReady : t.ui.smileProgress(done,4));
     updateBackButtonVisibility();
@@ -1410,7 +1503,7 @@ function initApp(){
 
   function nextStep(){
     if(state.method === 'manual'){ generatedText = document.getElementById('manualText').value.trim(); showResult(); return; }
-    if(currentStepName() === flow[flow.length-1]){ generateReview(); return; }
+    if(currentStepName() === '5'){ generateReview(); return; }
     stepIndex++;
     goToStep(currentStepName());
     refreshButton();
@@ -1584,9 +1677,18 @@ function initApp(){
 
   function showResult(){
     const t = T();
+    reviewLang = LANG; // 방금 생성된 리뷰는 현재 UI 언어로 작성됨
+    exitEditMode(false);
     resultText.textContent = generatedText;
     resultCard.classList.add('active');
     mainBtn.style.display = 'none';
+    document.getElementById('toneRow').style.display = state.method === 'ai' ? 'flex' : 'none';
+    document.getElementById('editRow').style.display = state.method === 'ai' ? 'flex' : 'none';
+    document.getElementById('translateRow').style.display = state.method === 'ai' ? 'flex' : 'none';
+    renderTranslateChips();
+    const postedConfirmEl = document.getElementById('postedConfirm');
+    postedConfirmEl.style.display = 'none';
+    postedConfirmEl.classList.remove('confirmed');
     if(NAVER_REVIEW_URL) document.getElementById('naverBtn').style.display = 'block';
     ghostBtn.style.display = 'block';
     ghostBtn.textContent = t.ui.btnRegenerate;
@@ -1600,21 +1702,152 @@ function initApp(){
     mainBtn.style.display = 'block';
     mainBtn.textContent = state.method === 'manual' ? T().ui.btnCheckReview : T().ui.btnMakeReview;
     if(state.method === 'manual') goToStep('manual');
-    else { const lastStep = flow[flow.length-1]; stepIndex = flow.indexOf(lastStep); goToStep(lastStep); generateReview(); }
+    else { stepIndex = flow.indexOf('5'); goToStep('5'); generateReview(); }
     updateBackButtonVisibility();
   });
+
+  // 직접 수정하기: AI가 만든 리뷰 문구를 사용자가 원하는 대로 바로 고칠 수 있게 함
+  function setEditingRowsDisabled(disabled){
+    ['toneRow','translateRow'].forEach(id=>{
+      const el = document.getElementById(id);
+      el.style.opacity = disabled ? '.45' : '1';
+      el.style.pointerEvents = disabled ? 'none' : 'auto';
+    });
+  }
+  function enterEditMode(){
+    isEditingReview = true;
+    const editEl = document.getElementById('resultTextEdit');
+    editEl.value = generatedText;
+    resultText.style.display = 'none';
+    editEl.style.display = 'block';
+    editEl.focus();
+    document.getElementById('editReviewBtn').textContent = T().ui.editReviewSaveBtn;
+    setEditingRowsDisabled(true);
+  }
+  function exitEditMode(save){
+    const editEl = document.getElementById('resultTextEdit');
+    if(save){
+      const edited = editEl.value.trim();
+      if(edited){ generatedText = edited; showToast(T().ui.toastEditSaved); }
+    }
+    isEditingReview = false;
+    resultText.textContent = generatedText;
+    resultText.style.display = 'block';
+    editEl.style.display = 'none';
+    document.getElementById('editReviewBtn').textContent = T().ui.editReviewBtn;
+    setEditingRowsDisabled(false);
+  }
+  document.getElementById('editReviewBtn').addEventListener('click', ()=>{
+    if(isEditingReview) exitEditMode(true);
+    else enterEditMode();
+  });
+
+  // 톤/분량 조절 칩: 이미 만들어진 리뷰를 같은 사실관계로 톤·분량만 바꿔 다시 작성
+  document.querySelectorAll('.tone-row .tone-chip').forEach(btn=>{
+    btn.addEventListener('click', ()=>regenerateTone(btn.dataset.tone));
+  });
+
+  async function regenerateTone(tone){
+    const t = T();
+    document.querySelectorAll('.tone-row .tone-chip').forEach(b=>b.classList.add('loading'));
+    try{
+      const res = await fetch('/api/generate-review', {
+        method:'POST',
+        headers:{ 'Content-Type':'application/json' },
+        body: JSON.stringify({
+          language: LANG_FULL_NAME[reviewLang || LANG],
+          tone,
+          previousText: generatedText
+        })
+      });
+      const data = await res.json();
+      if(data.text){
+        generatedText = data.text;
+        resultText.textContent = generatedText;
+        showToast(t.ui.toastToneUpdated);
+      } else {
+        showToast(t.ui.toastCopyFail);
+      }
+    }catch(err){
+      showToast(t.ui.toastCopyFail);
+    }
+    document.querySelectorAll('.tone-row .tone-chip').forEach(b=>b.classList.remove('loading'));
+  }
+
+  // 언어 변환 칩: 이미 작성된 리뷰를 다른 언어로 번역 (사실관계는 그대로 유지)
+  function renderTranslateChips(){
+    const box = document.getElementById('translateChips');
+    box.innerHTML = '';
+    LANG_META.forEach(l=>{
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'tone-chip';
+      btn.dataset.lang = l.code;
+      btn.textContent = `${l.flag} ${l.name}`;
+      if(l.code === reviewLang) btn.classList.add('active');
+      btn.addEventListener('click', ()=>{
+        if(l.code === reviewLang) return;
+        translateReview(l.code);
+      });
+      box.appendChild(btn);
+    });
+  }
+
+  async function translateReview(targetLangCode){
+    const t = T();
+    document.querySelectorAll('#translateChips .tone-chip').forEach(b=>b.classList.add('loading'));
+    try{
+      const res = await fetch('/api/generate-review', {
+        method:'POST',
+        headers:{ 'Content-Type':'application/json' },
+        body: JSON.stringify({
+          translateTo: LANG_FULL_NAME[targetLangCode],
+          previousText: generatedText
+        })
+      });
+      const data = await res.json();
+      if(data.text){
+        generatedText = data.text;
+        reviewLang = targetLangCode;
+        resultText.textContent = generatedText;
+        renderTranslateChips();
+        showToast(t.ui.toastTranslated(LANG_META.find(l=>l.code===targetLangCode).name));
+      } else {
+        showToast(t.ui.toastTranslateFail);
+      }
+    }catch(err){
+      showToast(t.ui.toastTranslateFail);
+    }
+    document.querySelectorAll('#translateChips .tone-chip').forEach(b=>b.classList.remove('loading'));
+  }
+
+  // "리뷰를 올리셨나요?" 게시 확인: 리뷰가 실제로 플랫폼에 게시됐는지 파악하기 위한 안내(개인정보 없음)
+  document.getElementById('postedConfirmBtn').addEventListener('click', ()=>{
+    const t = T();
+    const el = document.getElementById('postedConfirm');
+    el.classList.add('confirmed');
+    document.getElementById('txtPostedConfirmQuestion').textContent = t.ui.toastPostedThanks;
+    document.getElementById('postedConfirmBtn').style.display = 'none';
+    logPostedConfirmed();
+  });
+  function showPostedConfirm(){
+    if(state.method !== 'ai') return;
+    const el = document.getElementById('postedConfirm');
+    document.getElementById('postedConfirmBtn').style.display = 'inline-block';
+    el.style.display = 'block';
+  }
 
   function copyText(text){ return navigator.clipboard.writeText(text); }
 
   document.getElementById('googleBtn').addEventListener('click', ()=>{
     const finalText = state.method === 'manual' ? document.getElementById('manualText').value.trim() : generatedText;
     copyText(finalText).then(()=>{ showToast(T().ui.toastCopyGoogle); }).catch(()=>{ showToast(T().ui.toastCopyFail); });
-    setTimeout(()=>{ window.open(decodeURIComponent(GOOGLE_REVIEW_URL), '_blank'); }, 500);
+    setTimeout(()=>{ window.open(decodeURIComponent(GOOGLE_REVIEW_URL), '_blank'); showPostedConfirm(); }, 500);
   });
   document.getElementById('naverBtn').addEventListener('click', ()=>{
     const finalText = state.method === 'manual' ? document.getElementById('manualText').value.trim() : generatedText;
     copyText(finalText).then(()=>{ showToast(T().ui.toastCopyNaver); }).catch(()=>{ showToast(T().ui.toastCopyFail); });
-    setTimeout(()=>{ window.open(decodeURIComponent(NAVER_REVIEW_URL), '_blank'); }, 500);
+    setTimeout(()=>{ window.open(decodeURIComponent(NAVER_REVIEW_URL), '_blank'); showPostedConfirm(); }, 500);
   });
 
   // 작성 완료된 리뷰 본문 텍스트 가져오기
@@ -1689,14 +1922,32 @@ function initApp(){
         method:'POST',
         headers:{ 'Content-Type':'application/json' },
         body: JSON.stringify({
+          type: 'review_generated',
           clinicId: CLINIC_ID ? decodeURIComponent(CLINIC_ID) : decodeURIComponent(CLINIC_NAME),
           language: LANG,
           visit: state.visit,
           category: state.category,
           treatment: state.treatment,
           experienceRoles: [...new Set(state.experience.map(e=>e.role))],
+          experienceItems: state.experience.map(e => ({ role: e.role, id: e.id })),
           hasImprovement,
-          improvementCategories: state.improvements.map(i=>i.category)
+          improvementCategories: state.improvements.map(i=>i.category),
+          improvementItems: state.improvements.map(i => ({ category: i.category, id: i.id }))
+        })
+      }).catch(()=>{});
+    }catch(e){}
+  }
+
+  // 환자가 "리뷰를 올렸어요"를 눌렀을 때 — 실제 게시 전환율 집계용 (개인정보 없음)
+  function logPostedConfirmed(){
+    try{
+      fetch('/api/log-review', {
+        method:'POST',
+        headers:{ 'Content-Type':'application/json' },
+        body: JSON.stringify({
+          type: 'posted_confirmed',
+          clinicId: CLINIC_ID ? decodeURIComponent(CLINIC_ID) : decodeURIComponent(CLINIC_NAME),
+          language: LANG
         })
       }).catch(()=>{});
     }catch(e){}

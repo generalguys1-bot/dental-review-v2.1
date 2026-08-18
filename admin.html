@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>리뷰 대시보드</title>
+<link rel="stylesheet" as="style" crossorigin
+  href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<style>
+  :root{
+    --bg:#F3F6F4; --surface:#FFFFFF; --deep:#163832; --deep-light:#2C5D54;
+    --text:#1B2624; --muted:#5B6B67; --gold:#8F6A16; --gold-soft:#EADFC2;
+    --border:#E1E8E5; --radius:16px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:'Pretendard',-apple-system,BlinkMacSystemFont,sans-serif;
+    display:flex; justify-content:center; padding:32px 16px 60px;
+  }
+  .wrap{ width:100%; max-width:720px; }
+  .eyebrow{ font-size:12.5px; font-weight:700; color:var(--gold); letter-spacing:.03em; margin:0 0 6px; }
+  h1{ font-size:24px; font-weight:800; color:var(--deep); margin:0 0 6px; }
+  .sub{ font-size:14px; color:var(--muted); margin:0 0 22px; line-height:1.6; }
+  .lookup-card{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:16px; margin-bottom:18px; display:flex; gap:8px; }
+  .lookup-card input{ flex:1; border:1.5px solid var(--border); border-radius:10px; padding:11px 12px; font-size:14px; font-family:inherit; }
+  .lookup-card input:focus{ outline:none; border-color:var(--deep-light); }
+  .lookup-card button{ border:none; border-radius:10px; background:var(--deep); color:#fff; font-weight:700; font-size:14px; padding:0 18px; cursor:pointer; font-family:inherit; }
+  .summary-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:20px; }
+  .summary-card{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:16px 14px; text-align:center; }
+  .summary-num{ font-size:24px; font-weight:800; color:var(--deep); line-height:1.2; }
+  .summary-label{ font-size:12px; color:var(--muted); margin-top:4px; }
+  .section{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:18px; margin-bottom:16px; }
+  .section-title{ font-size:15px; font-weight:800; color:var(--deep); margin:0 0 3px; }
+  .section-sub{ font-size:12.5px; color:var(--muted); margin:0 0 14px; }
+  .bar-item{ margin-bottom:10px; }
+  .bar-item:last-child{ margin-bottom:0; }
+  .bar-item-top{ display:flex; justify-content:space-between; align-items:baseline; font-size:13.5px; margin-bottom:4px; }
+  .bar-item-label{ color:var(--text); font-weight:600; }
+  .bar-item-count{ color:var(--muted); font-weight:700; font-size:12.5px; }
+  .bar-track{ height:8px; border-radius:999px; background:var(--bg); overflow:hidden; }
+  .bar-fill{ height:100%; border-radius:999px; background:var(--gold); }
+  .bar-fill.improvement{ background:#C97B4A; }
+  .empty{ font-size:13.5px; color:var(--muted); text-align:center; padding:16px 0; }
+  .state-msg{ text-align:center; padding:40px 16px; color:var(--muted); font-size:14px; }
+  .state-msg.error{ color:#B3462C; }
+  a.reload{ display:inline-block; margin-top:10px; font-size:13px; font-weight:700; color:var(--deep-light); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow">📊 Admin Dashboard</p>
+  <h1>리뷰 대시보드</h1>
+  <p class="sub">담당자별 칭찬 · 개선사항 · 게시 확인율을 한눈에 볼 수 있어요. 리뷰 원문이나 환자 개인정보는 이 화면에도 표시되지 않습니다.</p>
+
+  <div class="lookup-card">
+    <input type="text" id="clinicIdInput" placeholder="병원 식별자(clinicId)를 입력하세요">
+    <button id="loadBtn">조회</button>
+  </div>
+
+  <div id="content"></div>
+</div>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+const adminKey = params.get('key') || '';
+const initialClinicId = params.get('clinicId') || params.get('cid') || '';
+
+const contentEl = document.getElementById('content');
+const inputEl = document.getElementById('clinicIdInput');
+inputEl.value = initialClinicId;
+
+document.getElementById('loadBtn').addEventListener('click', () => {
+  const id = inputEl.value.trim();
+  if (!id) return;
+  const url = new URL(window.location.href);
+  url.searchParams.set('clinicId', id);
+  window.location.href = url.toString();
+});
+inputEl.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') document.getElementById('loadBtn').click();
+});
+
+function escapeHtml(str){
+  return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function renderBarList(items, opts={}){
+  if (!items.length) return `<p class="empty">아직 데이터가 없어요.</p>`;
+  const max = Math.max(...items.map(i => i.count), 1);
+  const fillClass = opts.improvement ? 'bar-fill improvement' : 'bar-fill';
+  return items.slice(0, opts.limit || items.length).map(i => `
+    <div class="bar-item">
+      <div class="bar-item-top">
+        <span class="bar-item-label">${escapeHtml(i.label)}</span>
+        <span class="bar-item-count">${i.count}회</span>
+      </div>
+      <div class="bar-track"><div class="${fillClass}" style="width:${Math.max(4, Math.round((i.count / max) * 100))}%"></div></div>
+    </div>
+  `).join('');
+}
+
+async function loadStats(clinicId){
+  contentEl.innerHTML = `<p class="state-msg">불러오는 중...</p>`;
+  try{
+    const qs = new URLSearchParams({ clinicId });
+    if (adminKey) qs.set('key', adminKey);
+    const res = await fetch(`/api/get-stats?${qs.toString()}`);
+    const data = await res.json();
+
+    if (!res.ok) {
+      let msg = '데이터를 불러오지 못했어요.';
+      if (data.error === 'unauthorized') msg = '접근 권한이 없어요. 올바른 key 파라미터로 다시 접속해주세요.';
+      if (data.error === 'redis_not_configured') msg = 'Redis(Upstash)가 아직 연결되어 있지 않아요. Vercel 프로젝트의 Storage 탭에서 연결해주세요.';
+      contentEl.innerHTML = `<p class="state-msg error">${escapeHtml(msg)}</p>`;
+      return;
+    }
+
+    contentEl.innerHTML = `
+      <div class="summary-grid">
+        <div class="summary-card">
+          <div class="summary-num">${data.totalReviews}</div>
+          <div class="summary-label">AI 리뷰 생성 수</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-num">${data.withImprovement}</div>
+          <div class="summary-label">개선사항 포함 리뷰</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-num">${data.postedConfirmRate}%</div>
+          <div class="summary-label">게시 확인율</div>
+        </div>
+      </div>
+
+      <div class="section">
+        <p class="section-title">🙌 담당자별 칭찬 순위</p>
+        <p class="section-sub">역할별로 얼마나 자주 좋았던 점으로 선택됐는지예요.</p>
+        ${renderBarList(data.roles)}
+      </div>
+
+      <div class="section">
+        <p class="section-title">⭐ 가장 많이 칭찬받은 항목 TOP 10</p>
+        <p class="section-sub">담당자 · 구체적으로 좋았던 점 조합이에요.</p>
+        ${renderBarList(data.items, { limit: 10 })}
+      </div>
+
+      <div class="section">
+        <p class="section-title">🛠️ 개선사항 집계</p>
+        <p class="section-sub">환자들이 아쉬웠다고 표시한 항목이에요. 리뷰 원문은 저장되지 않아요.</p>
+        ${renderBarList(data.improvements, { improvement: true })}
+      </div>
+    `;
+  }catch(err){
+    contentEl.innerHTML = `<p class="state-msg error">데이터를 불러오는 중 오류가 발생했어요.<br><a class="reload" href="javascript:location.reload()">다시 시도</a></p>`;
+  }
+}
+
+if (initialClinicId) {
+  loadStats(initialClinicId);
+} else {
+  contentEl.innerHTML = `<p class="state-msg">위에 병원 식별자(clinicId)를 입력하고 조회를 눌러주세요.<br>보통 setup.html에서 등록한 cid 값과 같아요.</p>`;
+}
+</script>
+</body>
+</html>
