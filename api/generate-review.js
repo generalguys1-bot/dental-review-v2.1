@@ -49,47 +49,14 @@ export default async function handler(req, res) {
   const {
     clinicName, language, visit, category, treatment,
     experience, improvements, additionalNote, region,
-    motive, concern, priority, hesitation,
-    tone, previousText
+    motive, concern, priority, hesitation
   } = req.body || {};
 
+  if (!clinicName || !visit || !treatment || !Array.isArray(experience) || experience.length === 0) {
+    return res.status(400).json({ error: 'Missing required fields' });
+  }
+
   const targetLanguage = language || 'Korean';
-
-  // 톤 재작성 모드: 이미 만들어진 리뷰의 사실관계는 그대로 두고 톤(길이/격식/친근함)만 다시 씀
-  const TONE_INSTRUCTIONS = {
-    shorter: 'Make it noticeably shorter and more concise (about 2-3 sentences), keeping only the key points.',
-    polite: 'Make the tone more polite, warm, and formal, while staying natural and not stiff.',
-    casual: 'Make the tone more casual, friendly, and conversational, like talking to a friend — still respectful.'
-  };
-
-  let prompt;
-
-  if (previousText && tone) {
-    const instruction = TONE_INSTRUCTIONS[tone];
-    if (!instruction) {
-      return res.status(400).json({ error: 'Invalid tone' });
-    }
-    prompt = `You are helping a real dental patient revise the tone of their own Google review.
-
-IMPORTANT: Write the entire revised review ONLY in ${targetLanguage}. Do not include any other language, translation, or commentary — output only the revised review text itself.
-
-Original review:
-"""
-${previousText}
-"""
-
-Revise it as follows: ${instruction}
-- Do not add any new facts, names, or claims that weren't already in the original review
-- Keep it written like a genuine, understated first-person patient review — never like an advertisement
-- No emojis, no markdown, no quotation marks, no star ratings — output only the review body text
-
-[Medical advertising compliance guardrails — must still follow]
-- Never use absolute or guaranteed claims about medical outcomes
-- Never generate any personally identifying information (real name, birth date, phone number, etc.)`;
-  } else {
-    if (!clinicName || !visit || !treatment || !Array.isArray(experience) || experience.length === 0) {
-      return res.status(400).json({ error: 'Missing required fields' });
-    }
 
   // 지역/키워드는 선택 입력이며, 억지로 반복 삽입하지 않고 자연스러울 때만
   // 한 번 언급되도록 유도한다 (리뷰 품질과 플랫폼 정책 준수가 우선).
@@ -160,7 +127,6 @@ Requirements:
 - Never generate any personally identifying information (real name, birth date, phone number, etc.)
 - Never stuff or repeat location/keyword phrases — a genuine patient mentions their area naturally at most once, if at all
 - The review must read like a genuine, understated personal account from a patient — never like an advertisement written by the clinic`;
-  }
 
   try {
     const response = await fetch('https://api.anthropic.com/v1/messages', {
