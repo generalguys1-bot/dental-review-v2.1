@@ -193,6 +193,7 @@ Requirements:
       body: JSON.stringify({
         model: 'claude-sonnet-5',
         max_tokens: 1000,
+        thinking: { type: 'disabled' }, // 단순 텍스트 생성이라 thinking 불필요 + max_tokens를 리뷰 본문에 온전히 사용
         messages: [{ role: 'user', content: prompt }]
       })
     });
