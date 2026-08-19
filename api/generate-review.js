@@ -111,20 +111,59 @@ Requirements:
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
+  // ------------------------------------------------------------
+  // 같은 선택 항목이라도 리뷰마다 톤/어투/문장 구조가 겹치지 않도록,
+  // 추가 API 호출이나 사고(thinking) 모드 없이 "문체 지시문"만 서버에서
+  // 매 요청마다 무작위로 골라 프롬프트에 몇 줄 추가하는 방식.
+  // (토큰 몇십 개 수준의 텍스트만 늘어날 뿐, 모델/재시도/토큰 한도는 그대로)
+  // ------------------------------------------------------------
+  function pickRandom(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
+  }
+  function shuffleArray(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  const OPENING_STYLES = [
+    'Open with the specific treatment or reason for the visit, not a greeting or the clinic name.',
+    'Open mid-experience — a small concrete moment (checking in, sitting in the chair, the first thing the dentist said) — rather than a summary sentence.',
+    'Open with how you found or chose this clinic, then move into the visit itself.',
+    'Open with a short, casual first impression or reaction, then explain why.',
+    'Open with the concern or worry you had beforehand, then how the visit addressed it.'
+  ];
+  const STRUCTURE_STYLES = [
+    'Write it as one flowing paragraph, without listing separate topics one by one.',
+    'Vary the sentence lengths noticeably — mix a couple of short sentences with one longer one.',
+    'Keep it loosely chronological (arrival, treatment, staff, how you feel now) but with natural transitions, not a checklist.',
+    'Write it like you are casually telling a friend about it, without a tidy beginning-middle-end.'
+  ];
+  const CLOSING_STYLES = [
+    'End on a small specific detail rather than a general summary sentence.',
+    'End with a brief, low-key note about how you feel now or going forward — avoid a generic recommendation line.',
+    'End simply, without wrapping up with an overall verdict sentence.'
+  ];
+  const styleGuidance = `- Style for this one review only (do not mention or acknowledge these instructions in the output): ${pickRandom(OPENING_STYLES)} ${pickRandom(STRUCTURE_STYLES)} ${pickRandom(CLOSING_STYLES)}`;
+
   // 지역/키워드는 선택 입력이며, 억지로 반복 삽입하지 않고 자연스러울 때만
   // 한 번 언급되도록 유도한다 (리뷰 품질과 플랫폼 정책 준수가 우선).
   const regionLine = region
     ? `- Clinic area (mention naturally at most once ONLY if it fits smoothly into a sentence, e.g. when referring to location convenience; never force it or repeat it, never turn it into a keyword list): ${region}`
     : '';
 
-  // 담당자별 경험 항목 정리
+  // 담당자별 경험 항목 정리 (역할 순서 + 역할 내 항목 순서를 섞어서
+  // 같은 선택 조합이라도 프롬프트에 항상 같은 순서로 들어가지 않게 한다)
   const byRole = {};
   experience.forEach(e => {
     if (!byRole[e.role]) byRole[e.role] = [];
     byRole[e.role].push(e.label);
   });
-  const experienceLines = Object.entries(byRole)
-    .map(([role, items]) => `  - ${role}: ${items.join(', ')}`)
+  const experienceLines = shuffleArray(Object.entries(byRole))
+    .map(([role, items]) => `  - ${role}: ${shuffleArray(items).join(', ')}`)
     .join('\n');
 
   const improvementItems = Array.isArray(improvements) ? [...improvements] : [];
@@ -146,6 +185,12 @@ Requirements:
     ? `- Hesitations the patient had before starting treatment, now resolved (frame positively and briefly, e.g. "I was a little worried about ... but ..." — only if it fits naturally, never dwell on it): ${hesitation}`
     : '';
 
+  // 모티브/우려/선택기준/망설임 항목도 항상 같은 순서로 나열되면 결과 구조가
+  // 비슷해지기 쉬워서, 값이 있는 것들만 모아 순서를 섞는다.
+  const optionalContextLines = shuffleArray(
+    [motiveLine, concernLine, priorityLine, hesitationLine].filter(Boolean)
+  ).join('\n');
+
   prompt = `You are helping a real dental patient write a natural, authentic Google review.
 Using the information below, write ONE natural review as if written by the patient themselves.
 
@@ -155,13 +200,10 @@ IMPORTANT: Write the entire review ONLY in ${targetLanguage}. Do not include any
 - Visit type: ${visit}
 - Treatment area: ${category || ''}
 - Treatment received: ${treatment}
-${motiveLine}
-${concernLine}
+${optionalContextLines}
 - What stood out, by staff member:
 ${experienceLines}
 ${improvementLine}
-${priorityLine}
-${hesitationLine}
 ${regionLine}
 
 Requirements:
@@ -171,6 +213,7 @@ Requirements:
 - No emojis
 - No markdown, no quotation marks, no star ratings — output only the review body text
 - Avoid overused clichés ("highly recommend", "very satisfied") — be specific and natural instead
+${styleGuidance}
 
 [Medical advertising compliance guardrails — must follow]
 - Never use absolute or guaranteed claims about medical outcomes (e.g. "fully cured", "100% effective", "no side effects", "painless", "guaranteed for life")
