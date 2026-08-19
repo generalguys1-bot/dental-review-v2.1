@@ -75,7 +75,7 @@
 
   <div class="card">
     <label>치과 이름</label>
-    <input type="text" id="clinicName" placeholder="예: 스마일라인치과">
+    <input type="text" id="clinicName" placeholder="예: 밝은미소치과">
 
     <label style="margin-top:18px;">구글 리뷰 작성 링크</label>
     <input type="text" id="googleUrl" placeholder="https://search.google.com/local/writereview?placeid=...">
@@ -178,6 +178,11 @@
       &nbsp;&nbsp;• <code>ADMIN_WEBHOOK_URL__병원식별자</code> = Slack/카카오워크 Webhook 주소 (부정 피드백 알림용)<br>
       &nbsp;&nbsp;• <code>STATS_WEBHOOK_URL__병원식별자</code> = 통계를 쌓을 Webhook 주소 (Google Sheets 등)<br>
       3) 병원식별자에 특수문자가 있으면 영문/숫자만 남기고 대문자로 변환해서 등록하세요 (예: <code>bright-smile</code> → <code>ADMIN_WEBHOOK_URL__BRIGHT_SMILE</code>)
+    </div>
+    <div class="info-box" style="margin-top:10px;">
+      📊 <b>담당자별 칭찬 순위 대시보드</b>도 볼 수 있어요 (별도 웹훅 설정 없이, 짧은 링크 기능과 같은 Redis만 연결돼 있으면 자동으로 쌓여요).<br><br>
+      <code>admin.html?clinicId=병원식별자</code> 로 접속하면 담당자별 칭찬 순위 · 자주 나온 개선사항 · 리뷰 게시 확인율을 볼 수 있어요.<br><br>
+      운영진만 볼 수 있게 하려면 Vercel 환경변수에 <code>ADMIN_DASHBOARD_KEY</code>를 하나 정해 등록하고, <code>admin.html?clinicId=병원식별자&key=정한값</code> 형태의 링크를 북마크해서 쓰세요.
     </div>
     <label style="margin-top:18px;">병원 식별자 <span style="font-weight:500;color:var(--muted);">(선택)</span></label>
     <input type="text" id="clinicId" placeholder="예: bright-smile">
