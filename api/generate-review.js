@@ -182,73 +182,29 @@ Requirements:
 - The review must read like a genuine, understated personal account from a patient — never like an advertisement written by the clinic`;
   }
 
-  // 여러 치과가 동시에 몰릴 때 Anthropic 쪽 순간 혼잡(429 rate_limit_error,
-  // 529 overloaded_error)으로 실패하는 경우가 있어, 이 두 상태코드에 한해서만
-  // 짧은 대기 후 자동 재시도한다. 그 외 에러(400/401 등)는 재시도해도 어차피
-  // 실패하므로 즉시 반환한다.
-  const RETRYABLE_STATUS = new Set([429, 529]);
-  const MAX_ATTEMPTS = 3;          // 최초 시도 1회 + 재시도 2회
-  const BACKOFF_MS = [500, 1500];  // 재시도 간 대기 시간 (지수적으로 증가)
-
-  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
-
-  async function callAnthropic() {
-    let lastErr = null;
-
-    for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
-      let response;
-      try {
-        response = await fetch('https://api.anthropic.com/v1/messages', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': process.env.ANTHROPIC_API_KEY,
-            'anthropic-version': '2023-06-01'
-          },
-          body: JSON.stringify({
-            model: 'claude-sonnet-5',
-            max_tokens: 1000,
-            messages: [{ role: 'user', content: prompt }]
-          })
-        });
-      } catch (networkErr) {
-        // 네트워크 자체 실패는 재시도 대상이 아님 (즉시 상위 catch로)
-        throw networkErr;
-      }
-
-      if (response.ok) {
-        return { ok: true, data: await response.json() };
-      }
-
-      const errBody = await response.text();
-      console.error(`Anthropic API error (attempt ${attempt + 1}/${MAX_ATTEMPTS}):`, response.status, errBody);
-      lastErr = { status: response.status, body: errBody };
-
-      const canRetry = RETRYABLE_STATUS.has(response.status) && attempt < MAX_ATTEMPTS - 1;
-      if (!canRetry) break;
-
-      await sleep(BACKOFF_MS[attempt]);
-    }
-
-    return { ok: false, error: lastErr };
-  }
-
   try {
-    const result = await callAnthropic();
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': process.env.ANTHROPIC_API_KEY,
+        'anthropic-version': '2023-06-01'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-5',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
 
-    if (!result.ok) {
-      const status = result.error?.status;
-      if (RETRYABLE_STATUS.has(status)) {
-        // 재시도까지 했는데도 계속 혼잡한 경우: 사용자에게 원인을 명확히 안내
-        return res.status(503).json({
-          error: 'upstream_busy',
-          text: '지금 많은 분들이 동시에 이용 중이에요. 잠시 후 다시 시도해주세요.'
-        });
-      }
+    if (!response.ok) {
+      const errBody = await response.text();
+      console.error('Anthropic API error:', response.status, errBody);
       return res.status(502).json({ error: 'upstream_error' });
     }
 
-    const text = (result.data.content || [])
+    const data = await response.json();
+    const text = (data.content || [])
       .map(block => block.text || '')
       .join('')
       .trim();
