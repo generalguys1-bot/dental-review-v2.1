@@ -146,7 +146,7 @@ Requirements:
     ? `- Hesitations the patient had before starting treatment, now resolved (frame positively and briefly, e.g. "I was a little worried about ... but ..." — only if it fits naturally, never dwell on it): ${hesitation}`
     : '';
 
-  const prompt = `You are helping a real dental patient write a natural, authentic Google review.
+  prompt = `You are helping a real dental patient write a natural, authentic Google review.
 Using the information below, write ONE natural review as if written by the patient themselves.
 
 IMPORTANT: Write the entire review ONLY in ${targetLanguage}. Do not include any other language, translation, or commentary — output only the review text itself, in ${targetLanguage}.
