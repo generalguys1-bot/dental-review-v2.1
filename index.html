@@ -1108,9 +1108,9 @@ function initApp(){
     document.getElementById('txtEyebrow4').textContent = t.ui.eyebrow4;
     document.getElementById('txtTitle4').textContent = t.ui.title4;
     document.getElementById('txtDesc4').textContent = t.ui.desc4;
-    document.getElementById('txtEyebrow5').innerHTML = `${BLANCHE_MODE ? t.ui.eyebrow5Blanche : t.ui.eyebrow5} <span class="step-optional-tag">${t.ui.tag5}</span>`;
-    document.getElementById('txtTitle5').textContent = BLANCHE_MODE ? t.ui.title5Blanche : t.ui.title5;
-    document.getElementById('txtDesc5').textContent = BLANCHE_MODE ? t.ui.desc5Blanche : t.ui.desc5;
+    document.getElementById('txtEyebrow5').innerHTML = `${t.ui.eyebrow5Blanche} <span class="step-optional-tag">${t.ui.tag5}</span>`;
+    document.getElementById('txtTitle5').textContent = t.ui.title5Blanche;
+    document.getElementById('txtDesc5').textContent = t.ui.desc5Blanche;
     document.getElementById('txtPriorityHeader').textContent = t.ui.priorityHeader;
     document.getElementById('txtHesitationHeader').textContent = t.ui.hesitationHeader;
     document.getElementById('txtNoteLabel').textContent = t.ui.noteLabel;
@@ -1421,9 +1421,9 @@ function initApp(){
     const box = document.getElementById('improvementGroups');
     box.innerHTML = '';
     const t = T();
-    // 블랑쉬치과 링크에서는 개선사항(아쉬운점) 항목 목록만 비운다.
+    // 모든 병원 링크에서 개선사항(아쉬운점: 대기/예약, 비용/안내, 시설/환경, 설명/소통) 항목 목록을 비운다.
     // 단계 자체와 병원 선택 중요도/망설임 이유/추가 의견 입력란은 그대로 유지된다.
-    if(BLANCHE_MODE) return;
+    return;
     IMPROVEMENT_CATEGORY_ORDER.forEach(cat=>{
       const wrap = document.createElement('div');
       wrap.className = 'role-group';
